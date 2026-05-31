@@ -7,6 +7,7 @@ import ArchiveModal from '../components/ui/ArchiveModal'
 import { events } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
+import Masonry from '../components/sections/Masonry'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -59,26 +60,28 @@ export default function HomePage() {
         </SectionWrapper>
 
         {/* ── 2. Philosophy (Architectural Grid) ── */}
-        <SectionWrapper>
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-20 md:py-32">
           <ArchitecturalGrid showHorizontal={true} />
           <div className="absolute top-1/2 left-1/2 w-[1px] h-4 bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
           <div className="absolute top-1/2 left-1/2 w-4 h-[1px] bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
 
-          <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 relative z-10">
-            <div className="relative pr-0 lg:pr-20 flex flex-col justify-center pb-16 lg:pb-0 z-20">
-              <motion.div
-                className="relative overflow-hidden aspect-[4/5] max-w-md w-full ml-auto glass-panel border border-white/5 shadow-[0_0_60px_rgba(0,0,0,0.8)]"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.85, ease: 'easeOut' }}
-              >
-                <motion.img
-                  alt="Dramatic spotlight on empty stage"
-                  className="w-full h-full object-cover mix-blend-luminosity opacity-80"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKLcZnxXtiUpym29nbZcmcGIRFzPBzTboLmcn70G0q-i7-76jQg8VyHbtyQ0IysutbAlW2RGS0Yj47hopUhV3mj-Y7pQv8rapayb-e2C7V46W5h1XoBaMVTQUsliV4qgUUHehJ9Owtkx_lTMEn6dUthO2kE-A5yszgD0wkQKwXlyNSme9b3UyQdUKvwI88OzpY3OhKkc8N5xM2xrMWYVLe0azNdv23MrQwLqjkKTN5EQRNs6rtXJbzs82rorTDhpTeYhzoOu7Mtp0"
-                />
-              </motion.div>
+          <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 relative z-10 gap-12 lg:gap-0">
+            <div className="relative pr-0 lg:pr-20 w-full max-w-md mx-auto lg:ml-auto pb-6 lg:pb-0 z-20">
+              <Masonry
+                items={[
+                  {
+                    id: 'philosophy-img',
+                    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKLcZnxXtiUpym29nbZcmcGIRFzPBzTboLmcn70G0q-i7-76jQg8VyHbtyQ0IysutbAlW2RGS0Yj47hopUhV3mj-Y7pQv8rapayb-e2C7V46W5h1XoBaMVTQUsliV4qgUUHehJ9Owtkx_lTMEn6dUthO2kE-A5yszgD0wkQKwXlyNSme9b3UyQdUKvwI88OzpY3OhKkc8N5xM2xrMWYVLe0azNdv23MrQwLqjkKTN5EQRNs6rtXJbzs82rorTDhpTeYhzoOu7Mtp0',
+                    colSpan: 5
+                  }
+                ]}
+                stagger={0}
+                animateFrom="bottom"
+                scaleOnHover={true}
+                hoverScale={0.97}
+                blurToFocus={true}
+                colorShiftOnHover={false}
+              />
             </div>
 
             <div className="relative pl-0 lg:pl-20 flex flex-col justify-center gap-6 lg:gap-8 z-20">
