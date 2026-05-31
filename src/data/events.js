@@ -1,0 +1,97 @@
+export const events = [
+  {
+    id: '1',
+    img: 'https://picsum.photos/id/1025/800/1100?grayscale',
+    title: 'Digital Sovereignty',
+    subtitle: 'Debating control of identity beyond borders.',
+    date: 'Mar 14, 2024',
+    synopsis: 'A heated debate on data ownership, jurisdiction, and the new ethics of online citizenship.',
+    winner: 'House of Logic',
+    location: 'The Global Forum',
+    height: 520,
+    colSpan: 2
+  },
+  {
+    id: '2',
+    img: 'https://picsum.photos/id/1035/800/900?grayscale',
+    title: 'The Death of Privacy',
+    subtitle: 'A case study on surveillance and consent.',
+    date: 'Apr 2, 2024',
+    synopsis: 'Participants examined the shifting boundaries between public record and personal sanctuary.',
+    winner: 'Coalition for Transparency',
+    location: 'Chamber 7',
+    height: 360,
+    colSpan: 3
+  },
+  {
+    id: '3',
+    img: 'https://picsum.photos/id/1005/800/1150?grayscale',
+    title: 'Chaos Theory',
+    subtitle: 'When rhetoric changes the course of events.',
+    date: 'May 18, 2024',
+    synopsis: 'A retrospective on how moving the right argument at the right time reshaped an entire season.',
+    winner: 'Team Catalyst',
+    location: 'Main Hall',
+    height: 520,
+    colSpan: 3
+  },
+  {
+    id: '4',
+    img: 'https://picsum.photos/id/1041/800/850?grayscale',
+    title: 'Parallel Realities',
+    subtitle: 'Exploring contested truths and narrative frameworks.',
+    date: 'Oct 26, 2024',
+    synopsis: 'The society probed how parallel narratives collide and whether truth can still be negotiated.',
+    winner: 'House of Logic',
+    location: 'The Grand Forum',
+    height: 300,
+    colSpan: 1
+  },
+  {
+    id: '5',
+    img: 'https://picsum.photos/id/1031/800/950?grayscale',
+    title: 'The Art of Disruption',
+    subtitle: 'A strategy session on interrupting convention.',
+    date: 'Jun 8, 2024',
+    synopsis: 'A debate on disruption as a rhetorical tool in modern advocacy.',
+    winner: 'Narrative Vanguard',
+    location: 'Studio 3',
+    height: 380,
+    colSpan: 1
+  },
+  {
+    id: '6',
+    img: 'https://picsum.photos/id/1071/800/1050?grayscale',
+    title: 'State of the Stage',
+    subtitle: 'The future of public discourse in a fractured world.',
+    date: 'Aug 21, 2024',
+    synopsis: 'Leaders assessed the ecosystem of debate and the resilience of public forums.',
+    winner: 'Agora Collective',
+    location: 'Second Gallery',
+    height: 460,
+    colSpan: 1
+  },
+  {
+    id: '7',
+    img: 'https://picsum.photos/id/1083/800/900?grayscale',
+    title: 'Tactical Empathy',
+    subtitle: 'Negotiating with intent and feeling.',
+    date: 'Sep 12, 2024',
+    synopsis: 'A masterclass in using empathy to frame arguments without surrendering strength.',
+    winner: 'House of Logic',
+    location: 'Hall B',
+    height: 340,
+    colSpan: 3
+  },
+  {
+    id: '8',
+    img: 'https://picsum.photos/id/1059/800/980?grayscale',
+    title: 'Rhetorical Architecture',
+    subtitle: 'Designing persuasion for the next era.',
+    date: 'Nov 3, 2024',
+    synopsis: 'A workshop on crafting structures that carry ideas beyond the room.',
+    winner: 'Silent Partners',
+    location: 'Main Hall',
+    height: 500
+  }
+];
