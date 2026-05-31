@@ -121,8 +121,8 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D]"
-                  style={{ width: "500px", height: "500px" }}>
+                  className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D] w-full max-w-[500px] aspect-square md:w-[500px] md:h-[500px]"
+                >
                   <img src={event.img} alt={event.title} className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
                   <div className="absolute inset-0 p-8 flex flex-col justify-end text-left z-10">
