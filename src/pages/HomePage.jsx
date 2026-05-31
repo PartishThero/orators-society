@@ -81,15 +81,15 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            <div className="relative pl-0 lg:pl-20 flex flex-col justify-center z-20">
-              <div className="pb-8 lg:pb-12 flex flex-col justify-end h-1/2">
-                <span className="font-label-caps text-[10px] text-white/90 uppercase tracking-[0.4em] block mb-6">OUR PHILOSOPHY</span>
+            <div className="relative pl-0 lg:pl-20 flex flex-col justify-center gap-6 lg:gap-8 z-20">
+              <div className="pb-4 lg:pb-6 flex flex-col justify-end">
+                <span className="font-label-caps text-[10px] text-white/90 uppercase tracking-[0.4em] block mb-4 lg:mb-6">OUR PHILOSOPHY</span>
                 <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,4vw,4.5rem)] leading-[1] uppercase text-white tracking-tighter">
                   THE ART OF<br/>
                   <em className="italic text-primary tracking-normal">UNSPOKEN</em>
                 </h2>
               </div>
-              <div className="pt-8 lg:pt-12 flex flex-col justify-start h-1/2">
+              <div className="pt-4 lg:pt-6 flex flex-col justify-start">
                 <p className="font-body-md text-[1rem] md:text-[1.1rem] leading-relaxed text-white/70 max-w-md">
                   We are a collective of thinkers, disruptors, and orators dedicated to the craft of persuasive dialogue. In an era of noise, we prioritize the resonance of carefully constructed arguments.
                 </p>

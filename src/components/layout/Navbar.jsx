@@ -76,24 +76,12 @@ export default function Navbar() {
             {/* Hamburger Button for Mobile */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex md:hidden flex-col justify-center items-center gap-1.5 w-10 h-10 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm focus:outline-none"
+              className="flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors pointer-events-auto z-50 focus:outline-none"
               aria-label="Toggle Menu"
             >
-              <motion.span
-                animate={isOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="w-5 h-[1.5px] bg-white block"
-              />
-              <motion.span
-                animate={isOpen ? { opacity: 0 } : { opacity: 1 }}
-                transition={{ duration: 0.2 }}
-                className="w-5 h-[1.5px] bg-white block"
-              />
-              <motion.span
-                animate={isOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="w-5 h-[1.5px] bg-white block"
-              />
+              <span className="material-symbols-outlined text-white text-[24px]">
+                {isOpen ? 'close' : 'menu'}
+              </span>
             </button>
           </div>
         </GlassSurface>
@@ -103,10 +91,10 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
             className="w-[90%] max-w-7xl mt-2 overflow-hidden pointer-events-auto md:hidden"
           >
             <div className="glass-panel rounded-3xl p-6 border border-white/5 flex flex-col gap-4">

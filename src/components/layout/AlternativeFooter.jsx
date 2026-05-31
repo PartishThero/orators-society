@@ -19,10 +19,10 @@ export default function AlternativeFooter() {
           style={{ borderRadius: '40px' }}
           className="w-full bg-[#0E1117]/35 border border-white/5 shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
         >
-          <div className="w-full grid grid-cols-1 lg:grid-cols-2 p-12 md:p-16 gap-16">
+          <div className="w-full grid grid-cols-1 lg:grid-cols-2 p-6 sm:p-10 md:p-16 gap-12 lg:gap-16">
 
             {/* Left Column */}
-            <div className="flex flex-col justify-between gap-12">
+            <div className="flex flex-col justify-between gap-8 md:gap-12">
               {/* Top Left: Let's create together */}
               <div>
                 <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,5rem)] leading-[0.95] text-white uppercase tracking-tighter">
@@ -46,9 +46,9 @@ export default function AlternativeFooter() {
             </div>
 
             {/* Right Column */}
-            <div className="flex flex-col gap-12 justify-between">
+            <div className="flex flex-col gap-8 md:gap-12 justify-between">
               {/* Top Right: Socials */}
-              <div className="flex flex-wrap justify-end gap-8 items-center border-b border-white/5 pb-8">
+              <div className="flex flex-wrap justify-start lg:justify-end gap-6 lg:gap-8 items-center border-b border-white/5 pb-8">
                 <span className="font-label-caps text-[11px] tracking-[0.2em] text-white/40 uppercase mr-4">
                   CONNECT WITH US:
                 </span>
