@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
@@ -153,11 +154,11 @@ export default function HomePage() {
               ))}
             </div>
 
-            <a href="/archive" style={{ borderRadius: '9999px' }} className="group relative font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]">
+            <Link to="/archive" style={{ borderRadius: '9999px' }} className="group relative font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]">
               <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
               Explore Full Archive
               <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">open_in_new</span>
-            </a>
+            </Link>
           </div>
         </SectionWrapper>
       </main>
