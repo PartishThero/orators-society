@@ -47,10 +47,10 @@ export default function ArchivePage() {
         </SectionWrapper>
 
         {/* ── 2. Featured Archive ── */}
-        <SectionWrapper className="py-24 px-[clamp(1.5rem,7vw,10rem)] relative z-10">
+        <SectionWrapper className="py-16 md:py-24 px-[clamp(1.5rem,7vw,10rem)] relative z-10">
           <ArchitecturalGrid />
-          <div className="flex flex-col items-center text-center mb-16">
-            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
+          <div className="flex flex-col items-center text-center mb-8 md:mb-16">
+            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
               FEATURED SESSION
             </span>
             <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter">
@@ -59,7 +59,7 @@ export default function ArchivePage() {
           </div>
 
           <motion.div
-            className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative h-[600px] flex flex-col justify-end border border-outline-variant/20"
+            className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative h-[380px] sm:h-[480px] md:h-[600px] flex flex-col justify-end border border-outline-variant/20"
             onClick={() => {
               setSelectedItem(featuredEvent)
               setModalOpen(true)
@@ -81,8 +81,8 @@ export default function ArchivePage() {
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
             </div>
 
-            <div className="relative z-10 p-12 md:p-16 flex flex-col justify-end h-full w-full md:w-2/3">
-              <div className="flex items-center gap-4 mb-6">
+            <div className="relative z-10 p-6 sm:p-10 md:p-16 flex flex-col justify-end h-full w-full md:w-2/3">
+              <div className="flex items-center gap-4 mb-3 md:mb-6">
                 <span className="font-label-caps text-secondary tracking-[0.2em] uppercase font-semibold">
                   LATEST SESSION
                 </span>
@@ -90,16 +90,16 @@ export default function ArchivePage() {
                   {new Date(featuredEvent.date).getFullYear()}
                 </span>
               </div>
-              <h2 className="font-display-xl-mobile md:text-[64px] text-on-surface mb-6 leading-none group-hover:translate-x-2 transition-transform duration-500 uppercase tracking-tighter">
+              <h2 className="text-[clamp(1.8rem,4vw,3.5rem)] md:text-[64px] font-display-xl-mobile text-on-surface mb-3 md:mb-6 leading-none group-hover:translate-x-2 transition-transform duration-500 uppercase tracking-tighter">
                 {featuredEvent.title}
               </h2>
-              <p className="font-quote-serif text-on-surface-variant italic max-w-md">
+              <p className="font-quote-serif text-on-surface-variant italic max-w-md text-sm md:text-base">
                 "{featuredEvent.subtitle}"
               </p>
             </div>
 
-            <div className="absolute bottom-12 right-12 z-10 w-16 h-16 rounded-full border border-primary/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-400">
-              <span className="material-symbols-outlined text-primary text-3xl">play_arrow</span>
+            <div className="absolute bottom-6 right-6 md:bottom-12 md:right-12 z-10 w-12 h-12 md:w-16 md:h-16 rounded-full border border-primary/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-400">
+              <span className="material-symbols-outlined text-primary text-xl md:text-3xl">play_arrow</span>
             </div>
           </motion.div>
         </SectionWrapper>
@@ -107,14 +107,14 @@ export default function ArchivePage() {
         {/* ── 3. Discourse Catalog Masonry ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] relative z-10">
           <ArchitecturalGrid />
-          <div className="mb-24 flex flex-col items-center text-center relative z-20">
-            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
+          <div className="mb-12 md:mb-24 flex flex-col items-center text-center relative z-20">
+            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
               THE VAULT
             </span>
-            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-8 pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(5,8,15,0.8)]">
+            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-4 md:px-8 pb-2 md:pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(5,8,15,0.8)]">
               DISCOURSE CATALOG
             </h2>
-            <p className="max-w-2xl text-on-surface-variant font-body-md px-4 relative z-10 drop-shadow-[0_0_15px_rgba(5,8,15,0.8)]">
+            <p className="max-w-2xl text-on-surface-variant font-body-md px-4 relative z-10 drop-shadow-[0_0_15px_rgba(5,8,15,0.8)] text-sm md:text-base">
               A curated archive of memorable arguments, archived for curious minds and restless rhetoricians.
             </p>
           </div>
@@ -137,9 +137,9 @@ export default function ArchivePage() {
         </SectionWrapper>
 
         {/* ── 4. Continuum Timeline ── */}
-        <SectionWrapper className="relative z-10">
+        <SectionWrapper className="relative z-10 py-16 md:py-24">
           <ArchitecturalGrid />
-          <h3 className="font-headline-lg-mobile text-on-surface mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
+          <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
             THE CONTINUUM
           </h3>
           <TimelineSection items={archiveTimelineEvents} />

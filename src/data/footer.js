@@ -9,5 +9,14 @@ export const footerData = {
     email: "access@oratorsociety.org"
   },
   copyright: "© 2026 THE ORATOR SOCIETY. THE ART OF DISRUPTION.",
-  socials: ['Facebook', 'LinkedIn', 'Instagram']
+  socials: [
+    {
+      name: 'LinkedIn',
+      url: 'https://www.linkedin.com/showcase/orators-sst/'
+    },
+    {
+      name: 'Instagram',
+      url: 'https://www.instagram.com/orators.sst?igsh=MXN6amt6b3o3bnFxOA=='
+    }
+  ]
 };
