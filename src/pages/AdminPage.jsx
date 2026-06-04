@@ -16,7 +16,6 @@ export default function AdminPage() {
   // Auth Form State
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [authMethod, setAuthMethod] = useState('magic-link'); // 'magic-link' | 'password'
   const [authLoading, setAuthLoading] = useState(false);
   const [authMessage, setAuthMessage] = useState(null);
   const [authError, setAuthError] = useState(null);
@@ -107,29 +106,18 @@ export default function AdminPage() {
   // Handle Authentication
   async function handleAuth(e) {
     e.preventDefault();
-    if (!email) return;
+    if (!email || !password) return;
 
     setAuthLoading(true);
     setAuthMessage(null);
     setAuthError(null);
 
     try {
-      if (authMethod === 'magic-link') {
-        const { error } = await supabase.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: window.location.origin + '/admin',
-          }
-        });
-        if (error) throw error;
-        setAuthMessage('Check your email inbox for the magic login link!');
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
     } catch (err) {
       setAuthError(err.message || 'Authentication failed.');
     } finally {
@@ -445,37 +433,6 @@ color3:"#8AA18C",
                     
                     <h3 className="font-display-xl-mobile text-[1.8rem] text-white uppercase tracking-tight text-center mb-6">STAFF ACCESS</h3>
                     
-                    <div className="flex gap-4 mb-6 border-b border-white/5 pb-4 relative">
-                      <button 
-                        type="button" 
-                        onClick={() => setAuthMethod('magic-link')}
-                        className={`relative flex-1 text-[11px] uppercase tracking-wider font-label-caps pb-2 transition-colors ${authMethod === 'magic-link' ? 'text-primary' : 'text-white/40'}`}
-                      >
-                        Magic Link
-                        {authMethod === 'magic-link' && (
-                          <motion.div 
-                            layoutId="authTabLine"
-                            className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                          />
-                        )}
-                      </button>
-                      <button 
-                        type="button" 
-                        onClick={() => setAuthMethod('password')}
-                        className={`relative flex-1 text-[11px] uppercase tracking-wider font-label-caps pb-2 transition-colors ${authMethod === 'password' ? 'text-primary' : 'text-white/40'}`}
-                      >
-                        Password
-                        {authMethod === 'password' && (
-                          <motion.div 
-                            layoutId="authTabLine"
-                            className="absolute bottom-0 left-0 right-0 h-[2px] bg-primary"
-                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                          />
-                        )}
-                      </button>
-                    </div>
-
                     <form onSubmit={handleAuth} className="flex flex-col gap-4">
                       <div>
                         <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Registered Email</label>
@@ -489,19 +446,17 @@ color3:"#8AA18C",
                         />
                       </div>
 
-                      {authMethod === 'password' && (
-                        <div>
-                          <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Password</label>
-                          <input 
-                            type="password" 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
-                            required={authMethod === 'password'}
-                          />
-                        </div>
-                      )}
+                      <div>
+                        <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Password</label>
+                        <input 
+                          type="password" 
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="••••••••"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                          required
+                        />
+                      </div>
 
                       {authError && (
                         <div className="text-[12px] text-red-400 bg-red-950/20 border border-red-900/50 p-3 rounded-lg font-mono">
@@ -520,7 +475,7 @@ color3:"#8AA18C",
                         disabled={authLoading}
                         className="w-full bg-primary text-black font-label-caps uppercase text-[11px] tracking-wider py-4 rounded-xl font-bold hover:bg-white transition-colors disabled:opacity-50 mt-2"
                       >
-                        {authLoading ? 'Verifying...' : authMethod === 'magic-link' ? 'Send Link' : 'Log In'}
+                        {authLoading ? 'Verifying...' : 'Log In'}
                       </button>
                     </form>
                   </div>
