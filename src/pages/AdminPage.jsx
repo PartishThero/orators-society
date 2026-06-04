@@ -388,9 +388,9 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
       includeGrainient={true}
       hideFooter={true}
       grainientProps={{
-        color1:"#18241F",
+        color1:"#2e433a",
 color2:"#2A4035",
-color3:"#8AA18C",
+color3:"#58795a",
         timeSpeed: 1.5
       }}
     >
