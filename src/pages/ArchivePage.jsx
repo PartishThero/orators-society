@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
@@ -6,15 +6,40 @@ import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
 import ArchiveModal from '../components/ui/ArchiveModal'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
-import { events } from '../data/events'
+import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
-
-const sortedEvents = [...events].sort((a, b) => new Date(b.date) - new Date(a.date));
-const featuredEvent = sortedEvents[0];
+import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
 
 export default function ArchivePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [eventsList, setEventsList] = useState(localEvents)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    async function loadEvents() {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const formatted = data.map(item => ({
+            ...item,
+            colSpan: item.col_span
+          }));
+          setEventsList(formatted);
+        }
+      } catch (err) {
+        console.error('Failed to load events from Supabase, using local fallback:', err);
+      }
+    }
+    loadEvents();
+  }, []);
+
+  const sortedEvents = [...eventsList].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const featuredEvent = sortedEvents[0] || localEvents[0];
 
   return (
     <PageLayout grainientProps={{
@@ -120,7 +145,7 @@ export default function ArchivePage() {
           </div>
 
           <Masonry
-            items={events}
+            items={eventsList}
             ease="power3.out"
             duration={0.75}
             stagger={0.06}

@@ -96,7 +96,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             </div>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-[#0A0D14]/60 backdrop-blur-md border border-white/5 shadow-inner">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
             <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Signature Argument</h5>
             <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
               "If we concede the premise that truth is merely a consensus of the majority, then we have already lost the debate before stepping up to the podium."
@@ -130,7 +130,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
         </div>
       </div>
 
-      <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-[#0A0D14]/60 backdrop-blur-xl relative">
+      <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-black relative">
         <div data-lenis-prevent className="sticky top-0 h-full max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
           <motion.div
             initial="hidden"

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
@@ -9,10 +9,35 @@ import LegacyModal from '../components/ui/LegacyModal'
 import { legacyItems } from '../data/legacy'
 import { legacyTimelineEvents } from '../data/timeline'
 import { spotlightData } from '../data/spotlight'
+import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
 
 export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [legacyList, setLegacyList] = useState(legacyItems)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    async function loadLegacy() {
+      try {
+        const { data, error } = await supabase
+          .from('legacy_events')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const formatted = data.map(item => ({
+            ...item,
+            colSpan: item.col_span
+          }));
+          setLegacyList(formatted);
+        }
+      } catch (err) {
+        console.error('Failed to load legacy events from Supabase, using local fallback:', err);
+      }
+    }
+    loadLegacy();
+  }, []);
 
   return (
     <PageLayout grainientProps={{
@@ -59,7 +84,7 @@ color1: "#1A2A40", // Navy Blue anchor
             </div>
 
             <Masonry
-              items={legacyItems}
+              items={legacyList}
               ease="power3.out"
               duration={0.75}
               stagger={0.06}

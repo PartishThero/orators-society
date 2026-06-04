@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 import ArchivePage from './pages/ArchivePage'
 import LegacyPage from './pages/LegacyPage'
 import StagePage from './pages/StagePage'
+import AdminPage from './pages/AdminPage'
 import ClickSpark from './components/ui/ClickSpark'
 import Navbar from './components/layout/Navbar'
 import useSmoothScroll from './hooks/useSmoothScroll'
@@ -30,6 +31,7 @@ function AnimatedRoutes() {
         <Route path="/archive" element={<ArchivePage />} />
         <Route path="/legacy" element={<LegacyPage />} />
         <Route path="/stage" element={<StagePage />} />
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </AnimatePresence>
   )

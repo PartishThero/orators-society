@@ -1,17 +1,42 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import ArchiveModal from '../components/ui/ArchiveModal'
-import { events } from '../data/events'
+import { events as localEvents } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
 import Masonry from '../components/sections/Masonry'
+import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
+  const [eventsList, setEventsList] = useState(localEvents)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+    async function loadEvents() {
+      try {
+        const { data, error } = await supabase
+          .from('events')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const formatted = data.map(item => ({
+            ...item,
+            colSpan: item.col_span
+          }));
+          setEventsList(formatted);
+        }
+      } catch (err) {
+        console.error('Failed to load events from Supabase, using local fallback:', err);
+      }
+    }
+    loadEvents();
+  }, []);
   
   return (
     <PageLayout grainientProps={{
@@ -114,7 +139,7 @@ export default function HomePage() {
             </h2>
 
             <div className="flex flex-wrap justify-center gap-8 w-full mb-20">
-              {[...events]
+              {[...eventsList]
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .slice(0, 3)
                 .map((event, idx) => (
