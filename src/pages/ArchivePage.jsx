@@ -14,6 +14,7 @@ export default function ArchivePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const [eventsList, setEventsList] = useState(localEvents)
+  const [timelineList, setTimelineList] = useState(archiveTimelineEvents)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -35,7 +36,24 @@ export default function ArchivePage() {
         console.error('Failed to load events from Supabase, using local fallback:', err);
       }
     }
+
+    async function loadTimeline() {
+      try {
+        const { data, error } = await supabase
+          .from('archive_timeline')
+          .select('*')
+          .order('year', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setTimelineList(data);
+        }
+      } catch (err) {
+        console.error('Failed to load timeline from Supabase, using local fallback:', err);
+      }
+    }
+
     loadEvents();
+    loadTimeline();
   }, []);
 
   const sortedEvents = [...eventsList].sort((a, b) => new Date(b.date) - new Date(a.date));
@@ -167,7 +185,7 @@ export default function ArchivePage() {
           <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
             THE CONTINUUM
           </h3>
-          <TimelineSection items={archiveTimelineEvents} />
+          <TimelineSection items={timelineList} />
         </SectionWrapper>
 
       </main>

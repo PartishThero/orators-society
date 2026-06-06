@@ -1,14 +1,35 @@
 // Navbar.jsx — fixed pill-style top navigation bar with GlassSurface & Liquid Metal Logo
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { NavLink } from 'react-router-dom'
 import GlassSurface from '../ui/GlassSurface'
 import LiquidMetal from '../ui/LiquidMetal'
 import logoAsset from '../../assets/logo.svg'
 import { navLinks } from '../../data/navigation'
+import { supabase, isSupabaseConfigured } from '../../utils/supabaseClient'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAdmin(!!session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const activeLinks = [...navLinks];
+  if (isAdmin) {
+    activeLinks.push({ label: 'ADMIN', to: '/admin', bg: '#2A4035', text: '#F7F5F0' });
+  }
 
   return (
     <div className="fixed inset-x-0 top-6 z-50 flex flex-col items-center pointer-events-none">
@@ -45,7 +66,7 @@ export default function Navbar() {
 
             {/* Desktop Nav Links */}
             <div className="hidden md:flex gap-8 items-center font-label-caps text-label-caps">
-              {navLinks.map(({ label, to, bg, text }) => (
+              {activeLinks.map(({ label, to, bg, text }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -98,7 +119,7 @@ export default function Navbar() {
             className="w-[90%] max-w-7xl mt-2 overflow-hidden pointer-events-auto md:hidden"
           >
             <div className="glass-panel rounded-3xl p-6 border border-white/5 flex flex-col gap-4">
-              {navLinks.map(({ label, to, bg, text }) => (
+              {activeLinks.map(({ label, to, bg, text }) => (
                 <NavLink
                   key={to}
                   to={to}

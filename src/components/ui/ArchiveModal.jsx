@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import BaseModal from './BaseModal'
 
 export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave }) {
@@ -60,6 +60,177 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
 function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef }) {
   const themes = item.themes || [];
   const gallery = item.gallery || [];
+
+  const [cardDragActive, setCardDragActive] = useState(false);
+  const [galleryDragActive, setGalleryDragActive] = useState(false);
+  const [compressing, setCompressing] = useState(false);
+  const [expandedImageIndex, setExpandedImageIndex] = useState(null);
+
+  useEffect(() => {
+    if (expandedImageIndex === null) return;
+    
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        setExpandedImageIndex(prev => prev > 0 ? prev - 1 : prev);
+      } else if (e.key === 'ArrowRight') {
+        setExpandedImageIndex(prev => prev < gallery.length - 1 ? prev + 1 : prev);
+      } else if (e.key === 'Escape') {
+        setExpandedImageIndex(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [expandedImageIndex, gallery.length]);
+
+  const compressAndGetBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          if (width > height) {
+            if (width > maxWidth) {
+              height = Math.round((height * maxWidth) / width);
+              width = maxWidth;
+            }
+          } else {
+            if (height > maxHeight) {
+              width = Math.round((width * maxHeight) / height);
+              height = maxHeight;
+            }
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+          const dataUrl = canvas.toDataURL(mimeType, quality);
+          resolve(dataUrl);
+        };
+        img.onerror = (err) => reject(err);
+      };
+      reader.onerror = (err) => reject(err);
+    });
+  };
+
+  const handleCardDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setCardDragActive(true);
+    } else if (e.type === "dragleave") {
+      setCardDragActive(false);
+    }
+  };
+
+  const handleCardDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCardDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        try {
+          setCompressing(true);
+          const base64 = await compressAndGetBase64(file);
+          onFieldChange('img', base64);
+        } catch (err) {
+          console.error("Error loading image file:", err);
+        } finally {
+          setCompressing(false);
+        }
+      }
+    }
+  };
+
+  const handleCardFileSelect = async (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type.startsWith('image/')) {
+        try {
+          setCompressing(true);
+          const base64 = await compressAndGetBase64(file);
+          onFieldChange('img', base64);
+        } catch (err) {
+          console.error("Error loading image file:", err);
+        } finally {
+          setCompressing(false);
+        }
+      }
+    }
+  };
+
+  const handleGalleryDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setGalleryDragActive(true);
+    } else if (e.type === "dragleave") {
+      setGalleryDragActive(false);
+    }
+  };
+
+  const handleGalleryDrop = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setGalleryDragActive(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setCompressing(true);
+      const files = Array.from(e.dataTransfer.files);
+      const newImages = [];
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          try {
+            const base64 = await compressAndGetBase64(file);
+            newImages.push(base64);
+          } catch (err) {
+            console.error("Error processing file:", err);
+          }
+        }
+      }
+      if (newImages.length > 0) {
+        onFieldChange('gallery', [...gallery, ...newImages]);
+      }
+      setCompressing(false);
+    }
+  };
+
+  const handleGalleryFileSelect = async (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setCompressing(true);
+      const files = Array.from(e.target.files);
+      const newImages = [];
+      for (const file of files) {
+        if (file.type.startsWith('image/')) {
+          try {
+            const base64 = await compressAndGetBase64(file);
+            newImages.push(base64);
+          } catch (err) {
+            console.error("Error processing file:", err);
+          }
+        }
+      }
+      if (newImages.length > 0) {
+        onFieldChange('gallery', [...gallery, ...newImages]);
+      }
+      setCompressing(false);
+    }
+  };
+
+  const removeGalleryImage = (idxToRemove) => {
+    const updatedGallery = gallery.filter((_, idx) => idx !== idxToRemove);
+    onFieldChange('gallery', updatedGallery);
+  };
 
   return (
     <div className="flex flex-col md:flex-row h-full w-full overflow-hidden">
@@ -237,29 +408,137 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-20">
             <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-6">Gallery Images</h5>
             {isAdminEdit ? (
-              <div className="flex flex-col gap-2">
-                <span className="text-[9px] font-label-caps text-white/40 uppercase">Card Image (Img URL)</span>
-                <input 
-                  type="url"
-                  value={item.img || ''}
-                  onChange={(e) => onFieldChange('img', e.target.value)}
-                  placeholder="https://picsum.photos/id/... (Core Card Image)"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[13px] focus:outline-none focus:border-primary/50 mb-3"
-                />
+              <div className="flex flex-col gap-6">
                 
-                <span className="text-[9px] font-label-caps text-white/40 uppercase">Gallery Images (Comma separated URLs)</span>
-                <textarea 
-                  value={gallery.join(', ')}
-                  onChange={(e) => onFieldChange('gallery', e.target.value.split(',').map(u => u.trim()))}
-                  placeholder="https://url1, https://url2, https://url3"
-                  rows="3"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[13px] focus:outline-none focus:border-primary/50 resize-none"
-                />
+                {/* ── CARD IMAGE UPLOAD ── */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-[9px] font-label-caps text-white/40 uppercase">Card Image (Img URL or Upload)</span>
+                  <div 
+                    onDragEnter={handleCardDrag}
+                    onDragOver={handleCardDrag}
+                    onDragLeave={handleCardDrag}
+                    onDrop={handleCardDrop}
+                    onClick={() => document.getElementById('card-image-file').click()}
+                    className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[160px] ${
+                      cardDragActive 
+                        ? 'border-primary bg-primary/5 text-primary' 
+                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <input 
+                      id="card-image-file"
+                      type="file" 
+                      accept="image/*"
+                      onChange={handleCardFileSelect}
+                      className="hidden" 
+                    />
+                    {item.img ? (
+                      <div className="relative group w-full max-w-[200px] h-[130px] overflow-hidden rounded-lg border border-white/10">
+                        <img 
+                          src={item.img} 
+                          alt="Card preview" 
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <span className="text-[10px] font-label-caps tracking-wider text-white">Click/Drop to Replace</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-[24px]">📁</span>
+                        <span className="text-[12px] font-label-caps tracking-wider text-center">
+                          Drag & Drop or Click to Upload Card Image
+                        </span>
+                        <span className="text-[10px] text-white/40">PNG, JPG, GIF</span>
+                      </div>
+                    )}
+                  </div>
+                  <input 
+                    type="url"
+                    value={item.img || ''}
+                    onChange={(e) => onFieldChange('img', e.target.value)}
+                    placeholder="https://picsum.photos/id/... (or paste direct URL here)"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[12px] focus:outline-none focus:border-primary/50 mb-3 font-mono"
+                  />
+                </div>
+
+                {/* ── GALLERY IMAGES UPLOAD ── */}
+                <div className="flex flex-col gap-2">
+                  <span className="text-[9px] font-label-caps text-white/40 uppercase">Add Gallery Images</span>
+                  <div 
+                    onDragEnter={handleGalleryDrag}
+                    onDragOver={handleGalleryDrag}
+                    onDragLeave={handleGalleryDrag}
+                    onDrop={handleGalleryDrop}
+                    onClick={() => document.getElementById('gallery-images-files').click()}
+                    className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[120px] ${
+                      galleryDragActive 
+                        ? 'border-primary bg-primary/5 text-primary' 
+                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04]'
+                    }`}
+                  >
+                    <input 
+                      id="gallery-images-files"
+                      type="file" 
+                      accept="image/*"
+                      multiple
+                      onChange={handleGalleryFileSelect}
+                      className="hidden" 
+                    />
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="text-[24px]">📂</span>
+                      <span className="text-[12px] font-label-caps tracking-wider text-center">
+                        Drag & Drop or Click to Add Gallery Images
+                      </span>
+                      <span className="text-[10px] text-white/40">Drop multiple files</span>
+                    </div>
+                  </div>
+
+                  {compressing && (
+                    <div className="text-[11px] font-label-caps text-primary tracking-wider animate-pulse text-center">
+                      Processing files...
+                    </div>
+                  )}
+
+                  {/* Thumbnail Management Grid */}
+                  {gallery.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
+                      {gallery.map((imgUrl, idx) => (
+                        <div key={idx} onClick={() => setExpandedImageIndex(idx)} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 bg-neutral-900 cursor-zoom-in">
+                          <img src={imgUrl} alt={`Gallery preview ${idx}`} className="w-full h-full object-cover" />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeGalleryImage(idx);
+                            }}
+                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Raw Text Area Fallback */}
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <span className="text-[9px] font-label-caps text-white/40 uppercase">Or edit raw Comma-separated URLs</span>
+                    <textarea 
+                      value={gallery.join(', ')}
+                      onChange={(e) => onFieldChange('gallery', e.target.value.split(',').map(u => u.trim()).filter(Boolean))}
+                      placeholder="https://url1, https://url2"
+                      rows="2"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[12px] focus:outline-none focus:border-primary/50 resize-none font-mono"
+                    />
+                  </div>
+                </div>
+
               </div>
             ) : (
               <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-8 px-8 md:mx-0 md:px-0">
                 {gallery.map((imgUrl, idx) => (
-                  <img key={idx} src={imgUrl} alt={`Gallery preview ${idx}`} className="w-[180px] h-[120px] object-cover rounded-lg flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-400 cursor-pointer" />
+                  <img key={idx} src={imgUrl} onClick={() => setExpandedImageIndex(idx)} alt={`Gallery preview ${idx}`} className="w-[280px] h-[185px] object-cover rounded-lg flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-400 cursor-pointer" />
                 ))}
               </div>
             )}
@@ -357,6 +636,84 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           </motion.div>
         </div>
       </div>
+
+      {/* Lightbox / Expanded Image overlay */}
+      {expandedImageIndex !== null && gallery[expandedImageIndex] && (
+        <div 
+          className="fixed inset-0 z-[150] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 select-none"
+          onClick={() => setExpandedImageIndex(null)}
+        >
+          {/* Navigation Controls */}
+          {expandedImageIndex > 0 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedImageIndex(prev => prev - 1);
+              }}
+              className="absolute left-6 z-[160] w-12 h-12 rounded-full border border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-[20px] transition-colors"
+            >
+              ‹
+            </button>
+          )}
+
+          <div 
+            className="relative flex items-center justify-center max-w-[92vw] max-h-[88vh] pointer-events-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <AnimatePresence mode="wait">
+              <motion.img 
+                key={expandedImageIndex}
+                src={gallery[expandedImageIndex]} 
+                alt="Expanded gallery preview" 
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.6}
+                onDragEnd={(e, info) => {
+                  const swipeThreshold = 50;
+                  if (info.offset.x < -swipeThreshold && expandedImageIndex < gallery.length - 1) {
+                    setExpandedImageIndex(prev => prev + 1);
+                  } else if (info.offset.x > swipeThreshold && expandedImageIndex > 0) {
+                    setExpandedImageIndex(prev => prev - 1);
+                  }
+                }}
+                initial={{ opacity: 0, scale: 0.95, x: 50 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                exit={{ opacity: 0, scale: 0.95, x: -50 }}
+                transition={{ duration: 0.2 }}
+                className="max-w-full max-h-[88vh] object-contain rounded-lg shadow-2xl border border-white/10 select-none cursor-grab active:cursor-grabbing"
+              />
+            </AnimatePresence>
+
+            {/* Bottom Counter / Indicators */}
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/40 border border-white/5 text-[11px] font-mono text-white/60 tracking-wider">
+              {expandedImageIndex + 1} / {gallery.length}
+            </div>
+          </div>
+
+          {expandedImageIndex < gallery.length - 1 && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpandedImageIndex(prev => prev + 1);
+              }}
+              className="absolute right-6 z-[160] w-12 h-12 rounded-full border border-white/10 hover:border-white/30 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-[20px] transition-colors"
+            >
+              ›
+            </button>
+          )}
+
+          {/* Close Button */}
+          <button 
+            type="button"
+            onClick={() => setExpandedImageIndex(null)}
+            className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-[16px] transition-colors z-[160]"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   )
 }

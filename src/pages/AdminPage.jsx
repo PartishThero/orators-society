@@ -6,12 +6,13 @@ import SectionWrapper from '../components/layout/SectionWrapper';
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid';
 import { events as localEvents } from '../data/events';
 import { legacyItems as localLegacyEvents } from '../data/legacy';
+import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
 import ArchiveModal from '../components/ui/ArchiveModal';
 
 export default function AdminPage() {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('events'); // 'events' | 'legacy' | 'whitelist'
+  const [activeTab, setActiveTab] = useState('events'); // 'events' | 'legacy' | 'whitelist' | 'archive_timeline' | 'legacy_timeline'
   
   // Auth Form State
   const [email, setEmail] = useState('');
@@ -24,6 +25,8 @@ export default function AdminPage() {
   const [events, setEvents] = useState([]);
   const [legacyEvents, setLegacyEvents] = useState([]);
   const [whitelist, setWhitelist] = useState([]);
+  const [archiveTimeline, setArchiveTimeline] = useState([]);
+  const [legacyTimeline, setLegacyTimeline] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
@@ -41,7 +44,13 @@ export default function AdminPage() {
     img: '',
     height: 400,
     colSpan: 1,
-    whitelistEmail: '' // only used for whitelist tab
+    whitelistEmail: '', // only used for whitelist tab
+    // Timeline fields
+    year: '',
+    badge: 'outline', // 'primary' | 'secondary' | 'outline'
+    active: false,
+    body: '',
+    entriesText: '' // text representation of entries list, e.g. "icon:label"
   });
 
   // Track session
@@ -94,6 +103,20 @@ export default function AdminPage() {
           .order('created_at', { ascending: false });
         if (error) throw error;
         setWhitelist(data || []);
+      } else if (activeTab === 'archive_timeline') {
+        const { data, error } = await supabase
+          .from('archive_timeline')
+          .select('*')
+          .order('year', { ascending: false });
+        if (error) throw error;
+        setArchiveTimeline(data || []);
+      } else if (activeTab === 'legacy_timeline') {
+        const { data, error } = await supabase
+          .from('legacy_timeline')
+          .select('*')
+          .order('year', { ascending: false });
+        if (error) throw error;
+        setLegacyTimeline(data || []);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -131,15 +154,17 @@ export default function AdminPage() {
 
   // Sync Initial Static Data to Supabase
   async function syncInitialData() {
-    if (!window.confirm('This will copy all events from local files to Supabase. Continue?')) return;
+    if (!window.confirm('This will copy all events and timelines from local files to Supabase. Continue?')) return;
     setSyncLoading(true);
     setStatusMessage(null);
 
     try {
       let eventCount = 0;
       let legacyCount = 0;
+      let archiveTimelineCount = 0;
+      let legacyTimelineCount = 0;
 
-      // 1. Sync regular events (map local schema correctly)
+      // 1. Sync regular events
       const mappedEvents = localEvents.map(e => ({
         img: e.img,
         title: e.title,
@@ -158,7 +183,7 @@ export default function AdminPage() {
         eventCount = mappedEvents.length;
       }
 
-      // 2. Sync legacy events (map local schema correctly)
+      // 2. Sync legacy events
       const mappedLegacy = localLegacyEvents.map(e => ({
         img: e.img,
         title: e.title,
@@ -177,14 +202,42 @@ export default function AdminPage() {
         legacyCount = mappedLegacy.length;
       }
 
+      // 3. Sync Archive Timeline
+      if (localArchiveTimeline && localArchiveTimeline.length > 0) {
+        const { error } = await supabase.from('archive_timeline').insert(
+          localArchiveTimeline.map(t => ({
+            year: t.year,
+            title: t.title,
+            badge: t.badge || 'outline',
+            entries: t.entries || []
+          }))
+        );
+        if (error) throw error;
+        archiveTimelineCount = localArchiveTimeline.length;
+      }
+
+      // 4. Sync Legacy Timeline
+      if (localLegacyTimeline && localLegacyTimeline.length > 0) {
+        const { error } = await supabase.from('legacy_timeline').insert(
+          localLegacyTimeline.map(t => ({
+            year: t.year,
+            title: t.title,
+            body: t.body || '',
+            active: t.active || false
+          }))
+        );
+        if (error) throw error;
+        legacyTimelineCount = localLegacyTimeline.length;
+      }
+
       setStatusMessage({
         type: 'success',
-        text: `Successfully synced ${eventCount} events and ${legacyCount} legacy events to Supabase.`
+        text: `Successfully synced: ${eventCount} events, ${legacyCount} legacy events, ${archiveTimelineCount} archive timeline events, and ${legacyTimelineCount} legacy timeline events.`
       });
       fetchData();
     } catch (err) {
       console.error(err);
-      setStatusMessage({ type: 'error', text: err.message || 'Synchronization failed.' });
+      setStatusMessage({ type: 'error', text: err.message || 'Synchronization failed. Verify database tables exist.' });
     } finally {
       setSyncLoading(false);
     }
@@ -196,6 +249,24 @@ export default function AdminPage() {
       setEditingItem(null);
       setFormData({
         whitelistEmail: ''
+      });
+      setShowModal(true);
+    } else if (activeTab === 'archive_timeline') {
+      setEditingItem(null);
+      setFormData({
+        year: new Date().getFullYear().toString(),
+        title: '',
+        badge: 'outline',
+        entriesText: 'architecture:Structural Rhetoric Overhaul\nworkspace_premium:Record Attendance'
+      });
+      setShowModal(true);
+    } else if (activeTab === 'legacy_timeline') {
+      setEditingItem(null);
+      setFormData({
+        year: new Date().getFullYear().toString(),
+        title: '',
+        body: '',
+        active: false
       });
       setShowModal(true);
     } else {
@@ -232,6 +303,23 @@ export default function AdminPage() {
         whitelistEmail: item.email
       });
       setShowModal(true);
+    } else if (activeTab === 'archive_timeline') {
+      const entriesText = (item.entries || []).map(e => `${e.icon}:${e.label}`).join('\n');
+      setFormData({
+        year: item.year,
+        title: item.title,
+        badge: item.badge || 'outline',
+        entriesText
+      });
+      setShowModal(true);
+    } else if (activeTab === 'legacy_timeline') {
+      setFormData({
+        year: item.year,
+        title: item.title,
+        body: item.body || '',
+        active: item.active || false
+      });
+      setShowModal(true);
     } else {
       setShowModal(true);
     }
@@ -241,7 +329,11 @@ export default function AdminPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     setStatusMessage(null);
-    const table = activeTab === 'events' ? 'events' : activeTab === 'legacy' ? 'legacy_events' : 'allowed_admins';
+    const table = 
+      activeTab === 'events' ? 'events' : 
+      activeTab === 'legacy' ? 'legacy_events' : 
+      activeTab === 'whitelist' ? 'allowed_admins' : 
+      activeTab === 'archive_timeline' ? 'archive_timeline' : 'legacy_timeline';
 
     try {
       if (activeTab === 'whitelist') {
@@ -258,10 +350,62 @@ export default function AdminPage() {
             .insert([{ email: formData.whitelistEmail }]);
           if (error) throw error;
         }
+      } else if (activeTab === 'archive_timeline') {
+        const parsedEntries = (formData.entriesText || '')
+          .split('\n')
+          .map(line => {
+            const parts = line.split(':');
+            if (parts.length >= 2) {
+              return { icon: parts[0].trim(), label: parts.slice(1).join(':').trim() };
+            }
+            return null;
+          })
+          .filter(Boolean);
+
+        const payload = {
+          year: formData.year,
+          title: formData.title,
+          badge: formData.badge,
+          entries: parsedEntries
+        };
+
+        if (editingItem) {
+          const { error } = await supabase
+            .from(table)
+            .update(payload)
+            .eq('id', editingItem.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from(table)
+            .insert([payload]);
+          if (error) throw error;
+        }
+      } else if (activeTab === 'legacy_timeline') {
+        const payload = {
+          year: formData.year,
+          title: formData.title,
+          body: formData.body,
+          active: formData.active
+        };
+
+        if (editingItem) {
+          const { error } = await supabase
+            .from(table)
+            .update(payload)
+            .eq('id', editingItem.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from(table)
+            .insert([payload]);
+          if (error) throw error;
+        }
       }
+
       setStatusMessage({
         type: 'success',
-        text: editingItem ? 'Whitelist updated successfully.' : 'Email added to whitelist.'
+        text: editingItem ? 'Item updated successfully.' : 'Item added successfully.'
       });
       setShowModal(false);
       fetchData();
@@ -271,7 +415,7 @@ export default function AdminPage() {
     }
   }
 
-  // Handle live visual editor save
+  // Handle live visual editor save (for Masonry cards)
   async function handleLiveSave(updatedItem) {
     setStatusMessage(null);
     const table = activeTab === 'events' ? 'events' : 'legacy_events';
@@ -329,7 +473,11 @@ export default function AdminPage() {
   async function handleDelete(id, titleOrEmail) {
     if (!window.confirm(`Are you sure you want to delete "${titleOrEmail}"?`)) return;
     setStatusMessage(null);
-    const table = activeTab === 'events' ? 'events' : activeTab === 'legacy' ? 'legacy_events' : 'allowed_admins';
+    const table = 
+      activeTab === 'events' ? 'events' : 
+      activeTab === 'legacy' ? 'legacy_events' : 
+      activeTab === 'whitelist' ? 'allowed_admins' : 
+      activeTab === 'archive_timeline' ? 'archive_timeline' : 'legacy_timeline';
 
     try {
       const { error } = await supabase
@@ -357,7 +505,6 @@ export default function AdminPage() {
     );
   }
 
-  // Render NOT configured screen
   if (!isSupabaseConfigured) {
     return (
       <PageLayout includeGrainient={true} hideFooter={true}>
@@ -383,14 +530,14 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
     );
   }
 
-    return (
+  return (
     <PageLayout 
       includeGrainient={true}
       hideFooter={true}
       grainientProps={{
-        color1:"#2e433a",
-color2:"#2A4035",
-color3:"#58795a",
+        color1: "#2e433a",
+        color2: "#2A4035",
+        color3: "#58795a",
         timeSpeed: 1.5
       }}
     >
@@ -522,54 +669,33 @@ color3:"#58795a",
                   </AnimatePresence>
 
                   {/* Top Bar with Navigation & Actions */}
-                  <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 border-b border-white/5 pb-6">
+                  <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-white/5 pb-6">
                     {/* Tab Navigation */}
-                    <div className="flex gap-2 p-1 bg-white/[0.02] border border-white/5 rounded-full backdrop-blur-md relative">
-                      <button
-                        onClick={() => { setActiveTab('events'); setStatusMessage(null); }}
-                        className={`relative px-5 py-2.5 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                          activeTab === 'events' ? 'text-black font-semibold' : 'text-white/60 hover:text-white'
-                        }`}
-                      >
-                        Active Events
-                        {activeTab === 'events' && (
-                          <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute inset-0 bg-primary rounded-full -z-10"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => { setActiveTab('legacy'); setStatusMessage(null); }}
-                        className={`relative px-5 py-2.5 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                          activeTab === 'legacy' ? 'text-black font-semibold' : 'text-white/60 hover:text-white'
-                        }`}
-                      >
-                        Legacy Events
-                        {activeTab === 'legacy' && (
-                          <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute inset-0 bg-primary rounded-full -z-10"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => { setActiveTab('whitelist'); setStatusMessage(null); }}
-                        className={`relative px-5 py-2.5 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                          activeTab === 'whitelist' ? 'text-black font-semibold' : 'text-white/60 hover:text-white'
-                        }`}
-                      >
-                        Admin Whitelist
-                        {activeTab === 'whitelist' && (
-                          <motion.div
-                            layoutId="activeTabPill"
-                            className="absolute inset-0 bg-primary rounded-full -z-10"
-                            transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                          />
-                        )}
-                      </button>
+                    <div className="flex flex-wrap gap-2 p-1 bg-white/[0.02] border border-white/5 rounded-[2rem] backdrop-blur-md relative max-w-full">
+                      {[
+                        { id: 'events', label: 'Active Events' },
+                        { id: 'legacy', label: 'Legacy Events' },
+                        { id: 'archive_timeline', label: 'Archive Timeline' },
+                        { id: 'legacy_timeline', label: 'Legacy Timeline' },
+                        { id: 'whitelist', label: 'Admin Whitelist' }
+                      ].map((tab) => (
+                        <button
+                          key={tab.id}
+                          onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                          className={`relative px-5 py-2.5 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                            activeTab === tab.id ? 'text-black font-semibold' : 'text-white/60 hover:text-white'
+                          }`}
+                        >
+                          {tab.label}
+                          {activeTab === tab.id && (
+                            <motion.div
+                              layoutId="activeTabPill"
+                              className="absolute inset-0 bg-primary rounded-full -z-10"
+                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                            />
+                          )}
+                        </button>
+                      ))}
                     </div>
 
                     {/* Action buttons */}
@@ -585,7 +711,14 @@ color3:"#58795a",
                         onClick={openAddModal}
                         className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
                       >
-                        {activeTab === 'whitelist' ? '+ Whitelist Email' : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`}
+                        {activeTab === 'whitelist' 
+                          ? '+ Whitelist Email' 
+                          : activeTab === 'archive_timeline' 
+                          ? '+ Add Archive Year' 
+                          : activeTab === 'legacy_timeline' 
+                          ? '+ Add Legacy Year' 
+                          : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`
+                        }
                       </button>
                     </div>
                   </div>
@@ -710,6 +843,114 @@ color3:"#58795a",
                         </table>
                       </div>
                     )}
+
+                    {/* Archive Timeline Tab */}
+                    {activeTab === 'archive_timeline' && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/10 bg-white/[0.02]">
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 w-[80px]">Year</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Title / Headline</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Badge Color</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Key Metric Items</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {archiveTimeline.length === 0 ? (
+                              <tr>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found. Click "Sync Local Files" to seed timeline entries.</td>
+                              </tr>
+                            ) : (
+                              archiveTimeline.map((item) => (
+                                <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
+                                  <td className="p-5 text-white font-semibold text-[15px]">{item.year}</td>
+                                  <td className="p-5 text-white text-[13px]">{item.title}</td>
+                                  <td className="p-5">
+                                    <span className="bg-white/10 text-white text-[9px] font-label-caps px-2 py-0.5 rounded uppercase">
+                                      {item.badge}
+                                    </span>
+                                  </td>
+                                  <td className="p-5 text-white/60 text-[12px]">
+                                    {(item.entries || []).map(e => `${e.icon}: ${e.label}`).join(' | ')}
+                                  </td>
+                                  <td className="p-5 text-right">
+                                    <div className="flex justify-end gap-4">
+                                      <button 
+                                        onClick={() => openEditModal(item)}
+                                        className="text-primary hover:text-white text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDelete(item.id, `${item.year} Timeline`)}
+                                        className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                      >
+                                        Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+
+                    {/* Legacy Timeline Tab */}
+                    {activeTab === 'legacy_timeline' && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b border-white/10 bg-white/[0.02]">
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 w-[80px]">Year</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Event Title</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Active Spark</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 w-[40%]">Event Body Text</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 text-right">Actions</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {legacyTimeline.length === 0 ? (
+                              <tr>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found. Click "Sync Local Files" to seed timeline entries.</td>
+                              </tr>
+                            ) : (
+                              legacyTimeline.map((item) => (
+                                <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
+                                  <td className="p-5 text-white font-semibold text-[15px]">{item.year}</td>
+                                  <td className="p-5 text-white text-[13px]">{item.title}</td>
+                                  <td className="p-5">
+                                    <span className={`text-[9px] font-label-caps px-2 py-0.5 rounded uppercase ${item.active ? 'bg-primary/20 text-primary' : 'bg-white/5 text-white/40'}`}>
+                                      {item.active ? 'Yes' : 'No'}
+                                    </span>
+                                  </td>
+                                  <td className="p-5 text-white/60 text-[12px] truncate max-w-[250px]">{item.body}</td>
+                                  <td className="p-5 text-right">
+                                    <div className="flex justify-end gap-4">
+                                      <button 
+                                        onClick={() => openEditModal(item)}
+                                        className="text-primary hover:text-white text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                      >
+                                        Edit
+                                      </button>
+                                      <button 
+                                        onClick={() => handleDelete(item.id, `${item.year} Legacy`)}
+                                        className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                      >
+                                        Delete
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ))
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -719,9 +960,9 @@ color3:"#58795a",
         </SectionWrapper>
       </main>
 
-      {/* ── DIALOG / MODAL FORM (Whitelist Only) ── */}
+      {/* ── DIALOG / MODAL FORM (Whitelist & Timelines) ── */}
       <AnimatePresence>
-        {showModal && activeTab === 'whitelist' && (
+        {showModal && (activeTab === 'whitelist' || activeTab === 'archive_timeline' || activeTab === 'legacy_timeline') && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }}
@@ -741,7 +982,7 @@ color3:"#58795a",
               
               <div className="flex justify-between items-center mb-6">
                 <h3 className="font-display-xl-mobile text-[1.5rem] text-white uppercase tracking-tight">
-                  {editingItem ? 'Edit Whitelist' : 'Whitelist Admin'}
+                  {editingItem ? 'Edit Entry' : 'Add New Entry'}
                 </h3>
                 <button 
                   onClick={() => setShowModal(false)}
@@ -752,17 +993,117 @@ color3:"#58795a",
               </div>
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                <div>
-                  <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Admin Email Address</label>
-                  <input 
-                    type="email" 
-                    value={formData.whitelistEmail}
-                    onChange={(e) => setFormData({ whitelistEmail: e.target.value })}
-                    placeholder="admin@orator-society.org"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
-                    required
-                  />
-                </div>
+                {activeTab === 'whitelist' && (
+                  <div>
+                    <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Admin Email Address</label>
+                    <input 
+                      type="email" 
+                      value={formData.whitelistEmail}
+                      onChange={(e) => setFormData({ ...formData, whitelistEmail: e.target.value })}
+                      placeholder="admin@orator-society.org"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                      required
+                    />
+                  </div>
+                )}
+
+                {activeTab === 'archive_timeline' && (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Timeline Year</label>
+                      <input 
+                        type="text" 
+                        value={formData.year}
+                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                        placeholder="2026"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Year Headline</label>
+                      <input 
+                        type="text" 
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="Challenging the constructs of parallel realities."
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Badge Styling Color</label>
+                      <select 
+                        value={formData.badge}
+                        onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                      >
+                        <option value="primary" className="bg-[#090909]">Primary (Gold)</option>
+                        <option value="secondary" className="bg-[#090909]">Secondary (Deep Gold)</option>
+                        <option value="outline" className="bg-[#090909]">Outline (Gray)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Key Metric Items (one per line as icon:label)</label>
+                      <textarea 
+                        value={formData.entriesText}
+                        onChange={(e) => setFormData({ ...formData, entriesText: e.target.value })}
+                        placeholder="public:First Global Symposium&#10;forum:124 Discourse Sessions"
+                        rows="3"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[13px] focus:outline-none focus:border-primary/50 resize-none font-mono"
+                      />
+                      <span className="text-[10px] text-white/40 block mt-1">Available icons: public, forum, architecture, workspace_premium, group, emoji_events</span>
+                    </div>
+                  </>
+                )}
+
+                {activeTab === 'legacy_timeline' && (
+                  <>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Timeline Year</label>
+                      <input 
+                        type="text" 
+                        value={formData.year}
+                        onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                        placeholder="2026"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Event Title</label>
+                      <input 
+                        type="text" 
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="The Inaugural Spark"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Event Description / Body Text</label>
+                      <textarea 
+                        value={formData.body}
+                        onChange={(e) => setFormData({ ...formData, body: e.target.value })}
+                        placeholder="First inter-university championship won..."
+                        rows="3"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[13px] focus:outline-none focus:border-primary/50 resize-none"
+                        required
+                      />
+                    </div>
+                    <div className="flex items-center gap-3 py-1">
+                      <input 
+                        id="timeline-active"
+                        type="checkbox" 
+                        checked={formData.active}
+                        onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
+                        className="w-4 h-4 rounded border-white/10 text-primary focus:ring-0 focus:ring-offset-0 bg-white/[0.03]"
+                      />
+                      <label htmlFor="timeline-active" className="text-[11px] font-label-caps uppercase tracking-wider text-white/70 cursor-pointer">Active Spark Highlights</label>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex gap-4 mt-2">
                   <button 
@@ -787,7 +1128,7 @@ color3:"#58795a",
 
       {/* ── LIVE PREVIEW VISUAL EDITOR MODAL (Events & Legacy) ── */}
       <ArchiveModal 
-        isOpen={showModal && activeTab !== 'whitelist'} 
+        isOpen={showModal && activeTab !== 'whitelist' && activeTab !== 'archive_timeline' && activeTab !== 'legacy_timeline'} 
         onClose={() => setShowModal(false)} 
         item={editingItem} 
         isAdminEdit={true} 

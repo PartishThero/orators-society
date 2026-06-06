@@ -15,6 +15,7 @@ export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
   const [legacyList, setLegacyList] = useState(legacyItems)
+  const [timelineList, setTimelineList] = useState(legacyTimelineEvents)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -36,7 +37,24 @@ export default function LegacyPage() {
         console.error('Failed to load legacy events from Supabase, using local fallback:', err);
       }
     }
+
+    async function loadTimeline() {
+      try {
+        const { data, error } = await supabase
+          .from('legacy_timeline')
+          .select('*')
+          .order('year', { ascending: false });
+        if (error) throw error;
+        if (data && data.length > 0) {
+          setTimelineList(data);
+        }
+      } catch (err) {
+        console.error('Failed to load legacy timeline from Supabase, using local fallback:', err);
+      }
+    }
+
     loadLegacy();
+    loadTimeline();
   }, []);
 
   return (
@@ -112,7 +130,7 @@ color1: "#1A2A40", // Navy Blue anchor
               LEGACY TIMELINE
             </h2>
           </div>
-          <TimelineSection items={legacyTimelineEvents} />
+          <TimelineSection items={timelineList} />
         </SectionWrapper>
 
         {/* ── 4. Spotlight Section ── */}
