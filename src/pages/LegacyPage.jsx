@@ -9,53 +9,13 @@ import LegacyModal from '../components/ui/LegacyModal'
 import { legacyItems } from '../data/legacy'
 import { legacyTimelineEvents } from '../data/timeline'
 import { spotlightData } from '../data/spotlight'
-import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
+import { useData } from '../context/DataContext'
 
 export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [legacyList, setLegacyList] = useState(legacyItems)
-  const [timelineList, setTimelineList] = useState(legacyTimelineEvents)
+  const { legacyEvents: legacyList, legacyTimeline: timelineList } = useData()
 
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    async function loadLegacy() {
-      try {
-        const { data, error } = await supabase
-          .from('legacy_events')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          const formatted = data.map(item => ({
-            ...item,
-            colSpan: item.col_span
-          }));
-          setLegacyList(formatted);
-        }
-      } catch (err) {
-        console.error('Failed to load legacy events from Supabase, using local fallback:', err);
-      }
-    }
-
-    async function loadTimeline() {
-      try {
-        const { data, error } = await supabase
-          .from('legacy_timeline')
-          .select('*')
-          .order('year', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setTimelineList(data);
-        }
-      } catch (err) {
-        console.error('Failed to load legacy timeline from Supabase, using local fallback:', err);
-      }
-    }
-
-    loadLegacy();
-    loadTimeline();
-  }, []);
 
   return (
     <PageLayout grainientProps={{

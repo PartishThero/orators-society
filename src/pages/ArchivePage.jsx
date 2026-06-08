@@ -8,53 +8,13 @@ import ArchiveModal from '../components/ui/ArchiveModal'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
-import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
+import { useData } from '../context/DataContext'
 
 export default function ArchivePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const [eventsList, setEventsList] = useState(localEvents)
-  const [timelineList, setTimelineList] = useState(archiveTimelineEvents)
+  const { events: eventsList, archiveTimeline: timelineList } = useData()
 
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    async function loadEvents() {
-      try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          const formatted = data.map(item => ({
-            ...item,
-            colSpan: item.col_span
-          }));
-          setEventsList(formatted);
-        }
-      } catch (err) {
-        console.error('Failed to load events from Supabase, using local fallback:', err);
-      }
-    }
-
-    async function loadTimeline() {
-      try {
-        const { data, error } = await supabase
-          .from('archive_timeline')
-          .select('*')
-          .order('year', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          setTimelineList(data);
-        }
-      } catch (err) {
-        console.error('Failed to load timeline from Supabase, using local fallback:', err);
-      }
-    }
-
-    loadEvents();
-    loadTimeline();
-  }, []);
 
   const sortedEvents = [...eventsList].sort((a, b) => new Date(b.date) - new Date(a.date));
   const featuredEvent = sortedEvents[0] || localEvents[0];

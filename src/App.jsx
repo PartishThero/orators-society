@@ -1,4 +1,3 @@
-// App.jsx — root component with React Router routes
 import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
@@ -10,6 +9,7 @@ import AdminPage from './pages/AdminPage'
 import ClickSpark from './components/ui/ClickSpark'
 import Navbar from './components/layout/Navbar'
 import useSmoothScroll from './hooks/useSmoothScroll'
+import { DataProvider } from './context/DataContext'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -41,13 +41,16 @@ export default function App() {
   useSmoothScroll()
 
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <Navbar />
-      <ClickSpark sparkColor="#C5A872" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
-        <AnimatedRoutes />
-      </ClickSpark>
-    </BrowserRouter>
+    <DataProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <Navbar />
+        <ClickSpark sparkColor="#C5A872" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+          <AnimatedRoutes />
+        </ClickSpark>
+      </BrowserRouter>
+    </DataProvider>
   )
 }
+
 

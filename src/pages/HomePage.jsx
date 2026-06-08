@@ -9,34 +9,12 @@ import { events as localEvents } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
 import Masonry from '../components/sections/Masonry'
-import { supabase, isSupabaseConfigured } from '../utils/supabaseClient'
+import { useData } from '../context/DataContext'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
-  const [eventsList, setEventsList] = useState(localEvents)
+  const { events: eventsList } = useData()
 
-  useEffect(() => {
-    if (!isSupabaseConfigured) return;
-    async function loadEvents() {
-      try {
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .order('created_at', { ascending: false });
-        if (error) throw error;
-        if (data && data.length > 0) {
-          const formatted = data.map(item => ({
-            ...item,
-            colSpan: item.col_span
-          }));
-          setEventsList(formatted);
-        }
-      } catch (err) {
-        console.error('Failed to load events from Supabase, using local fallback:', err);
-      }
-    }
-    loadEvents();
-  }, []);
   
   return (
     <PageLayout grainientProps={{

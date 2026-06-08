@@ -8,8 +8,11 @@ import { events as localEvents } from '../data/events';
 import { legacyItems as localLegacyEvents } from '../data/legacy';
 import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
 import ArchiveModal from '../components/ui/ArchiveModal';
+import { useData } from '../context/DataContext';
 
 export default function AdminPage() {
+  const { refreshData } = useData();
+
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('events'); // 'events' | 'legacy' | 'whitelist' | 'archive_timeline' | 'legacy_timeline'
@@ -235,6 +238,10 @@ export default function AdminPage() {
         text: `Successfully synced: ${eventCount} events, ${legacyCount} legacy events, ${archiveTimelineCount} archive timeline events, and ${legacyTimelineCount} legacy timeline events.`
       });
       fetchData();
+      refreshData('events');
+      refreshData('legacy');
+      refreshData('archive_timeline');
+      refreshData('legacy_timeline');
     } catch (err) {
       console.error(err);
       setStatusMessage({ type: 'error', text: err.message || 'Synchronization failed. Verify database tables exist.' });
@@ -409,6 +416,7 @@ export default function AdminPage() {
       });
       setShowModal(false);
       fetchData();
+      refreshData(activeTab);
     } catch (err) {
       console.error(err);
       setStatusMessage({ type: 'error', text: err.message || 'Operation failed. Verify RLS permissions.' });
@@ -463,6 +471,7 @@ export default function AdminPage() {
       });
       setShowModal(false);
       fetchData();
+      refreshData(activeTab);
     } catch (err) {
       console.error(err);
       setStatusMessage({ type: 'error', text: err.message || 'Operation failed. Verify RLS permissions.' });
@@ -489,6 +498,7 @@ export default function AdminPage() {
 
       setStatusMessage({ type: 'success', text: 'Item deleted successfully.' });
       fetchData();
+      refreshData(activeTab);
     } catch (err) {
       console.error(err);
       setStatusMessage({ type: 'error', text: err.message || 'Failed to delete.' });
