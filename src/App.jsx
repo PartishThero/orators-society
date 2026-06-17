@@ -7,6 +7,7 @@ import LegacyPage from './pages/LegacyPage'
 import StagePage from './pages/StagePage'
 import AdminPage from './pages/AdminPage'
 import ClickSpark from './components/ui/ClickSpark'
+import { SmoothCursor } from './components/ui/SmoothCursor'
 import Navbar from './components/layout/Navbar'
 import useSmoothScroll from './hooks/useSmoothScroll'
 import { DataProvider } from './context/DataContext'
@@ -44,6 +45,7 @@ export default function App() {
     <DataProvider>
       <BrowserRouter>
         <ScrollToTop />
+        <SmoothCursor />
         <Navbar />
         <ClickSpark sparkColor="#C5A872" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
           <AnimatedRoutes />
