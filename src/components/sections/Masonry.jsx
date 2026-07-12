@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { gsap } from 'gsap'
 
 import './Masonry.css'
@@ -23,29 +23,25 @@ const useMeasure = () => {
 
   useLayoutEffect(() => {
     if (!ref.current) return
+    let timeoutId = null
     const ro = new ResizeObserver(([entry]) => {
       const { width, height } = entry.contentRect
-      setSize({ width, height })
+      if (timeoutId) clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => {
+        setSize({ width, height })
+      }, 50)
     })
     ro.observe(ref.current)
-    return () => ro.disconnect()
+    return () => {
+      ro.disconnect()
+      if (timeoutId) clearTimeout(timeoutId)
+    }
   }, [])
 
   return [ref, size]
 }
 
-const preloadImages = async urls => {
-  await Promise.all(
-    urls.map(
-      src =>
-        new Promise(resolve => {
-          const img = new Image()
-          img.src = src
-          img.onload = img.onerror = () => resolve()
-        })
-    )
-  )
-}
+
 
 const Masonry = ({
   items,
@@ -70,7 +66,7 @@ const Masonry = ({
 
   useEffect(() => {
     if (!items.length) return
-    preloadImages(items.map(i => i.img)).then(() => setImagesReady(true))
+    setImagesReady(true)
   }, [items])
 
   const grid = useMemo(() => {
@@ -242,7 +238,8 @@ return (
         onMouseEnter={e => handleMouseEnter(e, item)}
         onMouseLeave={e => handleMouseLeave(e, item)}
       >
-        <div className="item-img" style={{ backgroundImage: `url(${item.img})` }}>
+        <div className="item-img">
+          <img src={item.img} alt={item.title || ''} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} />
           {colorShiftOnHover && <div className="color-overlay" />}
 
           {/* Card overlay */}
@@ -270,4 +267,4 @@ return (
 )
 }
 
-export default Masonry
+export default React.memo(Masonry)

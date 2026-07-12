@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
-import LegacyModal from '../components/ui/LegacyModal'
+const LegacyModal = lazy(() => import('../components/ui/LegacyModal'))
 import { legacyItems } from '../data/legacy'
 import { legacyTimelineEvents } from '../data/timeline'
 import { spotlightData } from '../data/spotlight'
@@ -71,10 +71,10 @@ color1: "#1A2A40", // Navy Blue anchor
               hoverScale={0.96}
               blurToFocus={true}
               colorShiftOnHover={false}
-              onItemClick={item => {
+              onItemClick={useCallback(item => {
                 setSelectedItem(item)
                 setModalOpen(true)
-              }}
+              }, [])}
             />
           </div>
         </SectionWrapper>
@@ -124,7 +124,9 @@ color1: "#1A2A40", // Navy Blue anchor
         </SectionWrapper>
       </main>
 
-      <LegacyModal isOpen={modalOpen} onClose={() => setModalOpen(false)} item={selectedItem} />
+      <Suspense fallback={null}>
+        <LegacyModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedItem(null), 300); }} item={selectedItem} />
+      </Suspense>
     </PageLayout>
   )
 }

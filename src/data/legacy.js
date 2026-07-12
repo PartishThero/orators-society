@@ -23,7 +23,7 @@ export const legacyItems = [
   },
   {
     id: 'l3',
-    img: 'https://picsum.photos/id/1025/800/1100?grayscale',
+    img: 'https://picsum.photos/id/1025/800/1100.webp?grayscale',
     title: '142 Trophies Claimed',
     subtitle: 'Across parliamentary, British parliamentary, and policy formats.',
     winner: 'Legacy Record',
@@ -45,7 +45,7 @@ export const legacyItems = [
   },
   {
     id: 'l5',
-    img: 'https://picsum.photos/id/1031/800/950?grayscale',
+    img: 'https://picsum.photos/id/1031/800/950.webp?grayscale',
     title: 'Elias Vance',
     subtitle: 'The debate wasn\'t about policy; it was about the fundamental architecture of human hope.',
     winner: 'Class of \'22',
@@ -56,7 +56,7 @@ export const legacyItems = [
   },
   {
     id: 'l6',
-    img: 'https://picsum.photos/id/1071/800/1050?grayscale',
+    img: 'https://picsum.photos/id/1071/800/1050.webp?grayscale',
     title: 'The Endowment',
     subtitle: 'Secured permanent funding to ensure no voice is silenced by lack of resources.',
     winner: 'Milestone',

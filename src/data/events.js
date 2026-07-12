@@ -1,7 +1,7 @@
 export const events = [
   {
     id: '1',
-    img: 'https://picsum.photos/id/1025/800/1100?grayscale',
+    img: 'https://picsum.photos/id/1025/800/1100.webp?grayscale',
     title: 'Digital Sovereignty',
     subtitle: 'Debating control of identity beyond borders.',
     date: 'Mar 14, 2024',
@@ -13,7 +13,7 @@ export const events = [
   },
   {
     id: '2',
-    img: 'https://picsum.photos/id/1035/800/900?grayscale',
+    img: 'https://picsum.photos/id/1035/800/900.webp?grayscale',
     title: 'The Death of Privacy',
     subtitle: 'A case study on surveillance and consent.',
     date: 'Apr 2, 2024',
@@ -25,7 +25,7 @@ export const events = [
   },
   {
     id: '3',
-    img: 'https://picsum.photos/id/1005/800/1150?grayscale',
+    img: 'https://picsum.photos/id/1005/800/1150.webp?grayscale',
     title: 'Chaos Theory',
     subtitle: 'When rhetoric changes the course of events.',
     date: 'May 18, 2024',
@@ -37,7 +37,7 @@ export const events = [
   },
   {
     id: '4',
-    img: 'https://picsum.photos/id/1041/800/850?grayscale',
+    img: 'https://picsum.photos/id/1041/800/850.webp?grayscale',
     title: 'Parallel Realities',
     subtitle: 'Exploring contested truths and narrative frameworks.',
     date: 'Oct 26, 2024',
@@ -49,7 +49,7 @@ export const events = [
   },
   {
     id: '5',
-    img: 'https://picsum.photos/id/1031/800/950?grayscale',
+    img: 'https://picsum.photos/id/1031/800/950.webp?grayscale',
     title: 'The Art of Disruption',
     subtitle: 'A strategy session on interrupting convention.',
     date: 'Jun 8, 2024',
@@ -61,7 +61,7 @@ export const events = [
   },
   {
     id: '6',
-    img: 'https://picsum.photos/id/1071/800/1050?grayscale',
+    img: 'https://picsum.photos/id/1071/800/1050.webp?grayscale',
     title: 'State of the Stage',
     subtitle: 'The future of public discourse in a fractured world.',
     date: 'Aug 21, 2024',
@@ -73,7 +73,7 @@ export const events = [
   },
   {
     id: '7',
-    img: 'https://picsum.photos/id/1083/800/900?grayscale',
+    img: 'https://picsum.photos/id/1083/800/900.webp?grayscale',
     title: 'Tactical Empathy',
     subtitle: 'Negotiating with intent and feeling.',
     date: 'Sep 12, 2024',
@@ -85,7 +85,7 @@ export const events = [
   },
   {
     id: '8',
-    img: 'https://picsum.photos/id/1059/800/980?grayscale',
+    img: 'https://picsum.photos/id/1059/800/980.webp?grayscale',
     title: 'Rhetorical Architecture',
     subtitle: 'Designing persuasion for the next era.',
     date: 'Nov 3, 2024',

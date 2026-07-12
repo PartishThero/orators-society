@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
-import ArchiveModal from '../components/ui/ArchiveModal'
+const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
@@ -132,10 +132,10 @@ export default function ArchivePage() {
             hoverScale={0.96}
             blurToFocus={true}
             colorShiftOnHover={false}
-            onItemClick={item => {
+            onItemClick={useCallback(item => {
               setSelectedItem(item)
               setModalOpen(true)
-            }}
+            }, [])}
           />
         </SectionWrapper>
 
@@ -150,7 +150,9 @@ export default function ArchivePage() {
 
       </main>
 
-      <ArchiveModal isOpen={modalOpen} onClose={() => setModalOpen(false)} item={selectedItem} />
+      <Suspense fallback={null}>
+        <ArchiveModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedItem(null), 300); }} item={selectedItem} />
+      </Suspense>
     </PageLayout>
   )
 }

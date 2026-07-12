@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
-import ArchiveModal from '../components/ui/ArchiveModal'
+
+const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 import { events as localEvents } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
@@ -24,7 +25,9 @@ export default function HomePage() {
       color3: "#E2E8F0",
       timeSpeed: 2.15
     }}>
-      <ArchiveModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedEvent(null), 300); }} item={selectedEvent} />
+      <Suspense fallback={null}>
+        <ArchiveModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedEvent(null), 300); }} item={selectedEvent} />
+      </Suspense>
 
       <main className="flex-grow">
         {/* ── 1. Hero ── */}
