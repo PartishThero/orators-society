@@ -11,11 +11,10 @@ const DefaultCursorSVG = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width={50}
-      height={54}
+      width={25}
+      height={27}
       viewBox="0 0 50 54"
       fill="none"
-      style={{ scale: 0.5 }}
     >
       <g filter="url(#filter0_d_91_7928)">
         <path
@@ -230,7 +229,9 @@ export function SmoothCursor({
         left: cursorX,
         top: cursorY,
         translateX: "-50%",
-        translateY: "-50%",
+        translateY: "-12%",
+        originX: 0.5,
+        originY: 0.12,
         rotate: rotation,
         scale: scale,
         zIndex: 9999999,

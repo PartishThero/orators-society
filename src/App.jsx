@@ -1,16 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
-import HomePage from './pages/HomePage'
-import ArchivePage from './pages/ArchivePage'
-import LegacyPage from './pages/LegacyPage'
-import StagePage from './pages/StagePage'
-import AdminPage from './pages/AdminPage'
 import ClickSpark from './components/ui/ClickSpark'
 import { SmoothCursor } from './components/ui/SmoothCursor'
 import Navbar from './components/layout/Navbar'
 import useSmoothScroll from './hooks/useSmoothScroll'
 import { DataProvider } from './context/DataContext'
+
+const HomePage = lazy(() => import('./pages/HomePage'))
+const ArchivePage = lazy(() => import('./pages/ArchivePage'))
+const LegacyPage = lazy(() => import('./pages/LegacyPage'))
+const StagePage = lazy(() => import('./pages/StagePage'))
+const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -27,13 +28,15 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/archive" element={<ArchivePage />} />
-        <Route path="/legacy" element={<LegacyPage />} />
-        <Route path="/stage" element={<StagePage />} />
-        <Route path="/admin" element={<AdminPage />} />
-      </Routes>
+      <Suspense fallback={null}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/archive" element={<ArchivePage />} />
+          <Route path="/legacy" element={<LegacyPage />} />
+          <Route path="/stage" element={<StagePage />} />
+          <Route path="/admin" element={<AdminPage />} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   )
 }
@@ -47,7 +50,7 @@ export default function App() {
         <ScrollToTop />
         <SmoothCursor />
         <Navbar />
-        <ClickSpark sparkColor="#C5A872" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+        <ClickSpark sparkColor="#7eb1dbff" sparkSize={10} sparkRadius={20} sparkCount={6} duration={400}>
           <AnimatedRoutes />
         </ClickSpark>
       </BrowserRouter>
