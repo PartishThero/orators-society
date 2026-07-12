@@ -25,7 +25,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
       <div 
         ref={scrollRef}
         data-lenis-prevent
-        className="w-full md:w-[75%] h-full overflow-y-auto hide-scrollbar flex flex-col relative pt-12 md:pt-24 px-8 md:px-16"
+        className="w-full md:w-[75%] h-auto md:h-full overflow-visible md:overflow-y-auto hide-scrollbar flex flex-col relative pt-12 md:pt-24 px-8 md:px-16"
       >
         <div className="max-w-2xl pb-32">
           <motion.div 
@@ -131,7 +131,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
       </div>
 
       <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-black relative">
-        <div data-lenis-prevent className="sticky top-0 h-full max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
+        <div data-lenis-prevent className="sticky top-0 h-auto md:h-full max-h-none md:max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
           <motion.div
             initial="hidden"
             animate="visible"

@@ -125,7 +125,7 @@ export default function Navbar() {
                   to={to}
                   onClick={() => setIsOpen(false)}
                   className={({ isActive }) => 
-                    `block font-label-caps text-center text-sm py-3 px-6 rounded-full transition-all duration-300 ${
+                    `block font-label-caps text-center text-sm py-4 px-6 rounded-full transition-all duration-300 ${
                       isActive 
                         ? 'font-bold bg-white/10' 
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'

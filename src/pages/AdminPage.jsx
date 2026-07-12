@@ -598,7 +598,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="admin@orator-society.org"
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                           required
                         />
                       </div>
@@ -610,7 +610,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                           required
                         />
                       </div>
@@ -1011,7 +1011,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       value={formData.whitelistEmail}
                       onChange={(e) => setFormData({ ...formData, whitelistEmail: e.target.value })}
                       placeholder="admin@orator-society.org"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                       required
                     />
                   </div>
@@ -1026,7 +1026,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                         required
                       />
                     </div>
@@ -1037,7 +1037,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="Challenging the constructs of parallel realities."
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                         required
                       />
                     </div>
@@ -1046,7 +1046,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       <select 
                         value={formData.badge}
                         onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                       >
                         <option value="primary" className="bg-[#090909]">Primary (Gold)</option>
                         <option value="secondary" className="bg-[#090909]">Secondary (Deep Gold)</option>
@@ -1060,7 +1060,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         onChange={(e) => setFormData({ ...formData, entriesText: e.target.value })}
                         placeholder="public:First Global Symposium&#10;forum:124 Discourse Sessions"
                         rows="3"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[13px] focus:outline-none focus:border-primary/50 resize-none font-mono"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 resize-none font-mono"
                       />
                       <span className="text-[10px] text-white/40 block mt-1">Available icons: public, forum, architecture, workspace_premium, group, emoji_events</span>
                     </div>
@@ -1076,7 +1076,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                         required
                       />
                     </div>
@@ -1087,7 +1087,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="The Inaugural Spark"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[14px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
                         required
                       />
                     </div>
@@ -1098,7 +1098,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                         placeholder="First inter-university championship won..."
                         rows="3"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[13px] focus:outline-none focus:border-primary/50 resize-none"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 resize-none"
                         required
                       />
                     </div>

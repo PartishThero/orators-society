@@ -151,7 +151,7 @@ export default function StarCloud(props) {
       style={{
         width: "100%",
         height: "100%",
-        minHeight: "100vh",
+        minHeight: "100dvh",
         backgroundColor: "transparent",
         overflow: "hidden",
         position: "relative",

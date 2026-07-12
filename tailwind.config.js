@@ -90,7 +90,7 @@ export default {
         'headline-lg': ['48px', { lineHeight: '54px', letterSpacing: '-0.02em', fontWeight: '700' }],
         'body-md': ['16px', { lineHeight: '28px', fontWeight: '400' }],
         'quote-serif': ['28px', { lineHeight: '38px', fontWeight: '500' }],
-        'display-xl-mobile': ['64px', { lineHeight: '60px', letterSpacing: '-0.03em', fontWeight: '800' }],
+        'display-xl-mobile': ['clamp(2.5rem, 10vw, 4rem)', { lineHeight: '1.1', letterSpacing: '-0.03em', fontWeight: '800' }],
       },
     },
   },

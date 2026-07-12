@@ -37,7 +37,7 @@ export default function PageLayout({ children, grainientProps, hideFooter = fals
 
   return (
     <motion.div
-      className="antialiased selection:bg-primary/30 selection:text-primary min-h-screen flex flex-col relative font-body-md text-body-md text-surface"
+      className="antialiased selection:bg-primary/30 selection:text-primary min-h-[100dvh] flex flex-col relative font-body-md text-body-md text-surface"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}

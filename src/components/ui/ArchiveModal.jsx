@@ -233,12 +233,12 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-full w-full overflow-hidden">
+    <div className="flex flex-col md:flex-row h-full w-full overflow-y-auto md:overflow-hidden">
       {/* Center Content Column (Scrollable) */}
       <div 
         ref={scrollRef}
         data-lenis-prevent
-        className="w-full md:w-[75%] h-full overflow-y-auto hide-scrollbar flex flex-col relative pt-12 md:pt-24 px-8 md:px-16"
+        className="w-full md:w-[75%] h-auto md:h-full overflow-visible md:overflow-y-auto hide-scrollbar flex flex-col relative pt-12 md:pt-24 px-8 md:px-16"
       >
         <div className="max-w-2xl pb-32">
               
@@ -322,7 +322,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                       value={item[d.key] || ''}
                       onChange={(e) => onFieldChange(d.key, e.target.value)}
                       placeholder={d.placeholder}
-                      className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[12px] focus:outline-none focus:border-primary/50 text-center font-mono"
+                      className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
                     />
                   ) : (
                     <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{item[d.key]}</span>
@@ -344,7 +344,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   value={item.synopsis || ''}
                   onChange={(e) => onFieldChange('synopsis', e.target.value)}
                   rows="6"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[14px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[16px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
                   required
                 />
               </div>
@@ -373,7 +373,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   value={themes.join(', ')}
                   onChange={(e) => onFieldChange('themes', e.target.value.split(',').map(t => t.trim()))}
                   placeholder="Privacy, Consent, Governance (Comma separated)"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[13px] focus:outline-none focus:border-primary/50"
+                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50"
                 />
               </div>
             ) : (
@@ -395,7 +395,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                 value={item.winning_argument || ''}
                 onChange={(e) => onFieldChange('winning_argument', e.target.value)}
                 rows="3"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary text-[14px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50"
+                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50"
               />
             ) : (
               <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
@@ -458,7 +458,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     value={item.img || ''}
                     onChange={(e) => onFieldChange('img', e.target.value)}
                     placeholder="https://picsum.photos/id/... (or paste direct URL here)"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[12px] focus:outline-none focus:border-primary/50 mb-3 font-mono"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50 mb-3 font-mono"
                   />
                 </div>
 
@@ -529,7 +529,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                       onChange={(e) => onFieldChange('gallery', e.target.value.split(',').map(u => u.trim()).filter(Boolean))}
                       placeholder="https://url1, https://url2"
                       rows="2"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[12px] focus:outline-none focus:border-primary/50 resize-none font-mono"
+                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50 resize-none font-mono"
                     />
                   </div>
                 </div>
@@ -562,7 +562,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
 
       {/* Right Column: Sticky Metadata Sidebar */}
       <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-black relative">
-        <div data-lenis-prevent className="sticky top-0 h-full max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
+        <div data-lenis-prevent className="sticky top-0 h-auto md:h-full max-h-none md:max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
           <motion.div
             initial="hidden"
             animate="visible"
@@ -591,7 +591,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     value={item[data.key] || ''}
                     onChange={(e) => onFieldChange(data.key, e.target.value)}
                     placeholder={data.placeholder}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[13px] focus:outline-none focus:border-primary/50 font-mono"
+                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono"
                   />
                 ) : (
                   <span className="font-body-md text-[13px] text-white/90">
@@ -615,7 +615,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     type="number"
                     value={item.height || 400}
                     onChange={(e) => onFieldChange('height', parseInt(e.target.value) || 400)}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[13px] focus:outline-none focus:border-primary/50"
+                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
                   />
                 </div>
 
@@ -627,7 +627,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     max="3"
                     value={item.col_span || 1}
                     onChange={(e) => onFieldChange('col_span', parseInt(e.target.value) || 1)}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[13px] focus:outline-none focus:border-primary/50"
+                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
                   />
                 </div>
               </div>
