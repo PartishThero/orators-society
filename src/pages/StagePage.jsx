@@ -25,7 +25,7 @@ export default function StagePage() {
           <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] uppercase">
             COMING SOON
           </span>
-          <h1 className="font-display-xl-mobile md:font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
+          <h1 className="font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
             THE ACTIVE<br />STAGE
           </h1>
           <p className="font-label-caps text-[14px] md:text-[16px] text-on-surface-variant tracking-widest mt-4 opacity-70">

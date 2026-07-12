@@ -42,7 +42,7 @@ export default function TimelineSection({ items }) {
                 viewport={{ once: true }}
                 transition={{ type: 'spring', delay: i * 0.15 + 0.3 }}
               />
-              <h4 className="font-display-xl-mobile text-[64px] text-on-surface-variant font-bold leading-none -mt-4 tracking-tighter group-hover:text-primary transition-colors duration-500">
+              <h4 className="font-display-xl text-[64px] text-on-surface-variant font-bold leading-none -mt-4 tracking-tighter group-hover:text-primary transition-colors duration-500">
                 {year}
               </h4>
               <p className="font-quote-serif text-on-surface-variant group-hover:text-white transition-colors duration-500">"{title}"</p>

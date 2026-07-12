@@ -522,7 +522,7 @@ export default function AdminPage() {
           <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-24 max-w-4xl mx-auto">
             <div className="bg-black/40 border border-white/10 rounded-[2rem] p-8 md:p-12 backdrop-blur-md">
               <span className="font-label-caps text-primary tracking-[0.2em] text-[12px] block mb-4">CONFIG REQUIRED</span>
-              <h1 className="font-display-xl-mobile text-white uppercase tracking-tighter mb-6">SUPABASE NOT CONFIGURED</h1>
+              <h1 className="font-display-xl text-white uppercase tracking-tighter mb-6">SUPABASE NOT CONFIGURED</h1>
               <p className="font-body-md text-white/70 leading-relaxed mb-8">
                 To enable the admin dashboard and dynamic events storage, please create a `.env` file in the root of your project directory and add your Supabase access keys:
               </p>
@@ -561,7 +561,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
               <div>
                 <span className="font-label-caps text-primary tracking-[0.3em] text-[11px] block mb-2 uppercase">ORATOR SOCIETY CONTROL</span>
-                <h1 className="font-display-xl-mobile text-[3rem] text-white uppercase tracking-tighter leading-none">ADMIN PANEL</h1>
+                <h1 className="font-display-xl text-[3rem] text-white uppercase tracking-tighter leading-none">ADMIN PANEL</h1>
               </div>
               {session && (
                 <div className="flex items-center gap-4">
@@ -588,7 +588,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   <div className="bg-[#0A0A0A]/80 border border-white/5 rounded-[2rem] p-8 md:p-10 backdrop-blur-xl relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
                     
-                    <h3 className="font-display-xl-mobile text-[1.8rem] text-white uppercase tracking-tight text-center mb-6">STAFF ACCESS</h3>
+                    <h3 className="font-display-xl text-[1.8rem] text-white uppercase tracking-tight text-center mb-6">STAFF ACCESS</h3>
                     
                     <form onSubmit={handleAuth} className="flex flex-col gap-4">
                       <div>
@@ -991,7 +991,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
               
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-display-xl-mobile text-[1.5rem] text-white uppercase tracking-tight">
+                <h3 className="font-display-xl text-[1.5rem] text-white uppercase tracking-tight">
                   {editingItem ? 'Edit Entry' : 'Add New Entry'}
                 </h3>
                 <button 

@@ -48,9 +48,9 @@ export default function App() {
     <DataProvider>
       <BrowserRouter>
         <ScrollToTop />
-        <SmoothCursor />
-        <Navbar />
-        <ClickSpark sparkColor="#7eb1dbff" sparkSize={10} sparkRadius={20} sparkCount={6} duration={400}>
+        <ClickSpark sparkColor="#bcb669ff" sparkSize={10} sparkRadius={15} sparkCount={8} duration={400}>
+          <SmoothCursor />
+          <Navbar />
           <AnimatedRoutes />
         </ClickSpark>
       </BrowserRouter>

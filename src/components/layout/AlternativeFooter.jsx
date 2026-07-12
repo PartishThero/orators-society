@@ -42,7 +42,7 @@ export default function AlternativeFooter() {
             <div className="flex flex-col justify-between gap-8 md:gap-12">
               {/* Top Left: Let's create together */}
               <div>
-                <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,5rem)] leading-[0.95] text-white uppercase tracking-tighter">
+                <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5rem)] leading-[0.95] text-white uppercase tracking-tighter">
                   LET’S CREATE <br />
                   <em className="font-quote-serif text-primary italic lowercase tracking-normal">together.</em>
                 </h2>

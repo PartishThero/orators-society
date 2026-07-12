@@ -66,7 +66,7 @@ export default function Footer() {
       {/* ── Top Section: Giant Headline ── */}
       <div className="w-full max-w-7xl mx-auto px-[clamp(1.5rem,7vw,5rem)] flex flex-col lg:flex-row justify-between items-center gap-16 flex-grow">
         <div className="flex-1 flex flex-col justify-center">
-          <h2 className="font-display-xl-mobile md:text-[clamp(4rem,7vw,8rem)] leading-[0.9] text-on-surface uppercase tracking-tight">
+          <h2 className="font-display-xl text-[clamp(4rem,7vw,8rem)] leading-[0.9] text-on-surface uppercase tracking-tight">
             {footerData.headline.part1} <br /> <em className="font-quote-serif text-primary italic lowercase tracking-normal">{footerData.headline.highlight}</em> <br /> {footerData.headline.part2}
           </h2>
           <div className="mt-12 md:mt-16 inline-flex flex-col">

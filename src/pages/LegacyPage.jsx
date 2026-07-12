@@ -38,7 +38,7 @@ color1: "#1A2A40", // Navy Blue anchor
             <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] uppercase">
               The Archive of Impact
             </span>
-            <h1 className="font-display-xl-mobile md:font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
+            <h1 className="font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
               THE VOICES<br />THAT REMAIN
             </h1>
             <p className="font-label-caps text-[14px] md:text-[16px] text-on-surface-variant tracking-widest mt-4 opacity-70">
@@ -56,7 +56,7 @@ color1: "#1A2A40", // Navy Blue anchor
               <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
                 01 / EST. 2018
               </span>
-              <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter relative z-10 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+              <h2 className="font-display-xl text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter relative z-10 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)]">
                 HALL OF VOICES
               </h2>
             </div>
@@ -86,7 +86,7 @@ color1: "#1A2A40", // Navy Blue anchor
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
               THE CONTINUUM
             </span>
-            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-8 pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)]">
+            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-8 pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(0,0,0,0.8)]">
               LEGACY TIMELINE
             </h2>
           </div>
@@ -101,7 +101,7 @@ color1: "#1A2A40", // Navy Blue anchor
               <span className="font-label-caps text-[12px] tracking-[0.2em] text-primary uppercase block mb-8 font-semibold">
                 {spotlightData.legacy.tag}
               </span>
-              <h3 className="font-display-xl-mobile md:text-[clamp(3rem,4vw,4rem)] text-white uppercase leading-[0.9] tracking-tighter mb-8">
+              <h3 className="font-display-xl text-[clamp(3rem,4vw,4rem)] text-white uppercase leading-[0.9] tracking-tighter mb-8">
                 {spotlightData.legacy.heading}<br/>
                 <em className="text-primary italic font-normal tracking-normal">{spotlightData.legacy.highlight}</em>
               </h3>

@@ -40,7 +40,7 @@ export default function ArchivePage() {
             <span className="font-label-caps text-label-caps text-primary tracking-[0.3em] uppercase">
               THE CHRONICLE OF DISCOURSE
             </span>
-            <h1 className="font-display-xl-mobile md:font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
+            <h1 className="font-display-xl text-primary uppercase tracking-tighter font-extrabold leading-none text-transparent bg-clip-text bg-gradient-to-br from-primary via-primary-fixed to-inverse-primary drop-shadow-[0_0_40px_rgba(243,205,147,0.3)]">
               ARCHIVE OF<br />VOICES
             </h1>
             <p className="font-label-caps text-[14px] md:text-[16px] text-on-surface-variant tracking-widest mt-4 opacity-70">
@@ -56,7 +56,7 @@ export default function ArchivePage() {
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
               FEATURED SESSION
             </span>
-            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter">
+            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter">
               THE LATEST DISCOURSE
             </h2>
           </div>
@@ -93,7 +93,7 @@ export default function ArchivePage() {
                   {new Date(featuredEvent.date).getFullYear()}
                 </span>
               </div>
-              <h2 className="text-[clamp(1.8rem,4vw,3.5rem)] md:text-[64px] font-display-xl-mobile text-on-surface mb-3 md:mb-6 leading-none group-hover:translate-x-2 transition-transform duration-500 uppercase tracking-tighter">
+              <h2 className="text-[64px] font-display-xl text-on-surface mb-3 md:mb-6 leading-none group-hover:translate-x-2 transition-transform duration-500 uppercase tracking-tighter">
                 {featuredEvent.title}
               </h2>
               <p className="font-quote-serif text-on-surface-variant italic max-w-md text-sm md:text-base">
@@ -114,7 +114,7 @@ export default function ArchivePage() {
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
               THE VAULT
             </span>
-            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-4 md:px-8 pb-2 md:pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(5,8,15,0.8)]">
+            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter px-4 md:px-8 pb-2 md:pb-4 relative z-10 drop-shadow-[0_0_20px_rgba(5,8,15,0.8)]">
               DISCOURSE CATALOG
             </h2>
             <p className="max-w-2xl text-on-surface-variant font-body-md px-4 relative z-10 drop-shadow-[0_0_15px_rgba(5,8,15,0.8)] text-sm md:text-base">

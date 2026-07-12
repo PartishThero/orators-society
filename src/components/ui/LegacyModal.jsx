@@ -42,7 +42,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
 
           <motion.h2 
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}
-            className="font-display-xl-mobile md:text-[clamp(3rem,4.5vw,5rem)] leading-[0.9] text-white uppercase tracking-tighter mb-8"
+            className="font-display-xl text-[clamp(3rem,4.5vw,5rem)] leading-[0.9] text-white uppercase tracking-tighter mb-8"
           >
             {item.title}
           </motion.h2>

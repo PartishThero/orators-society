@@ -44,7 +44,7 @@ export default function HomePage() {
             </span>
 
             <motion.h1
-              className="font-display-xl-mobile text-[clamp(2.2rem,10vw,4.5rem)] md:text-[clamp(4.5rem,8vw,7.5rem)] lg:text-display-xl uppercase text-on-surface text-center leading-[0.95] tracking-tighter"
+              className="font-display-xl text-[clamp(4.5rem,8vw,7.5rem)] lg:text-display-xl uppercase text-on-surface text-center leading-[0.95] tracking-tighter"
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, delay: 0.2, ease: 'easeOut' }}
@@ -95,7 +95,7 @@ export default function HomePage() {
             <div className="relative pl-0 lg:pl-20 flex flex-col justify-center gap-6 lg:gap-8 z-20">
               <div className="pb-4 lg:pb-6 flex flex-col justify-end">
                 <span className="font-label-caps text-[10px] text-white/90 uppercase tracking-[0.4em] block mb-4 lg:mb-6">OUR PHILOSOPHY</span>
-                <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,4vw,4.5rem)] leading-[1] uppercase text-white tracking-tighter">
+                <h2 className="font-display-xl text-[clamp(3.5rem,4vw,4.5rem)] leading-[1] uppercase text-white tracking-tighter">
                   THE ART OF<br/>
                   <em className="italic text-primary tracking-normal">UNSPOKEN</em>
                 </h2>
@@ -116,7 +116,7 @@ export default function HomePage() {
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
               FROM THE ARCHIVES
             </span>
-            <h2 className="font-display-xl-mobile md:text-[clamp(3.5rem,6vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter mb-16 max-w-4xl">
+            <h2 className="font-display-xl text-[clamp(3.5rem,6vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter mb-16 max-w-4xl">
               A PRESERVED HISTORY
             </h2>
 
@@ -144,7 +144,7 @@ export default function HomePage() {
                       <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-3 block group-hover:text-white/80 transition-colors duration-500">
                         {event.date}
                       </span>
-                      <h3 className="font-display-xl-mobile text-[2rem] md:text-[2.25rem] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
+                      <h3 className="font-display-xl text-[2.25rem] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
                         {event.title}
                       </h3>
                       <div className="grid grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">

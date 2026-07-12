@@ -269,12 +269,12 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   type="text"
                   value={item.title || ''}
                   onChange={(e) => onFieldChange('title', e.target.value)}
-                  className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl-mobile text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
+                  className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
                   required
                 />
               </div>
             ) : (
-              <h2 className="font-display-xl-mobile md:text-[clamp(3rem,4.5vw,5rem)] leading-[0.9] text-white uppercase tracking-tighter">
+              <h2 className="font-display-xl text-[clamp(3rem,4.5vw,5rem)] leading-[0.9] text-white uppercase tracking-tighter">
                 {item.title}
               </h2>
             )}
