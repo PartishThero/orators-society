@@ -23,8 +23,10 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('events'); // 'events' | 'legacy' | 'whitelist' | 'archive_timeline' | 'legacy_timeline'
   
   // Auth Form State
+  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [authMessage, setAuthMessage] = useState(null);
   const [authError, setAuthError] = useState(null);
@@ -184,6 +186,49 @@ export default function AdminPage() {
       if (error) throw error;
     } catch (err) {
       setAuthError(err.message || 'Authentication failed.');
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  // Note: This signup path is intentionally whitelist-gated on the client.
+  // Supabase RLS on allowed_admins should also block unauthorized inserts server-side 
+  // as defense in depth.
+  async function handleSignUp(e) {
+    e.preventDefault();
+    if (!email || !password || !confirmPassword) return;
+
+    if (password !== confirmPassword) {
+      setAuthError('Passwords do not match.');
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthMessage(null);
+    setAuthError(null);
+
+    try {
+      // Check if email is in allowed_admins
+      const { data, error: checkError } = await supabase
+        .from('allowed_admins')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (checkError || !data) {
+        throw new Error('This email is not authorized. Contact an existing admin to be whitelisted first.');
+      }
+
+      // Proceed with signup
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      setAuthMessage('Signup successful! If email confirmation is enabled, please check your inbox to confirm your email before logging in.');
+    } catch (err) {
+      setAuthError(err.message || 'Signup failed.');
     } finally {
       setAuthLoading(false);
     }
@@ -636,7 +681,25 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                     
                     <h3 className="font-display-xl text-[1.8rem] text-white uppercase tracking-tight text-center mb-6">STAFF ACCESS</h3>
                     
-                    <form onSubmit={handleAuth} className="flex flex-col gap-4">
+                    {/* Toggle */}
+                    <div className="flex rounded-lg overflow-hidden border border-white/10 mb-6 bg-white/[0.02]">
+                      <button 
+                        type="button"
+                        onClick={() => { setAuthMode('login'); setAuthError(null); setAuthMessage(null); }}
+                        className={`flex-1 py-2 text-[10px] font-label-caps uppercase tracking-wider transition-colors ${authMode === 'login' ? 'bg-primary/20 text-primary' : 'text-white/50 hover:text-white/80'}`}
+                      >
+                        Log In
+                      </button>
+                      <button 
+                        type="button"
+                        onClick={() => { setAuthMode('signup'); setAuthError(null); setAuthMessage(null); }}
+                        className={`flex-1 py-2 text-[10px] font-label-caps uppercase tracking-wider transition-colors ${authMode === 'signup' ? 'bg-primary/20 text-primary' : 'text-white/50 hover:text-white/80'}`}
+                      >
+                        Sign Up
+                      </button>
+                    </div>
+
+                    <form onSubmit={authMode === 'login' ? handleAuth : handleSignUp} className="flex flex-col gap-4">
                       <div>
                         <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Registered Email</label>
                         <input 
@@ -661,6 +724,20 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         />
                       </div>
 
+                      {authMode === 'signup' && (
+                        <div>
+                          <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Confirm Password</label>
+                          <input 
+                            type="password" 
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="••••••••"
+                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                            required
+                          />
+                        </div>
+                      )}
+
                       {authError && (
                         <div className="text-[12px] text-red-400 bg-red-950/20 border border-red-900/50 p-3 rounded-lg font-mono">
                           {authError}
@@ -678,7 +755,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         disabled={authLoading}
                         className="w-full bg-primary text-black font-label-caps uppercase text-[11px] tracking-wider py-4 rounded-xl font-bold hover:bg-white transition-colors disabled:opacity-50 mt-2"
                       >
-                        {authLoading ? 'Verifying...' : 'Log In'}
+                        {authLoading ? 'Verifying...' : (authMode === 'login' ? 'Log In' : 'Sign Up')}
                       </button>
                     </form>
                   </div>

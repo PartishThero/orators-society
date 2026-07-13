@@ -8,6 +8,7 @@ import logoAsset from '../../assets/logo.svg'
 import { navLinks } from '../../data/navigation'
 import { supabase, isSupabaseConfigured } from '../../utils/supabaseClient'
 import RegistrationModal from '../ui/RegistrationModal'
+import RecruitmentModal from '../ui/RecruitmentModal'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -165,10 +166,9 @@ export default function Navbar() {
     </div>
 
     <div className="pointer-events-auto">
-      <RegistrationModal 
+      <RecruitmentModal 
         isOpen={recruitModalOpen}
         onClose={() => setRecruitModalOpen(false)}
-        eventItem={{ id: 'Recruitment', title: 'Society Recruitment' }}
       />
     </div>
     </>
