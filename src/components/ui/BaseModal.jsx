@@ -39,11 +39,11 @@ export default function BaseModal({ isOpen, onClose, item, children }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-            className="relative z-10 w-full max-w-[95vw] h-[90vh] md:max-w-[80vw] md:h-[80vh] bg-black rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-[0_30px_100px_rgba(0,0,0,0.9)] border border-white/5"
+            className="relative z-10 w-full h-[100dvh] sm:h-[90vh] sm:max-w-[95vw] md:max-w-[80vw] md:h-[80vh] bg-black rounded-none sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-[0_30px_100px_rgba(0,0,0,0.9)] border border-white/5"
           >
             <button
               onClick={onClose}
-              className="absolute top-6 right-6 z-50 text-white/50 hover:text-primary transition-colors duration-400 group flex items-center justify-center p-2 rounded-full hover:bg-white/5 bg-black/50 backdrop-blur-md"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 text-white/50 hover:text-primary transition-colors duration-400 group flex items-center justify-center p-3 rounded-full hover:bg-white/5 bg-black/50 backdrop-blur-md min-w-[44px] min-h-[44px]"
             >
               <span className="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform duration-500">close</span>
             </button>

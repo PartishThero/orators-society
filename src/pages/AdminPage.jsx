@@ -38,11 +38,10 @@ export default function AdminPage() {
   const [archiveTimeline, setArchiveTimeline] = useState([]);
   const [legacyTimeline, setLegacyTimeline] = useState([]);
   const [registrations, setRegistrations] = useState([]);
+  const [recruitments, setRecruitments] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
-  
-  const [registrationFilter, setRegistrationFilter] = useState('All');
 
   // Form Modal States
   const [showModal, setShowModal] = useState(false);
@@ -160,6 +159,13 @@ export default function AdminPage() {
           .order('created_at', { ascending: false });
         if (error) throw error;
         setRegistrations(data || []);
+      } else if (activeTab === 'petitions') {
+        const { data, error } = await supabase
+          .from('society_petitions')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setRecruitments(data || []);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -579,6 +585,7 @@ export default function AdminPage() {
       else if (type === 'Archive Timeline') table = 'archive_timeline';
       else if (type === 'Legacy Timeline') table = 'legacy_timeline';
       else if (type === 'Registration') table = 'event_registrations';
+      else if (type === 'Petition') table = 'society_petitions';
       
       const { error } = await supabase
         .from(table)
@@ -674,7 +681,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="max-w-md mx-auto"
+                  className="w-full max-w-md mx-auto"
                 >
                   <div className="bg-[#0A0A0A]/80 border border-white/5 rounded-[2rem] p-8 md:p-10 backdrop-blur-xl relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
@@ -707,7 +714,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="admin@orator-society.org"
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                          className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                           required
                         />
                       </div>
@@ -719,7 +726,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                          className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                           required
                         />
                       </div>
@@ -732,7 +739,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                            className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                             required
                           />
                         </div>
@@ -751,11 +758,13 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       )}
 
                       <button 
-                        type="submit" 
+                        type="submit"
                         disabled={authLoading}
-                        className="w-full bg-primary text-black font-label-caps uppercase text-[11px] tracking-wider py-4 rounded-xl font-bold hover:bg-white transition-colors disabled:opacity-50 mt-2"
+                        style={{ borderRadius: '9999px' }}
+                        className="group relative w-full font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08] disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                       >
-                        {authLoading ? 'Verifying...' : (authMode === 'login' ? 'Log In' : 'Sign Up')}
+                        <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
+                        {authLoading ? 'Authenticating...' : authMode === 'login' ? 'Enter System' : 'Submit Credentials'}
                       </button>
                     </form>
                   </div>
@@ -804,8 +813,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   {/* Top Bar with Navigation & Actions */}
                   <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-white/5 pb-6">
                     {/* Tab Navigation */}
-                    <div className="flex flex-wrap items-center gap-3 p-1 max-w-full">
-                      <div className="flex flex-wrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3 max-w-full overflow-hidden">
+                      <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
                         {[
                           { id: 'events', label: 'Active Events' },
                           { id: 'legacy', label: 'Legacy Events' },
@@ -833,9 +842,10 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
 
                       <div className="hidden md:block w-px h-6 bg-white/10 mx-1" />
 
-                      <div className="flex flex-wrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md">
+                      <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
                         {[
                           { id: 'registrations', label: 'Registrations' },
+                          { id: 'petitions', label: 'Petitions' },
                           { id: 'whitelist', label: 'Admin Whitelist' }
                         ].map((tab) => (
                           <button
@@ -859,7 +869,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6">
+                    <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6 w-full xl:w-auto overflow-x-auto hide-scrollbar">
                       <button
                         onClick={openAddModal}
                         className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
@@ -871,6 +881,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           : activeTab === 'legacy_timeline' 
                           ? '+ Add Legacy Year' 
                           : activeTab === 'registrations'
+                          ? 'View Only'
+                          : activeTab === 'petitions'
                           ? 'View Only'
                           : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`
                         }
@@ -1118,65 +1130,133 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           <div className="flex items-center gap-3">
                             <span className="font-label-caps text-[10px] uppercase tracking-wider text-white/50">Total Registrations:</span>
                             <span className="font-mono text-[16px] text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
-                              {registrations.filter(r => registrationFilter === 'All' || r.event_id === registrationFilter).length}
+                              {registrations.length}
                             </span>
                           </div>
+                        </div>
                           
-                          <div className="flex items-center gap-3">
-                            <span className="font-label-caps text-[10px] uppercase tracking-wider text-white/50">Filter by Event:</span>
-                            <select 
-                              value={registrationFilter}
-                              onChange={(e) => setRegistrationFilter(e.target.value)}
-                              className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-white text-[12px] focus:outline-none focus:border-primary/50"
-                            >
-                              <option value="All">All Events</option>
-                              {[...new Set(registrations.map(r => r.event_id))].filter(Boolean).map(eventId => (
-                                <option key={eventId} value={eventId}>{getEventTitle(eventId)}</option>
-                              ))}
-                            </select>
+                        <div className="flex flex-col gap-8 p-6 min-h-[400px]">
+                          {registrations.length === 0 ? (
+                            <div className="text-center py-20 text-white/40 font-mono text-[14px]">
+                              No registrations found.
+                            </div>
+                          ) : (
+                            Object.entries(
+                              registrations.reduce((acc, item) => {
+                                const title = getEventTitle(item.event_id);
+                                if (!acc[title]) acc[title] = [];
+                                acc[title].push(item);
+                                return acc;
+                              }, {})
+                            ).map(([eventTitle, eventRegistrations]) => (
+                              <div key={eventTitle} className="bg-white/[0.02] border border-white/5 rounded-2xl overflow-hidden">
+                                <div className="bg-white/[0.02] border-b border-white/5 px-6 py-4 flex justify-between items-center">
+                                  <h3 className="font-display-xl text-[1.2rem] text-white uppercase">{eventTitle}</h3>
+                                  <span className="font-mono text-[12px] text-white/50 bg-white/5 px-2 py-1 rounded">
+                                    {eventRegistrations.length} {eventRegistrations.length === 1 ? 'Registration' : 'Registrations'}
+                                  </span>
+                                </div>
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-left border-collapse">
+                                    <thead>
+                                      <tr className="border-b border-white/5 bg-black/20">
+                                        <th className="p-4 px-6 font-label-caps text-[10px] tracking-wider text-white/50">Date</th>
+                                        <th className="p-4 px-6 font-label-caps text-[10px] tracking-wider text-white/50">Name</th>
+                                        <th className="p-4 px-6 font-label-caps text-[10px] tracking-wider text-white/50">Email</th>
+                                        <th className="p-4 px-6 font-label-caps text-[10px] tracking-wider text-white/50 text-right">Actions</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {eventRegistrations
+                                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                        .map((item) => (
+                                          <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                                            <td className="p-4 px-6 text-white/60 text-[12px]">{new Date(item.created_at).toLocaleDateString()}</td>
+                                            <td className="p-4 px-6 text-white font-semibold text-[13px]">{item.name}</td>
+                                            <td className="p-4 px-6 text-white/80 text-[13px]">{item.email}</td>
+                                            <td className="p-4 px-6 text-right">
+                                              <button 
+                                                onClick={() => handleDelete(item.id, 'Registration', 'Registration')}
+                                                className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                              >
+                                                Delete
+                                              </button>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Petitions Tab */}
+                    {activeTab === 'petitions' && (
+                      <div className="flex flex-col p-6 min-h-[400px]">
+                        <div className="flex justify-between items-center mb-8">
+                          <h2 className="font-display-xl text-[1.5rem] uppercase text-white">Active Petitions</h2>
+                          <span className="font-mono text-[14px] text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                            {recruitments.length} Pending
+                          </span>
+                        </div>
+                        
+                        {recruitments.length === 0 ? (
+                          <div className="text-center py-20 text-white/40 font-mono text-[14px]">
+                            No petitions found.
                           </div>
-                        </div>
-                          
-                        <div className="overflow-x-auto min-h-[300px]">
-                          <table className="w-full text-left border-collapse">
-                            <thead>
-                              <tr className="border-b border-white/10 bg-black/20">
-                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Date</th>
-                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Event</th>
-                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Name</th>
-                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Email</th>
-                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 text-right">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {registrations.filter(r => registrationFilter === 'All' || r.event_id === registrationFilter).length === 0 ? (
-                                <tr>
-                                  <td colSpan="5" className="p-12 text-center text-white/40 font-mono text-[14px]">No registrations found for this selection.</td>
-                                </tr>
-                              ) : (
-                                registrations
-                                  .filter(r => registrationFilter === 'All' || r.event_id === registrationFilter)
-                                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                                  .map((item) => (
-                                  <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-                                    <td className="p-5 text-white/60 text-[12px]">{new Date(item.created_at).toLocaleDateString()}</td>
-                                    <td className="p-5 text-white/60 text-[12px]">{getEventTitle(item.event_id)}</td>
-                                    <td className="p-5 text-white font-semibold text-[13px]">{item.name}</td>
-                                    <td className="p-5 text-white/80 text-[13px]">{item.email}</td>
-                                    <td className="p-5 text-right">
-                                      <button 
-                                        onClick={() => handleDelete(item.id, 'Registration', 'Registration')}
-                                        className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
-                                      >
-                                        Delete
-                                      </button>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
+                        ) : (
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            {recruitments.map((petition) => (
+                              <div key={petition.id} className="flex flex-col bg-white/[0.02] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:bg-white/[0.04] transition-colors">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-[50px] -mr-10 -mt-10 pointer-events-none" />
+                                
+                                <div className="flex justify-between items-start mb-4">
+                                  <div>
+                                    <h4 className="font-display-xl text-[1.2rem] text-white uppercase">{petition.full_name}</h4>
+                                    <div className="flex gap-4 mt-1 text-[11px] font-label-caps tracking-wider text-white/50">
+                                      <a href={`mailto:${petition.email}`} className="hover:text-primary transition-colors">{petition.email}</a>
+                                      {petition.phone && <span>&bull; {petition.phone}</span>}
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <div className="text-[10px] text-white/30 font-mono">
+                                      {new Date(petition.created_at).toLocaleDateString()}
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex flex-wrap gap-2 mb-5">
+                                  <span className="px-3 py-1 rounded-full text-[10px] font-label-caps tracking-wider bg-white/5 border border-white/10 text-white/80">
+                                    {petition.interest_area}
+                                  </span>
+                                  <span className="px-3 py-1 rounded-full text-[10px] font-label-caps tracking-wider bg-primary/10 border border-primary/20 text-primary">
+                                    {petition.experience_level}
+                                  </span>
+                                </div>
+                                
+                                <div className="bg-black/40 rounded-xl p-4 border border-white/5 mb-5 flex-1">
+                                  <span className="block text-[9px] font-label-caps uppercase tracking-wider text-white/30 mb-2">Opening Statement</span>
+                                  <p className="text-[13px] text-white/70 font-body-md leading-relaxed whitespace-pre-wrap">
+                                    {petition.motivation_text}
+                                  </p>
+                                </div>
+                                
+                                <div className="flex justify-end pt-2 border-t border-white/5">
+                                  <button 
+                                    onClick={() => handleDelete(petition.id, 'Petition', 'Recruitment')}
+                                    className="text-red-400 hover:text-red-300 text-[10px] font-label-caps tracking-wider uppercase transition-colors px-4 py-2"
+                                  >
+                                    Dismiss Petition
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -1191,7 +1271,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
       {/* ── DIALOG / MODAL FORM (Whitelist & Timelines) ── */}
       <AnimatePresence>
         {showModal && (activeTab === 'whitelist' || activeTab === 'archive_timeline' || activeTab === 'legacy_timeline') && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-0 sm:p-4">
             <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -1204,7 +1284,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
               initial={{ opacity: 0, scale: 0.95, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
-              className="relative w-full max-w-md bg-[#090909] border border-white/10 rounded-[2rem] shadow-2xl p-8 z-10"
+              className="relative w-full h-[100dvh] sm:h-auto sm:max-w-md bg-[#090909] border-t sm:border border-white/10 rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl p-6 sm:p-8 z-10 overflow-hidden flex flex-col justify-center sm:block"
             >
               <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
               
@@ -1213,8 +1293,9 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   {editingItem ? 'Edit Entry' : 'Add New Entry'}
                 </h3>
                 <button 
+                  type="button"
                   onClick={() => setShowModal(false)}
-                  className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-colors"
+                  className="w-11 h-11 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white transition-colors"
                 >
                   ✕
                 </button>
@@ -1229,7 +1310,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       value={formData.whitelistEmail}
                       onChange={(e) => setFormData({ ...formData, whitelistEmail: e.target.value })}
                       placeholder="admin@orator-society.org"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                      className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                       required
                     />
                   </div>
@@ -1244,7 +1325,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                         required
                       />
                     </div>
@@ -1255,7 +1336,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="Challenging the constructs of parallel realities."
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                         required
                       />
                     </div>
@@ -1264,7 +1345,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       <select 
                         value={formData.badge}
                         onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                       >
                         <option value="primary" className="bg-[#090909]">Primary (Gold)</option>
                         <option value="secondary" className="bg-[#090909]">Secondary (Deep Gold)</option>
@@ -1278,7 +1359,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         onChange={(e) => setFormData({ ...formData, entriesText: e.target.value })}
                         placeholder="public:First Global Symposium&#10;forum:124 Discourse Sessions"
                         rows="3"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 resize-none font-mono"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 resize-none font-mono placeholder:text-white/20"
                       />
                       <span className="text-[10px] text-white/40 block mt-1">Available icons: public, forum, architecture, workspace_premium, group, emoji_events</span>
                     </div>
@@ -1294,7 +1375,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                         required
                       />
                     </div>
@@ -1305,7 +1386,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="The Inaugural Spark"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
                         required
                       />
                     </div>
@@ -1316,7 +1397,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                         placeholder="First inter-university championship won..."
                         rows="3"
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 resize-none"
+                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 resize-none placeholder:text-white/20"
                         required
                       />
                     </div>
@@ -1337,14 +1418,17 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   <button 
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 border border-white/10 text-white font-label-caps uppercase text-[10px] tracking-wider py-3.5 rounded-xl hover:bg-white/[0.02] transition-colors"
+                    style={{ borderRadius: '9999px' }}
+                    className="flex-[0.4] border border-white/10 bg-white/[0.02] text-white/70 font-label-caps uppercase text-[10px] tracking-wider py-4 hover:bg-white/[0.05] transition-colors"
                   >
                     Cancel
                   </button>
                   <button 
                     type="submit"
-                    className="flex-1 bg-primary text-black font-label-caps uppercase text-[10px] tracking-wider py-3.5 rounded-xl font-bold hover:bg-white transition-colors"
+                    style={{ borderRadius: '9999px' }}
+                    className="group relative flex-1 font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]"
                   >
+                    <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
                     Save Changes
                   </button>
                 </div>

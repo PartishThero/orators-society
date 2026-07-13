@@ -64,6 +64,16 @@ const Masonry = ({
 
   const [containerRef, { width }] = useMeasure()
   const [imagesReady, setImagesReady] = useState(false)
+  const [activeCols, setActiveCols] = useState(columns)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setActiveCols(window.innerWidth < 768 ? 1 : columns)
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [columns])
 
   useEffect(() => {
     if (!items.length) return
@@ -73,16 +83,16 @@ const Masonry = ({
   const grid = useMemo(() => {
     if (!width) return []
 
-    const colHeights = new Array(columns).fill(0)
-    const columnWidth = width / columns
+    const colHeights = new Array(activeCols).fill(0)
+    const columnWidth = width / activeCols
 
     return items.map(child => {
-      const span = Math.min(child.colSpan || 1, columns)
+      const span = Math.min(child.colSpan || 1, activeCols)
       
       let bestCol = 0
       let minMaxHeight = Infinity
       
-      for (let i = 0; i <= columns - span; i++) {
+      for (let i = 0; i <= activeCols - span; i++) {
         let maxHeightInSpan = 0
         for (let j = 0; j < span; j++) {
           if (colHeights[i + j] > maxHeightInSpan) {
@@ -107,7 +117,7 @@ const Masonry = ({
 
       return { ...child, x, y, w: itemWidth, h: height }
     })
-  }, [columns, items, width])
+  }, [activeCols, items, width])
 
   const containerHeight = useMemo(() => {
     if (!grid.length) return 0

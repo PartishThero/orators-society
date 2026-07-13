@@ -13,6 +13,7 @@ export function DataProvider({ children }) {
   const [archiveTimeline, setArchiveTimeline] = useState(localArchiveTimeline);
   const [legacyTimeline, setLegacyTimeline] = useState(localLegacyTimeline);
   const [registrations, setRegistrations] = useState(localRegistrations);
+  const [recruitments, setRecruitments] = useState([]);
 
   const [loading, setLoading] = useState({
     events: false,
@@ -20,6 +21,7 @@ export function DataProvider({ children }) {
     archiveTimeline: false,
     legacyTimeline: false,
     registrations: false,
+    recruitments: false,
   });
 
   const fetchEvents = useCallback(async () => {
@@ -125,6 +127,25 @@ export function DataProvider({ children }) {
     }
   }, []);
 
+  const fetchRecruitments = useCallback(async () => {
+    if (!isSupabaseConfigured) return;
+    setLoading(prev => ({ ...prev, recruitments: true }));
+    try {
+      const { data, error } = await supabase
+        .from('society_petitions')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      if (data) {
+        setRecruitments(data);
+      }
+    } catch (err) {
+      console.error('Failed to load recruitments from Supabase:', err);
+    } finally {
+      setLoading(prev => ({ ...prev, recruitments: false }));
+    }
+  }, []);
+
   const addRegistration = useCallback(async (eventId, name, email) => {
     const newReg = {
       event_id: eventId,
@@ -148,11 +169,39 @@ export function DataProvider({ children }) {
         // Re-fetch to get real ID
         fetchRegistrations();
       } catch (err) {
-        console.error('Failed to save registration to Supabase:', err);
+        console.error('Failed to add registration to Supabase:', err);
         throw err;
       }
     }
   }, [fetchRegistrations]);
+
+  const addRecruitment = useCallback(async (payload) => {
+    const newReg = {
+      full_name: payload.name,
+      email: payload.email,
+      phone: payload.phone,
+      interest_area: payload.interestArea,
+      experience_level: payload.experienceLevel,
+      motivation_text: payload.motivationText,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+    
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('society_petitions')
+          .insert([newReg]);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Failed to add recruitment petition to Supabase:', err);
+        throw err;
+      }
+    } else {
+      console.log('Local Mode - Recruitment Petition Saved:', newReg);
+    }
+  }, []);
+
 
   const deleteRegistration = useCallback(async (id) => {
     // Optimistic local update
@@ -173,6 +222,22 @@ export function DataProvider({ children }) {
     }
   }, [fetchRegistrations]);
 
+  const deleteRecruitment = useCallback(async (id) => {
+    setRecruitments(prev => prev.filter(r => r.id !== id));
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase
+          .from('society_petitions')
+          .delete()
+          .eq('id', id);
+        if (error) throw error;
+      } catch (err) {
+        console.error('Failed to delete recruitment petition:', err);
+        throw err;
+      }
+    }
+  }, []);
+
   // Force-refresh function for individual tables (to be triggered after admin mutations)
   const refreshData = useCallback((type) => {
     if (type === 'events' || type === 'events_list') {
@@ -185,8 +250,10 @@ export function DataProvider({ children }) {
       fetchLegacyTimeline();
     } else if (type === 'registrations') {
       fetchRegistrations();
+    } else if (type === 'petitions') {
+      fetchRecruitments();
     }
-  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations]);
+  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments]);
 
   // Load all data once on mount
   useEffect(() => {
@@ -196,8 +263,9 @@ export function DataProvider({ children }) {
       fetchArchiveTimeline();
       fetchLegacyTimeline();
       fetchRegistrations();
+      fetchRecruitments();
     }
-  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations]);
+  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments]);
 
   return (
     <DataContext.Provider
@@ -207,10 +275,13 @@ export function DataProvider({ children }) {
         archiveTimeline,
         legacyTimeline,
         registrations,
+        recruitments,
         loading,
         refreshData,
         addRegistration,
+        addRecruitment,
         deleteRegistration,
+        deleteRecruitment,
       }}
     >
       {children}

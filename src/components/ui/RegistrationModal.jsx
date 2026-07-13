@@ -41,7 +41,7 @@ export default function RegistrationModal({ isOpen, onClose, eventItem }) {
   return (
     <AnimatePresence>
       {isOpen && eventItem && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4">
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -54,9 +54,15 @@ export default function RegistrationModal({ isOpen, onClose, eventItem }) {
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-md bg-[#090909] border border-white/10 rounded-[2rem] shadow-2xl p-8 z-10 overflow-hidden"
+            className="relative w-full h-[100dvh] sm:h-auto sm:max-w-md bg-[#090909] border-t sm:border border-white/10 rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl p-6 sm:p-8 z-10 overflow-hidden flex flex-col justify-center sm:block"
           >
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white transition-colors"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
 
             {isSuccess ? (
               <motion.div 
@@ -87,27 +93,33 @@ export default function RegistrationModal({ isOpen, onClose, eventItem }) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  <div>
-                    <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Full Name</label>
+                  <div className="relative group">
+                    <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2 group-focus-within:text-primary/80 transition-colors">
+                      Full Name
+                    </label>
                     <input 
                       type="text" 
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="John Doe"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                      className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-none px-4 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03]"
                       required
                     />
+                    <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
                   </div>
-                  <div>
-                    <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Email Address</label>
+                  <div className="relative group">
+                    <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2 group-focus-within:text-primary/80 transition-colors">
+                      Email Address
+                    </label>
                     <input 
                       type="email" 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="john@example.com"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/50 transition-colors"
+                      className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-none px-4 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03]"
                       required
                     />
+                    <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
                   </div>
 
                   <div className="mt-4">

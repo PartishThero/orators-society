@@ -111,7 +111,7 @@ export default function Navbar() {
             {/* Hamburger Button for Mobile */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="flex md:hidden items-center justify-center w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors pointer-events-auto z-50 focus:outline-none"
+              className="flex md:hidden items-center justify-center w-11 h-11 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-colors pointer-events-auto z-50 focus:outline-none"
               aria-label="Toggle Menu"
             >
               <span className="material-symbols-outlined text-white text-[24px]">

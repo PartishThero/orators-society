@@ -384,10 +384,10 @@ export default function HomePage() {
                         <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-3 block group-hover:text-white/80 transition-colors duration-500">
                           {event.date}
                         </span>
-                        <h3 className="font-display-xl text-[2.25rem] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
+                        <h3 className="font-display-xl text-[clamp(1.5rem,5vw,2.25rem)] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
                           {event.title}
                         </h3>
-                        <div className="grid grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
+                        <div className="grid grid-rows-[1fr] opacity-100 lg:grid-rows-[0fr] lg:opacity-0 lg:group-hover:grid-rows-[1fr] lg:group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
                           <div className="overflow-hidden">
                             <p className="font-quote-serif text-[1.1rem] italic text-white/80 mt-4 mb-6 line-clamp-2">
                               "{event.subtitle || event.synopsis}"
