@@ -30,7 +30,7 @@ export default function BaseModal({ isOpen, onClose, item, children }) {
             animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
             exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
             transition={{ duration: 0.8, ease: 'easeInOut' }}
-            className="absolute inset-0 bg-black/85"
+            className="absolute inset-0 bg-black/30"
             onClick={onClose}
           />
 

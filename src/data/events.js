@@ -9,7 +9,8 @@ export const events = [
     winner: 'House of Logic',
     location: 'The Global Forum',
     height: 520,
-    colSpan: 2
+    colSpan: 2,
+    status: 'live'
   },
   {
     id: '2',
@@ -21,7 +22,8 @@ export const events = [
     winner: 'Coalition for Transparency',
     location: 'Chamber 7',
     height: 360,
-    colSpan: 3
+    colSpan: 3,
+    status: 'upcoming'
   },
   {
     id: '3',
@@ -33,7 +35,8 @@ export const events = [
     winner: 'Team Catalyst',
     location: 'Main Hall',
     height: 520,
-    colSpan: 3
+    colSpan: 3,
+    status: 'past'
   },
   {
     id: '4',
@@ -45,7 +48,8 @@ export const events = [
     winner: 'House of Logic',
     location: 'The Grand Forum',
     height: 300,
-    colSpan: 1
+    colSpan: 1,
+    status: 'past'
   },
   {
     id: '5',
@@ -57,7 +61,8 @@ export const events = [
     winner: 'Narrative Vanguard',
     location: 'Studio 3',
     height: 380,
-    colSpan: 1
+    colSpan: 1,
+    status: 'past'
   },
   {
     id: '6',
@@ -69,7 +74,8 @@ export const events = [
     winner: 'Agora Collective',
     location: 'Second Gallery',
     height: 460,
-    colSpan: 1
+    colSpan: 1,
+    status: 'past'
   },
   {
     id: '7',
@@ -81,7 +87,8 @@ export const events = [
     winner: 'House of Logic',
     location: 'Hall B',
     height: 340,
-    colSpan: 3
+    colSpan: 3,
+    status: 'past'
   },
   {
     id: '8',
@@ -92,6 +99,7 @@ export const events = [
     synopsis: 'A workshop on crafting structures that carry ideas beyond the room.',
     winner: 'Silent Partners',
     location: 'Main Hall',
-    height: 500
+    height: 500,
+    status: 'past'
   }
 ];

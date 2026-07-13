@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BaseModal from './BaseModal'
 
-export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave }) {
+export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave, onRegister }) {
   if (typeof document === 'undefined') return null
 
   const [editItem, setEditItem] = useState(item || {});
@@ -11,21 +11,17 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
     if (item) {
       setEditItem({
         ...item,
-        themes: item.themes || ['Privacy', 'Consent', 'Governance', 'Digital Ethics'],
-        gallery: item.gallery || [
-          'https://picsum.photos/id/1025/400/300?grayscale',
-          'https://picsum.photos/id/1035/400/300?grayscale',
-          'https://picsum.photos/id/1005/400/300?grayscale'
-        ],
-        runner_up: item.runner_up || 'Coalition for Transparency',
-        event_series: item.event_series || 'The Disruption Series',
-        attendance: item.attendance || '450 Guests',
-        speaker_count: item.speaker_count || '14',
-        duration: item.duration || '120 Min',
-        participants: item.participants || '14',
-        rounds: item.rounds || '3',
-        judges: item.judges || 'Panel of 5',
-        winning_argument: item.winning_argument || 'The boundaries of the public record are no longer dictated by physical walls, but by the invisible architecture of consent.',
+        themes: item.themes || [],
+        gallery: item.gallery || [],
+        runner_up: item.runner_up || '',
+        event_series: item.event_series || '',
+        attendance: item.attendance || '',
+        speaker_count: item.speaker_count || '',
+        duration: item.duration || '',
+        participants: item.participants || '',
+        rounds: item.rounds || '',
+        judges: item.judges || '',
+        winning_argument: item.winning_argument || '',
       });
     }
   }, [item, isOpen]);
@@ -39,7 +35,17 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
 
   const handleSave = () => {
     if (onSave) {
-      onSave(editItem);
+      const isPast = (editItem.status || 'past') === 'past';
+      const finalItem = { ...editItem };
+      if (!isPast) {
+        finalItem.winner = '';
+        finalItem.runner_up = '';
+        finalItem.winning_argument = '';
+        finalItem.attendance = '';
+        finalItem.speaker_count = '';
+        finalItem.gallery = [];
+      }
+      onSave(finalItem);
     }
   };
 
@@ -52,14 +58,16 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
         isAdminEdit={isAdminEdit} 
         onFieldChange={handleFieldChange} 
         onSave={handleSave} 
+        onRegister={onRegister}
       />
     </BaseModal>
   )
 }
 
-function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef }) {
+function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef, onRegister }) {
   const themes = item.themes || [];
   const gallery = item.gallery || [];
+  const isPast = (item.status || 'past') === 'past';
 
   const [cardDragActive, setCardDragActive] = useState(false);
   const [galleryDragActive, setGalleryDragActive] = useState(false);
@@ -269,6 +277,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   type="text"
                   value={item.title || ''}
                   onChange={(e) => onFieldChange('title', e.target.value)}
+                  placeholder="New Event Title"
                   className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
                   required
                 />
@@ -292,6 +301,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   type="text"
                   value={item.subtitle || ''}
                   onChange={(e) => onFieldChange('subtitle', e.target.value)}
+                  placeholder="Add a subtitle here..."
                   className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary italic font-quote-serif text-[1.2rem] w-full focus:outline-none focus:border-primary/50"
                 />
               </div>
@@ -303,39 +313,57 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           </motion.div>
 
           {/* Inline Metadata */}
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}
-            className="mb-16 border-y border-white/5 py-6"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {[
-                { label: 'Duration', key: 'duration', placeholder: '120 Min' },
-                { label: 'Participants', key: 'participants', placeholder: '14' },
-                { label: 'Rounds', key: 'rounds', placeholder: '3' },
-                { label: 'Judges', key: 'judges', placeholder: 'Panel of 5' }
-              ].map(d => (
-                <div key={d.key} className="flex flex-col gap-1.5">
-                  <span className="font-label-caps text-[9px] text-white/40 tracking-[0.2em] uppercase">{d.label}:</span>
-                  {isAdminEdit ? (
-                    <input 
-                      type="text"
-                      value={item[d.key] || ''}
-                      onChange={(e) => onFieldChange(d.key, e.target.value)}
-                      placeholder={d.placeholder}
-                      className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
-                    />
-                  ) : (
-                    <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{item[d.key]}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
+          {((isAdminEdit) || [
+            item.duration,
+            item.participants,
+            item.rounds,
+            item.judges
+          ].some(val => val && val.trim() !== '')) && (
+            <motion.div 
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}
+              className="mb-16 border-y border-white/5 py-6"
+            >
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[
+                  { label: 'Duration', key: 'duration', placeholder: '120 Min', options: ['30 Min', '60 Min', '90 Min', '120 Min'] },
+                  { label: 'Participants', key: 'participants', placeholder: '14' },
+                  { label: 'Rounds', key: 'rounds', placeholder: '3', options: ['1', '2', '3', '4', '5'] },
+                  { label: 'Judges', key: 'judges', placeholder: 'Panel of 5', options: ['Single Judge', 'Panel of 3', 'Panel of 5', 'Audience Vote'] }
+                ].filter(d => isAdminEdit || (item[d.key] && item[d.key].trim() !== '')).map(d => (
+                  <div key={d.key} className="flex flex-col gap-1.5">
+                    <span className="font-label-caps text-[9px] text-white/40 tracking-[0.2em] uppercase">{d.label}:</span>
+                    {isAdminEdit ? (
+                      d.options ? (
+                        <select
+                          value={item[d.key] || ''}
+                          onChange={(e) => onFieldChange(d.key, e.target.value)}
+                          className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
+                        >
+                          <option value="" disabled className="bg-[#090909]">{d.placeholder}</option>
+                          {d.options.map(opt => <option key={opt} value={opt} className="bg-[#090909]">{opt}</option>)}
+                        </select>
+                      ) : (
+                        <input 
+                          type="text"
+                          value={item[d.key] || ''}
+                          onChange={(e) => onFieldChange(d.key, e.target.value)}
+                          placeholder={d.placeholder}
+                          className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
+                        />
+                      )
+                    ) : (
+                      <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{item[d.key]}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
           {/* Event Overview */}
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }}
-            className="font-body-md text-white/70 text-[1.05rem] leading-[1.8] space-y-6 mb-16"
+            className="font-body-md text-white/80 text-[1.1rem] md:text-[1.15rem] leading-[2] tracking-[0.01em] max-w-[65ch] space-y-6 mb-16"
           >
             {isAdminEdit ? (
               <div className="flex flex-col gap-1">
@@ -343,70 +371,86 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                 <textarea 
                   value={item.synopsis || ''}
                   onChange={(e) => onFieldChange('synopsis', e.target.value)}
+                  placeholder="Add a detailed description here..."
                   rows="6"
                   className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[16px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
                   required
                 />
               </div>
             ) : (
-              <>
-                <p>
-                  {item.synopsis || 'Participants challenged the prevailing narratives, stripping away convention to debate the core philosophies that shape our modern society.'}
-                </p>
-                <p>
-                  The session opened with an exploration of historical precedents, carefully dismantling the established views that have long governed public opinion. It became clear early on that the traditional frameworks were insufficient for addressing the complexities of the digital age.
-                </p>
-                <p>
-                  By the final round, the discourse shifted toward actionable governance. The debate not only highlighted the inherent tensions between opposing ideologies but also proposed a radical new synthesis that left the audience in contemplative silence.
-                </p>
-              </>
+              <div className="space-y-6">
+                {item.synopsis ? (
+                  item.synopsis.split('\n\n').map((paragraph, index) => (
+                    <p key={index}>{paragraph}</p>
+                  ))
+                ) : (
+                  <>
+                    <p>
+                      Participants challenged the prevailing narratives, stripping away convention to debate the core philosophies that shape our modern society.
+                    </p>
+                    <p>
+                      The session opened with an exploration of historical precedents, carefully dismantling the established views that have long governed public opinion. It became clear early on that the traditional frameworks were insufficient for addressing the complexities of the digital age.
+                    </p>
+                    <p>
+                      By the final round, the discourse shifted toward actionable governance. The debate not only highlighted the inherent tensions between opposing ideologies but also proposed a radical new synthesis that left the audience in contemplative silence.
+                    </p>
+                  </>
+                )}
+              </div>
             )}
           </motion.div>
 
           {/* Discussion Themes */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="mb-16">
-            <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-4">Themes</h5>
-            {isAdminEdit ? (
-              <div className="flex flex-col gap-1">
-                <input 
-                  type="text"
-                  value={themes.join(', ')}
-                  onChange={(e) => onFieldChange('themes', e.target.value.split(',').map(t => t.trim()))}
-                  placeholder="Privacy, Consent, Governance (Comma separated)"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50"
-                />
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {themes.map(theme => (
-                  <span key={theme} className="font-label-caps text-[10px] tracking-[0.15em] uppercase px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/80">
-                    {theme}
-                  </span>
-                ))}
-              </div>
-            )}
-          </motion.div>
+          {((isAdminEdit) || (themes.length > 0)) && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="mb-16">
+              <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-4">Themes</h5>
+              {isAdminEdit ? (
+                <div className="flex flex-col gap-1">
+                  <input 
+                    type="text"
+                    value={themes.join(', ')}
+                    onChange={(e) => onFieldChange('themes', e.target.value.split(',').map(t => t.trim()))}
+                    placeholder="Privacy, Consent, Governance (Comma separated)"
+                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50"
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-3">
+                  {themes.map(theme => (
+                    <span key={theme} className="font-label-caps text-[10px] tracking-[0.15em] uppercase px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/80">
+                      {theme}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
 
           {/* Winning Argument Pull-Quote */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
-            <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Winning Argument</h5>
-            {isAdminEdit ? (
-              <textarea 
-                value={item.winning_argument || ''}
-                onChange={(e) => onFieldChange('winning_argument', e.target.value)}
-                rows="3"
-                className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50"
-              />
-            ) : (
-              <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
-                "{item.winning_argument}"
-              </p>
-            )}
-          </motion.div>
+          {((isAdminEdit) || (item.winning_argument && item.winning_argument.trim() !== '')) && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
+              <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Winning Argument</h5>
+              {isAdminEdit ? (
+                <textarea 
+                  value={item.winning_argument || ''}
+                  onChange={(e) => onFieldChange('winning_argument', e.target.value)}
+                  placeholder="Add the winning argument pull-quote..."
+                  rows="3"
+                  disabled={!isPast}
+                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50 ${!isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                />
+              ) : (
+                <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
+                  "{item.winning_argument}"
+                </p>
+              )}
+            </motion.div>
+          )}
 
           {/* Gallery Preview */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-20">
-            <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-6">Gallery Images</h5>
+          {((isAdminEdit) || (gallery.length > 0)) && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-20">
+              <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-6">Gallery Images</h5>
             {isAdminEdit ? (
               <div className="flex flex-col gap-6">
                 
@@ -463,7 +507,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                 </div>
 
                 {/* ── GALLERY IMAGES UPLOAD ── */}
-                <div className="flex flex-col gap-2">
+                <div className={`flex flex-col gap-2 ${!isPast ? 'opacity-50 pointer-events-none select-none' : ''}`}>
                   <span className="text-[9px] font-label-caps text-white/40 uppercase">Add Gallery Images</span>
                   <div 
                     onDragEnter={handleGalleryDrag}
@@ -543,6 +587,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               </div>
             )}
           </motion.div>
+          )}
 
           {/* Admin Save Button */}
           {isAdminEdit && (
@@ -568,15 +613,32 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             animate="visible"
             className="flex flex-row md:flex-col gap-8 md:gap-10 overflow-x-auto md:overflow-visible pb-4 md:pb-0"
           >
+            {(!isAdminEdit && !isPast) && (
+              <div className="mb-8 md:mb-10 w-full">
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (onRegister) onRegister();
+                  }}
+                  style={{ borderRadius: '9999px' }}
+                  className="group relative w-full font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]"
+                >
+                  <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
+                  Register for Event
+                  <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>
+                </button>
+              </div>
+            )}
+
             {[
-              { label: 'Winner', key: 'winner', placeholder: 'House of Logic' },
-              { label: 'Runner Up', key: 'runner_up', placeholder: 'Coalition for Transparency' },
+              { label: 'Winner', key: 'winner', placeholder: 'House of Logic', pastOnly: true },
+              { label: 'Runner Up', key: 'runner_up', placeholder: 'Coalition for Transparency', pastOnly: true },
               { label: 'Event Series', key: 'event_series', placeholder: 'The Disruption Series' },
               { label: 'Date / Year', key: 'date', placeholder: 'Oct 26, 2024' },
               { label: 'Venue / Location', key: 'location', placeholder: 'The Grand Forum' },
-              { label: 'Attendance', key: 'attendance', placeholder: '450 Guests' },
-              { label: 'Speaker Count', key: 'speaker_count', placeholder: '14' },
-            ].map((data, i) => (
+              { label: 'Attendance', key: 'attendance', placeholder: '450 Guests', pastOnly: true },
+              { label: 'Speaker Count', key: 'speaker_count', placeholder: '14', pastOnly: true },
+            ].filter(data => isAdminEdit || (item[data.key] && item[data.key].trim() !== '')).map((data, i, arr) => (
               <div 
                 key={data.label}
                 className="flex flex-col gap-2 min-w-[120px] md:min-w-0"
@@ -591,14 +653,15 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     value={item[data.key] || ''}
                     onChange={(e) => onFieldChange(data.key, e.target.value)}
                     placeholder={data.placeholder}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono"
+                    disabled={data.pastOnly && !isPast}
+                    className={`bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono ${data.pastOnly && !isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
                 ) : (
-                  <span className="font-body-md text-[13px] text-white/90">
+                  <span className="font-body-md text-[16px] font-semibold text-white">
                     {item[data.key]}
                   </span>
                 )}
-                {i < 6 && (
+                {i < arr.length - 1 && (
                   <div className="hidden md:block w-full h-[1px] bg-white/5 mt-4" />
                 )}
               </div>
@@ -630,8 +693,23 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
                   />
                 </div>
+
+                <div className="flex flex-col gap-2">
+                  <span className="font-label-caps text-[9px] text-white/40 uppercase">Event Status</span>
+                  <select 
+                    value={item.status || 'past'}
+                    onChange={(e) => onFieldChange('status', e.target.value)}
+                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
+                  >
+                    <option value="past" className="bg-[#090909]">Past</option>
+                    <option value="live" className="bg-[#090909]">Live</option>
+                    <option value="upcoming" className="bg-[#090909]">Upcoming</option>
+                  </select>
+                </div>
               </div>
             )}
+
+
 
           </motion.div>
         </div>

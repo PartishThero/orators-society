@@ -4,20 +4,22 @@ import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
-const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
 import { useData } from '../context/DataContext'
 
+const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
+const RegistrationModal = lazy(() => import('../components/ui/RegistrationModal'))
+
 export default function ArchivePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
+  const [registerModalOpen, setRegisterModalOpen] = useState(false)
+  const [registerItem, setRegisterItem] = useState(null)
+  const [returnToArchive, setReturnToArchive] = useState(false)
+  const [activeFilter, setActiveFilter] = useState('All Events')
   const { events: eventsList, archiveTimeline: timelineList } = useData()
-
-
-  const sortedEvents = [...eventsList].sort((a, b) => new Date(b.date) - new Date(a.date));
-  const featuredEvent = sortedEvents[0] || localEvents[0];
 
   return (
     <PageLayout grainientProps={{
@@ -49,63 +51,6 @@ export default function ArchivePage() {
           </motion.div>
         </SectionWrapper>
 
-        {/* ── 2. Featured Archive ── */}
-        <SectionWrapper className="py-16 md:py-24 px-[clamp(1.5rem,7vw,10rem)] relative z-10">
-          <ArchitecturalGrid />
-          <div className="flex flex-col items-center text-center mb-8 md:mb-16">
-            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
-              FEATURED SESSION
-            </span>
-            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter">
-              THE LATEST DISCOURSE
-            </h2>
-          </div>
-
-          <motion.div
-            className="glass-panel rounded-xl overflow-hidden group cursor-pointer relative h-[380px] sm:h-[480px] md:h-[600px] flex flex-col justify-end border border-outline-variant/20"
-            onClick={() => {
-              setSelectedItem(featuredEvent)
-              setModalOpen(true)
-            }}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            whileHover={{ scale: 1.01 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="absolute inset-0 z-0 bg-[#0D0D0D] overflow-hidden">
-              <motion.img
-                alt={featuredEvent.title}
-                className="w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-80 transition-transform duration-1000 ease-out"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.6 }}
-                transition={{ duration: 1.1, delay: 0.25, ease: 'easeOut' }}
-                src={featuredEvent.img}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent" />
-            </div>
-
-            <div className="relative z-10 p-6 sm:p-10 md:p-16 flex flex-col justify-end h-full w-full md:w-2/3">
-              <div className="flex items-center gap-4 mb-3 md:mb-6">
-                <span className="font-label-caps text-secondary tracking-[0.2em] uppercase font-semibold">
-                  LATEST SESSION
-                </span>
-                <span className="font-label-caps text-on-surface-variant">
-                  {new Date(featuredEvent.date).getFullYear()}
-                </span>
-              </div>
-              <h2 className="text-[64px] font-display-xl text-on-surface mb-3 md:mb-6 leading-none group-hover:translate-x-2 transition-transform duration-500 uppercase tracking-tighter">
-                {featuredEvent.title}
-              </h2>
-              <p className="font-quote-serif text-on-surface-variant italic max-w-md text-sm md:text-base">
-                "{featuredEvent.subtitle}"
-              </p>
-            </div>
-
-            <div className="absolute bottom-6 right-6 md:bottom-12 md:right-12 z-10 w-12 h-12 md:w-16 md:h-16 rounded-full border border-primary/30 flex items-center justify-center group-hover:bg-primary/10 transition-colors duration-400">
-              <span className="material-symbols-outlined text-primary text-xl md:text-3xl">play_arrow</span>
-            </div>
-          </motion.div>
-        </SectionWrapper>
 
         {/* ── 3. Discourse Catalog Masonry ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] relative z-10">
@@ -122,8 +67,35 @@ export default function ArchivePage() {
             </p>
           </div>
 
+          <div className="flex flex-wrap justify-center gap-2 mb-12 relative z-20">
+            {['All Events', 'Upcoming', 'Live'].map(filterOption => (
+              <button
+                key={filterOption}
+                onClick={() => setActiveFilter(filterOption)}
+                className={`relative px-6 py-2.5 rounded-full text-[12px] font-label-caps uppercase tracking-wider transition-all duration-300 ${
+                  activeFilter === filterOption
+                    ? 'text-black font-semibold'
+                    : 'text-white/60 hover:text-white bg-white/[0.02] border border-white/5 hover:bg-white/[0.05]'
+                }`}
+              >
+                {filterOption}
+                {activeFilter === filterOption && (
+                  <motion.div
+                    layoutId="archiveFilter"
+                    className="absolute inset-0 bg-primary rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+
           <Masonry
-            items={eventsList}
+            items={
+              activeFilter === 'All Events' 
+                ? eventsList 
+                : eventsList.filter(e => (e.status || 'past').toLowerCase() === activeFilter.toLowerCase())
+            }
             ease="power3.out"
             duration={0.75}
             stagger={0.06}
@@ -135,6 +107,11 @@ export default function ArchivePage() {
             onItemClick={useCallback(item => {
               setSelectedItem(item)
               setModalOpen(true)
+            }, [])}
+            onRegisterClick={useCallback(item => {
+              setReturnToArchive(false)
+              setRegisterItem(item)
+              setRegisterModalOpen(true)
             }, [])}
           />
         </SectionWrapper>
@@ -151,7 +128,33 @@ export default function ArchivePage() {
       </main>
 
       <Suspense fallback={null}>
-        <ArchiveModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedItem(null), 300); }} item={selectedItem} />
+        <ArchiveModal 
+          isOpen={modalOpen} 
+          onClose={() => { setModalOpen(false); setTimeout(() => setSelectedItem(null), 300); }} 
+          item={selectedItem} 
+          onRegister={() => {
+            setReturnToArchive(true)
+            setRegisterItem(selectedItem)
+            setModalOpen(false)
+            setTimeout(() => setRegisterModalOpen(true), 300)
+          }}
+        />
+        <RegistrationModal 
+          isOpen={registerModalOpen} 
+          onClose={() => { 
+            setRegisterModalOpen(false);
+            if (returnToArchive && registerItem) {
+              setSelectedItem(registerItem);
+              setTimeout(() => {
+                setModalOpen(true);
+                setReturnToArchive(false);
+              }, 300);
+            } else {
+              setTimeout(() => setRegisterItem(null), 300); 
+            }
+          }} 
+          eventItem={registerItem} 
+        />
       </Suspense>
     </PageLayout>
   )

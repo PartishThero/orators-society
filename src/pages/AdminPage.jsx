@@ -11,7 +11,12 @@ import ArchiveModal from '../components/ui/ArchiveModal';
 import { useData } from '../context/DataContext';
 
 export default function AdminPage() {
-  const { refreshData } = useData();
+  const { refreshData, events: allEvents, legacyEvents: allLegacyEvents } = useData();
+
+  const getEventTitle = (eventId) => {
+    const event = [...(allEvents || []), ...(allLegacyEvents || [])].find(e => e.id === eventId);
+    return event ? event.title : eventId;
+  };
 
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -30,9 +35,12 @@ export default function AdminPage() {
   const [whitelist, setWhitelist] = useState([]);
   const [archiveTimeline, setArchiveTimeline] = useState([]);
   const [legacyTimeline, setLegacyTimeline] = useState([]);
+  const [registrations, setRegistrations] = useState([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
+  
+  const [registrationFilter, setRegistrationFilter] = useState('All');
 
   // Form Modal States
   const [showModal, setShowModal] = useState(false);
@@ -120,6 +128,13 @@ export default function AdminPage() {
           .order('year', { ascending: false });
         if (error) throw error;
         setLegacyTimeline(data || []);
+      } else if (activeTab === 'registrations') {
+        const { data, error } = await supabase
+          .from('event_registrations')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        setRegistrations(data || []);
       }
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -177,7 +192,8 @@ export default function AdminPage() {
         winner: e.winner || '',
         location: e.location || '',
         height: e.height || 400,
-        col_span: e.colSpan || 1
+        col_span: e.colSpan || 1,
+        status: e.status || 'past'
       }));
 
       if (mappedEvents.length > 0) {
@@ -196,7 +212,8 @@ export default function AdminPage() {
         winner: e.winner || '',
         location: e.location || '',
         height: e.height || 400,
-        col_span: e.colSpan || 1
+        col_span: e.colSpan || 1,
+        status: e.status || 'past'
       }));
 
       if (mappedLegacy.length > 0) {
@@ -278,26 +295,27 @@ export default function AdminPage() {
       setShowModal(true);
     } else {
       setEditingItem({
-        title: 'New Event Title',
-        subtitle: 'Add a subtitle here...',
-        date: 'Jun 4, 2026',
-        location: 'The Main Hall',
-        winner: 'House of Logic',
-        runner_up: 'Coalition for Transparency',
-        event_series: 'The Disruption Series',
-        attendance: '450 Guests',
-        speaker_count: '14',
-        duration: '120 Min',
-        participants: '14',
-        rounds: '3',
-        judges: 'Panel of 5',
-        img: 'https://picsum.photos/id/1025/800/1100?grayscale',
-        synopsis: 'Add a detailed description here...',
-        winning_argument: 'Add the winning argument pull-quote...',
+        title: '',
+        subtitle: '',
+        date: '',
+        location: '',
+        winner: '',
+        runner_up: '',
+        event_series: '',
+        attendance: '',
+        speaker_count: '',
+        duration: '',
+        participants: '',
+        rounds: '',
+        judges: '',
+        img: '',
+        synopsis: '',
+        winning_argument: '',
         height: 500,
         col_span: 2,
-        themes: ['Debate', 'Governance'],
-        gallery: ['https://picsum.photos/id/1025/400/300?grayscale', 'https://picsum.photos/id/1035/400/300?grayscale']
+        status: 'past',
+        themes: [],
+        gallery: []
       });
       setShowModal(true);
     }
@@ -449,7 +467,8 @@ export default function AdminPage() {
         judges: updatedItem.judges,
         themes: updatedItem.themes,
         winning_argument: updatedItem.winning_argument,
-        gallery: updatedItem.gallery
+        gallery: updatedItem.gallery,
+        status: updatedItem.status || 'past'
       };
 
       if (updatedItem.id) {
@@ -478,17 +497,20 @@ export default function AdminPage() {
     }
   }
 
-  // Delete Item
-  async function handleDelete(id, titleOrEmail) {
-    if (!window.confirm(`Are you sure you want to delete "${titleOrEmail}"?`)) return;
-    setStatusMessage(null);
-    const table = 
-      activeTab === 'events' ? 'events' : 
-      activeTab === 'legacy' ? 'legacy_events' : 
-      activeTab === 'whitelist' ? 'allowed_admins' : 
-      activeTab === 'archive_timeline' ? 'archive_timeline' : 'legacy_timeline';
+  // Delete Handlers
+  async function handleDelete(id, type) {
+    if (!window.confirm(`Are you sure you want to delete this ${type}? This action cannot be undone.`)) return;
 
+    setStatusMessage(null);
     try {
+      let table = '';
+      if (type.includes('Event')) table = 'events';
+      else if (type.includes('Legacy Event')) table = 'legacy_events';
+      else if (type.includes('Whitelist')) table = 'allowed_admins';
+      else if (type.includes('Archive Timeline')) table = 'archive_timeline';
+      else if (type.includes('Legacy Timeline')) table = 'legacy_timeline';
+      else if (type === 'Registration') table = 'event_registrations';
+      
       const { error } = await supabase
         .from(table)
         .delete()
@@ -681,35 +703,62 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                   {/* Top Bar with Navigation & Actions */}
                   <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-white/5 pb-6">
                     {/* Tab Navigation */}
-                    <div className="flex flex-wrap gap-2 p-1 bg-white/[0.02] border border-white/5 rounded-[2rem] backdrop-blur-md relative max-w-full">
-                      {[
-                        { id: 'events', label: 'Active Events' },
-                        { id: 'legacy', label: 'Legacy Events' },
-                        { id: 'archive_timeline', label: 'Archive Timeline' },
-                        { id: 'legacy_timeline', label: 'Legacy Timeline' },
-                        { id: 'whitelist', label: 'Admin Whitelist' }
-                      ].map((tab) => (
-                        <button
-                          key={tab.id}
-                          onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
-                          className={`relative px-5 py-2.5 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                            activeTab === tab.id ? 'text-black font-semibold' : 'text-white/60 hover:text-white'
-                          }`}
-                        >
-                          {tab.label}
-                          {activeTab === tab.id && (
-                            <motion.div
-                              layoutId="activeTabPill"
-                              className="absolute inset-0 bg-primary rounded-full -z-10"
-                              transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                            />
-                          )}
-                        </button>
-                      ))}
+                    <div className="flex flex-wrap items-center gap-3 p-1 max-w-full">
+                      <div className="flex flex-wrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md">
+                        {[
+                          { id: 'events', label: 'Active Events' },
+                          { id: 'legacy', label: 'Legacy Events' },
+                          { id: 'archive_timeline', label: 'Archive Timeline' },
+                          { id: 'legacy_timeline', label: 'Legacy Timeline' }
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                            className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                              activeTab === tab.id ? 'text-black font-semibold' : 'text-white/40 hover:text-white/80'
+                            }`}
+                          >
+                            {tab.label}
+                            {activeTab === tab.id && (
+                              <motion.div
+                                layoutId="activeTabPill"
+                                className="absolute inset-0 bg-primary rounded-full -z-10"
+                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      <div className="hidden md:block w-px h-6 bg-white/10 mx-1" />
+
+                      <div className="flex flex-wrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md">
+                        {[
+                          { id: 'registrations', label: 'Registrations' },
+                          { id: 'whitelist', label: 'Admin Whitelist' }
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                            className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                              activeTab === tab.id ? 'text-black font-semibold' : 'text-white/40 hover:text-white/80'
+                            }`}
+                          >
+                            {tab.label}
+                            {activeTab === tab.id && (
+                              <motion.div
+                                layoutId="activeTabPill"
+                                className="absolute inset-0 bg-primary rounded-full -z-10"
+                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6">
                       <button
                         onClick={syncInitialData}
                         disabled={syncLoading}
@@ -727,6 +776,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           ? '+ Add Archive Year' 
                           : activeTab === 'legacy_timeline' 
                           ? '+ Add Legacy Year' 
+                          : activeTab === 'registrations'
+                          ? 'View Only'
                           : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`
                         }
                       </button>
@@ -818,15 +869,19 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                     />
                                   </td>
                                   <td className="p-5">
-                                    <span className="text-white text-[15px] font-semibold block">{item.title}</span>
-                                    <span className="text-white/45 text-[12px] block line-clamp-1 mt-0.5">{item.subtitle || item.synopsis}</span>
+                                    <span className="text-white text-[15px] font-semibold block">{item.title || 'Untitled Event'}</span>
+                                    <span className="text-white/45 text-[12px] block line-clamp-1 mt-0.5">{item.subtitle || item.synopsis || 'No description available'}</span>
                                   </td>
                                   <td className="p-5">
-                                    <span className="text-white text-[13px] block">{item.date}</span>
-                                    <span className="text-white/45 text-[12px] block">{item.location}</span>
+                                    <span className="text-white text-[13px] block">{item.date || 'TBD'}</span>
+                                    <span className="text-white/45 text-[12px] block">{item.location || 'TBA'}</span>
                                   </td>
                                   <td className="p-5">
-                                    <span className="bg-primary/10 border border-primary/20 text-primary text-[10px] font-label-caps uppercase px-2.5 py-1 rounded-full inline-block">
+                                    <span className={`text-[10px] font-label-caps uppercase px-2.5 py-1 rounded-full inline-block border ${
+                                      !item.winner || item.winner.trim() === '' || item.winner === 'N/A' 
+                                      ? 'bg-white/5 border-white/10 text-white/40' 
+                                      : 'bg-primary/10 border-primary/20 text-primary'
+                                    }`}>
                                       {item.winner || 'N/A'}
                                     </span>
                                   </td>
@@ -961,6 +1016,75 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         </table>
                       </div>
                     )}
+
+                    {/* Registrations Tab */}
+                    {activeTab === 'registrations' && (
+                      <div className="flex flex-col">
+                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white/[0.02] border-b border-white/5 p-4 px-5">
+                          <div className="flex items-center gap-3">
+                            <span className="font-label-caps text-[10px] uppercase tracking-wider text-white/50">Total Registrations:</span>
+                            <span className="font-mono text-[16px] text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
+                              {registrations.filter(r => registrationFilter === 'All' || r.event_id === registrationFilter).length}
+                            </span>
+                          </div>
+                          
+                          <div className="flex items-center gap-3">
+                            <span className="font-label-caps text-[10px] uppercase tracking-wider text-white/50">Filter by Event:</span>
+                            <select 
+                              value={registrationFilter}
+                              onChange={(e) => setRegistrationFilter(e.target.value)}
+                              className="bg-black/50 border border-white/10 rounded-lg px-3 py-1.5 text-white text-[12px] focus:outline-none focus:border-primary/50"
+                            >
+                              <option value="All">All Events</option>
+                              {[...new Set(registrations.map(r => r.event_id))].filter(Boolean).map(eventId => (
+                                <option key={eventId} value={eventId}>{getEventTitle(eventId)}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                          
+                        <div className="overflow-x-auto min-h-[300px]">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="border-b border-white/10 bg-black/20">
+                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Date</th>
+                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Event</th>
+                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Name</th>
+                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Email</th>
+                                <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 text-right">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {registrations.filter(r => registrationFilter === 'All' || r.event_id === registrationFilter).length === 0 ? (
+                                <tr>
+                                  <td colSpan="5" className="p-12 text-center text-white/40 font-mono text-[14px]">No registrations found for this selection.</td>
+                                </tr>
+                              ) : (
+                                registrations
+                                  .filter(r => registrationFilter === 'All' || r.event_id === registrationFilter)
+                                  .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                                  .map((item) => (
+                                  <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                                    <td className="p-5 text-white/60 text-[12px]">{new Date(item.created_at).toLocaleDateString()}</td>
+                                    <td className="p-5 text-white/60 text-[12px]">{getEventTitle(item.event_id)}</td>
+                                    <td className="p-5 text-white font-semibold text-[13px]">{item.name}</td>
+                                    <td className="p-5 text-white/80 text-[13px]">{item.email}</td>
+                                    <td className="p-5 text-right">
+                                      <button 
+                                        onClick={() => handleDelete(item.id, 'Registration')}
+                                        className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
+                                      >
+                                        Delete
+                                      </button>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -979,7 +1103,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowModal(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/30 backdrop-blur-xl"
             />
             
             <motion.div 

@@ -53,7 +53,8 @@ const Masonry = ({
   hoverScale = 0.95,
   blurToFocus = true,
   colorShiftOnHover = false,
-  onItemClick = () => {}
+  onItemClick = () => {},
+  onRegisterClick = () => {}
 }) => {
   const columns = useMedia(
     ['(min-width:1500px)', '(min-width:1024px)', '(min-width:768px)', '(min-width:640px)'],
@@ -249,7 +250,17 @@ return (
               <span className="item-overlay-sub">{item.subtitle}</span>
             )}
             <div className="item-overlay-meta">
-              {item.winner && (
+              {(item.status === 'live' || item.status === 'upcoming') ? (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRegisterClick(item);
+                  }}
+                  className="bg-primary text-black font-label-caps uppercase text-[9px] font-bold px-3 py-1.5 rounded-full hover:bg-white transition-colors"
+                >
+                  Register
+                </button>
+              ) : item.winner && (
                 <span className="item-overlay-badge">{item.winner}</span>
               )}
               {item.date && (

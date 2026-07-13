@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { motion, useSpring } from "framer-motion"
 
 const DESKTOP_POINTER_QUERY = "(any-hover: hover) and (any-pointer: fine)"
@@ -82,6 +83,7 @@ export function SmoothCursor({
   const lastUpdateTime = useRef(Date.now())
   const previousAngle = useRef(0)
   const accumulatedRotation = useRef(0)
+  const isClicking = useRef(false)
   const [isEnabled, setIsEnabled] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
 
@@ -169,14 +171,18 @@ export function SmoothCursor({
         rotation.set(accumulatedRotation.current)
         previousAngle.current = currentAngle
 
-        scale.set(0.95)
+        if (!isClicking.current) {
+          scale.set(0.95)
+        }
 
         if (timeout !== null) {
           clearTimeout(timeout)
         }
 
         timeout = setTimeout(() => {
-          scale.set(1)
+          if (!isClicking.current) {
+            scale.set(1)
+          }
         }, 150)
       }
     }
@@ -195,6 +201,18 @@ export function SmoothCursor({
       })
     }
 
+    const handlePointerDown = (e) => {
+      if (!isTrackablePointer(e.pointerType)) return
+      isClicking.current = true
+      scale.set(0.75)
+    }
+
+    const handlePointerUp = (e) => {
+      if (!isTrackablePointer(e.pointerType)) return
+      isClicking.current = false
+      scale.set(1)
+    }
+
     // Add CSS globally to hide the native cursor on pointermove
     const styleEl = document.createElement("style")
     styleEl.innerHTML = `
@@ -207,9 +225,17 @@ export function SmoothCursor({
     window.addEventListener("pointermove", throttledPointerMove, {
       passive: true,
     })
+    window.addEventListener("pointerdown", handlePointerDown, {
+      passive: true,
+    })
+    window.addEventListener("pointerup", handlePointerUp, {
+      passive: true,
+    })
 
     return () => {
       window.removeEventListener("pointermove", throttledPointerMove)
+      window.removeEventListener("pointerdown", handlePointerDown)
+      window.removeEventListener("pointerup", handlePointerUp)
       document.head.removeChild(styleEl)
       if (rafId) cancelAnimationFrame(rafId)
       if (timeout !== null) {
@@ -222,7 +248,7 @@ export function SmoothCursor({
     return null
   }
 
-  return (
+  const cursorContent = (
     <motion.div
       style={{
         position: "fixed",
@@ -248,4 +274,6 @@ export function SmoothCursor({
       {cursor}
     </motion.div>
   )
+
+  return typeof document !== "undefined" ? createPortal(cursorContent, document.body) : null
 }
