@@ -10,7 +10,7 @@ import { DataProvider } from './context/DataContext'
 const HomePage = lazy(() => import('./pages/HomePage'))
 const ArchivePage = lazy(() => import('./pages/ArchivePage'))
 const LegacyPage = lazy(() => import('./pages/LegacyPage'))
-const StagePage = lazy(() => import('./pages/StagePage'))
+const GalleryPage = lazy(() => import('./pages/GalleryPage'))
 const AdminPage = lazy(() => import('./pages/AdminPage'))
 
 function ScrollToTop() {
@@ -33,7 +33,7 @@ function AnimatedRoutes() {
           <Route path="/" element={<HomePage />} />
           <Route path="/archive" element={<ArchivePage />} />
           <Route path="/legacy" element={<LegacyPage />} />
-          <Route path="/stage" element={<StagePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </Suspense>

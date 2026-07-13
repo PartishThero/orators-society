@@ -12,6 +12,7 @@ import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
 import Masonry from '../components/sections/Masonry'
 import { useData } from '../context/DataContext'
+import { coreFounders, otherMembers } from '../data/founders'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -154,7 +155,7 @@ export default function HomePage() {
                 items={[
                   {
                     id: 'philosophy-img',
-                    img: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDKLcZnxXtiUpym29nbZcmcGIRFzPBzTboLmcn70G0q-i7-76jQg8VyHbtyQ0IysutbAlW2RGS0Yj47hopUhV3mj-Y7pQv8rapayb-e2C7V46W5h1XoBaMVTQUsliV4qgUUHehJ9Owtkx_lTMEn6dUthO2kE-A5yszgD0wkQKwXlyNSme9b3UyQdUKvwI88OzpY3OhKkc8N5xM2xrMWYVLe0azNdv23MrQwLqjkKTN5EQRNs6rtXJbzs82rorTDhpTeYhzoOu7Mtp0',
+                    img: 'motto.jpeg',
                     colSpan: 5
                   }
                 ]}
@@ -214,7 +215,7 @@ export default function HomePage() {
                       src={founder.img} 
                       alt={founder.name} 
                       loading="lazy" 
-                      className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-50 group-hover:opacity-80 group-hover:mix-blend-normal group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90" />
                   </div>
@@ -235,12 +236,28 @@ export default function HomePage() {
               <span className="font-label-caps text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-6">
                 The Extended Council
               </span>
-              <div className="relative w-full">
-                {/* Fade edges */}
-                <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#050810] to-transparent z-10 pointer-events-none" />
-                <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#050810] to-transparent z-10 pointer-events-none" />
+              <div className="relative w-full group/scroll">
+                {/* Scroll arrows */}
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('members-scroll');
+                    if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
+                  }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('members-scroll');
+                    if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
+                  }}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
                 
-                <div className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
+                <div id="members-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
                   {otherMembers.map((member, idx) => (
                     <motion.div
                       key={member.id}
@@ -255,9 +272,8 @@ export default function HomePage() {
                           src={member.img} 
                           alt={member.name} 
                           loading="lazy" 
-                          className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-70 group-hover:mix-blend-normal group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent" />
                       </div>
                       <div className="p-4 pt-2">
                         <h4 className="font-display-xl text-[0.9rem] text-white uppercase leading-[1.2] tracking-tight mb-1">

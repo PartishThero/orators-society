@@ -7,10 +7,12 @@ import LiquidMetal from '../ui/LiquidMetal'
 import logoAsset from '../../assets/logo.svg'
 import { navLinks } from '../../data/navigation'
 import { supabase, isSupabaseConfigured } from '../../utils/supabaseClient'
+import RegistrationModal from '../ui/RegistrationModal'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
+  const [recruitModalOpen, setRecruitModalOpen] = useState(false)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -32,13 +34,14 @@ export default function Navbar() {
   }
 
   return (
-    <div className="fixed inset-x-0 top-6 z-50 flex flex-col items-center pointer-events-none">
-      <motion.div
-        initial={{ opacity: 0, y: -24, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="pointer-events-auto w-[90%] max-w-7xl"
-      >
+    <>
+      <div className="fixed inset-x-0 top-6 z-50 flex flex-col items-center pointer-events-none">
+        <motion.div
+          initial={{ opacity: 0, y: -24, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          className="pointer-events-auto w-[90%] max-w-7xl"
+        >
         <GlassSurface
           width="100%"
           height={72}
@@ -92,6 +95,16 @@ export default function Navbar() {
                   )}
                 </NavLink>
               ))}
+
+              {/* Recruitment Button */}
+              <button
+                onClick={() => setRecruitModalOpen(true)}
+                className="relative px-5 py-2 group overflow-hidden rounded-full border border-[#C5A872]/30 hover:border-[#C5A872] transition-colors duration-400 bg-[#C5A872]/5 hover:bg-[#C5A872]/10"
+              >
+                <span className="relative z-10 text-[#C5A872] font-bold group-hover:text-white transition-colors duration-400">
+                  RECRUIT
+                </span>
+              </button>
             </div>
 
             {/* Hamburger Button for Mobile */}
@@ -136,10 +149,28 @@ export default function Navbar() {
                   {label}
                 </NavLink>
               ))}
+              <button
+                onClick={() => {
+                  setIsOpen(false);
+                  setRecruitModalOpen(true);
+                }}
+                className="block font-label-caps text-center text-sm py-4 px-6 rounded-full transition-all duration-300 font-bold text-[#C5A872] border border-[#C5A872]/30 hover:border-[#C5A872] bg-[#C5A872]/5 hover:bg-[#C5A872]/10"
+              >
+                RECRUIT
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+
+    <div className="pointer-events-auto">
+      <RegistrationModal 
+        isOpen={recruitModalOpen}
+        onClose={() => setRecruitModalOpen(false)}
+        eventItem={{ id: 'Recruitment', title: 'Society Recruitment' }}
+      />
+    </div>
+    </>
   )
 }

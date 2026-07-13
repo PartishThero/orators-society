@@ -64,6 +64,27 @@ export default function AdminPage() {
     entriesText: '' // text representation of entries list, e.g. "icon:label"
   });
 
+  // Note: This client-side check does not replace server-side enforcement.
+  // Supabase Row Level Security (RLS) policies on events, legacy_events,
+  // archive_timeline, legacy_timeline, and allowed_admins should independently
+  // restrict writes to whitelisted emails, since a client-side check alone
+  // can be bypassed by calling the Supabase API directly.
+  const verifyAdminAccess = async (currentSession) => {
+    if (!currentSession) return;
+    
+    const { data, error } = await supabase
+      .from('allowed_admins')
+      .select('*')
+      .eq('email', currentSession.user.email)
+      .maybeSingle();
+
+    if (error || !data) {
+      await supabase.auth.signOut();
+      setSession(null);
+      setAuthError("This account is not authorized for admin access.");
+    }
+  };
+
   // Track session
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -73,11 +94,13 @@ export default function AdminPage() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      verifyAdminAccess(session);
       setLoading(false);
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      verifyAdminAccess(session);
     });
 
     return () => subscription.unsubscribe();
@@ -498,17 +521,18 @@ export default function AdminPage() {
   }
 
   // Delete Handlers
-  async function handleDelete(id, type) {
-    if (!window.confirm(`Are you sure you want to delete this ${type}? This action cannot be undone.`)) return;
+  async function handleDelete(id, name, type) {
+    const displayName = name && name !== type ? `"${name}" (${type})` : type;
+    if (!window.confirm(`Are you sure you want to delete ${displayName}? This action cannot be undone.`)) return;
 
     setStatusMessage(null);
     try {
       let table = '';
-      if (type.includes('Event')) table = 'events';
-      else if (type.includes('Legacy Event')) table = 'legacy_events';
-      else if (type.includes('Whitelist')) table = 'allowed_admins';
-      else if (type.includes('Archive Timeline')) table = 'archive_timeline';
-      else if (type.includes('Legacy Timeline')) table = 'legacy_timeline';
+      if (type === 'Event') table = 'events';
+      else if (type === 'Legacy Event') table = 'legacy_events';
+      else if (type === 'Whitelist') table = 'allowed_admins';
+      else if (type === 'Archive Timeline') table = 'archive_timeline';
+      else if (type === 'Legacy Timeline') table = 'legacy_timeline';
       else if (type === 'Registration') table = 'event_registrations';
       
       const { error } = await supabase
@@ -760,13 +784,6 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                     {/* Action buttons */}
                     <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6">
                       <button
-                        onClick={syncInitialData}
-                        disabled={syncLoading}
-                        className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider border border-white/10 hover:bg-white/[0.05] transition-all disabled:opacity-50 text-white"
-                      >
-                        {syncLoading ? 'Syncing...' : 'Sync Local Files'}
-                      </button>
-                      <button
                         onClick={openAddModal}
                         className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
                       >
@@ -824,7 +841,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                         Edit
                                       </button>
                                       <button 
-                                        onClick={() => handleDelete(item.id, item.email)}
+                                        onClick={() => handleDelete(item.id, item.email, 'Whitelist')}
                                         className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
                                       >
                                         Remove
@@ -855,7 +872,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           <tbody>
                             {(activeTab === 'events' ? events : legacyEvents).length === 0 ? (
                               <tr>
-                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found in this table. Click "Sync Local Files" to initialize.</td>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found in this table.</td>
                               </tr>
                             ) : (
                               (activeTab === 'events' ? events : legacyEvents).map((item) => (
@@ -894,7 +911,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                         Edit
                                       </button>
                                       <button 
-                                        onClick={() => handleDelete(item.id, item.title)}
+                                        onClick={() => handleDelete(item.id, item.title, activeTab === 'events' ? 'Event' : 'Legacy Event')}
                                         className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
                                       >
                                         Delete
@@ -925,7 +942,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           <tbody>
                             {archiveTimeline.length === 0 ? (
                               <tr>
-                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found. Click "Sync Local Files" to seed timeline entries.</td>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found.</td>
                               </tr>
                             ) : (
                               archiveTimeline.map((item) => (
@@ -949,7 +966,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                         Edit
                                       </button>
                                       <button 
-                                        onClick={() => handleDelete(item.id, `${item.year} Timeline`)}
+                                        onClick={() => handleDelete(item.id, `${item.year} Timeline`, 'Archive Timeline')}
                                         className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
                                       >
                                         Delete
@@ -980,7 +997,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           <tbody>
                             {legacyTimeline.length === 0 ? (
                               <tr>
-                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found. Click "Sync Local Files" to seed timeline entries.</td>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found.</td>
                               </tr>
                             ) : (
                               legacyTimeline.map((item) => (
@@ -1002,7 +1019,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                         Edit
                                       </button>
                                       <button 
-                                        onClick={() => handleDelete(item.id, `${item.year} Legacy`)}
+                                        onClick={() => handleDelete(item.id, `${item.year} Legacy`, 'Legacy Timeline')}
                                         className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
                                       >
                                         Delete
@@ -1071,7 +1088,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                     <td className="p-5 text-white/80 text-[13px]">{item.email}</td>
                                     <td className="p-5 text-right">
                                       <button 
-                                        onClick={() => handleDelete(item.id, 'Registration')}
+                                        onClick={() => handleDelete(item.id, 'Registration', 'Registration')}
                                         className="text-red-400 hover:text-red-300 text-[11px] font-label-caps tracking-wider uppercase transition-colors"
                                       >
                                         Delete
