@@ -585,7 +585,7 @@ export default function AdminPage() {
       else if (type === 'Archive Timeline') table = 'archive_timeline';
       else if (type === 'Legacy Timeline') table = 'legacy_timeline';
       else if (type === 'Registration') table = 'event_registrations';
-      else if (type === 'Petition') table = 'society_petitions';
+      else if (type === 'Recruitment') table = 'society_petitions';
       
       const { error } = await supabase
         .from(table)
