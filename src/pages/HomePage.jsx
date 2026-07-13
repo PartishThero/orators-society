@@ -12,22 +12,22 @@ import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
 import Masonry from '../components/sections/Masonry'
 import { useData } from '../context/DataContext'
-import { coreFounders, otherMembers } from '../data/founders'
+import { coreFounders, currentCores, previousCores } from '../data/founders'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
-  
+
   const [promoOpen, setPromoOpen] = useState(false)
   const [registerModalOpen, setRegisterModalOpen] = useState(false)
-  
+
   const { events: eventsList } = useData()
 
   const promoEvent = useMemo(() => {
     if (!eventsList || eventsList.length === 0) return null;
-    return eventsList.find(e => (e.status || 'past').toLowerCase() === 'live') 
-        || eventsList.find(e => (e.status || 'past').toLowerCase() === 'upcoming') 
-        || eventsList[0];
+    return eventsList.find(e => (e.status || 'past').toLowerCase() === 'live')
+      || eventsList.find(e => (e.status || 'past').toLowerCase() === 'upcoming')
+      || eventsList[0];
   }, [eventsList]);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function HomePage() {
     return () => clearTimeout(timer)
   }, [promoEvent])
 
-  
+
   return (
     <PageLayout grainientProps={{
       color1: "#23426D",
@@ -50,17 +50,17 @@ export default function HomePage() {
     }}>
       <Suspense fallback={null}>
         <ArchiveModal isOpen={modalOpen} onClose={() => { setModalOpen(false); setTimeout(() => setSelectedEvent(null), 300); }} item={selectedEvent} />
-        
-        <RegistrationModal 
-          isOpen={registerModalOpen} 
-          onClose={() => setRegisterModalOpen(false)} 
-          eventItem={promoEvent} 
+
+        <RegistrationModal
+          isOpen={registerModalOpen}
+          onClose={() => setRegisterModalOpen(false)}
+          eventItem={promoEvent}
         />
       </Suspense>
 
       <AnimatePresence>
         {promoOpen && promoEvent && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.96 }}
@@ -71,7 +71,7 @@ export default function HomePage() {
             <div className="relative h-[140px] overflow-hidden">
               <img src={promoEvent.img} alt={promoEvent.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0E1117]/90 via-[#0E1117]/40 to-transparent" />
-              <button 
+              <button
                 onClick={() => {
                   setPromoOpen(false);
                   sessionStorage.setItem('promo_dismissed', 'true');
@@ -95,8 +95,8 @@ export default function HomePage() {
               <h4 className="font-display-xl text-[1.15rem] text-white uppercase leading-[1.15] tracking-tight mb-4 line-clamp-2">
                 {promoEvent.title}
               </h4>
-              
-              <button 
+
+              <button
                 onClick={() => {
                   setPromoOpen(false);
                   sessionStorage.setItem('promo_dismissed', 'true');
@@ -172,7 +172,7 @@ export default function HomePage() {
               <div className="pb-4 lg:pb-6 flex flex-col justify-end">
                 <span className="font-label-caps text-[10px] text-white/90 uppercase tracking-[0.4em] block mb-4 lg:mb-6">OUR PHILOSOPHY</span>
                 <h2 className="font-display-xl text-[clamp(3.5rem,4vw,4.5rem)] leading-[1] uppercase text-white tracking-tighter">
-                  THE ART OF<br/>
+                  THE ART OF<br />
                   <em className="text-primary tracking-normal">UNSPOKEN</em>
                 </h2>
               </div>
@@ -211,11 +211,11 @@ export default function HomePage() {
                   className="group relative w-[280px] rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D]"
                 >
                   <div className="aspect-[3/4] relative overflow-hidden">
-                    <img 
-                      src={founder.img} 
-                      alt={founder.name} 
-                      loading="lazy" 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                    <img
+                      src={founder.img}
+                      alt={founder.name}
+                      loading="lazy"
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90" />
                   </div>
@@ -231,34 +231,34 @@ export default function HomePage() {
               ))}
             </div>
 
-            {/* Other Members — horizontal scroll strip */}
-            <div className="w-full">
-              <span className="font-label-caps text-[10px] text-white/40 tracking-[0.2em] uppercase block mb-6">
-                The Extended Council
+            {/* Current Cores — horizontal scroll strip */}
+            <div className="w-full mb-16">
+              <span className="font-label-caps text-[12px] text-primary tracking-[0.2em] uppercase block mb-6">
+                Current Cores
               </span>
               <div className="relative w-full group/scroll">
                 {/* Scroll arrows */}
-                <button 
+                <button
                   onClick={() => {
-                    const el = document.getElementById('members-scroll');
+                    const el = document.getElementById('current-cores-scroll');
                     if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
                   }}
                   className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
                 >
                   <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                 </button>
-                <button 
+                <button
                   onClick={() => {
-                    const el = document.getElementById('members-scroll');
+                    const el = document.getElementById('current-cores-scroll');
                     if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
                   }}
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
                 >
                   <span className="material-symbols-outlined text-[18px]">chevron_right</span>
                 </button>
-                
-                <div id="members-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
-                  {otherMembers.map((member, idx) => (
+
+                <div id="current-cores-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
+                  {currentCores.map((member, idx) => (
                     <motion.div
                       key={member.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -268,11 +268,69 @@ export default function HomePage() {
                       className="group flex-shrink-0 w-[200px] rounded-2xl overflow-hidden border border-white/5 bg-[#0A0A0A] hover:border-white/10 transition-colors duration-500"
                     >
                       <div className="aspect-square relative overflow-hidden">
-                        <img 
-                          src={member.img} 
-                          alt={member.name} 
-                          loading="lazy" 
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]" 
+                        <img
+                          src={member.img}
+                          alt={member.name}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                        />
+                      </div>
+                      <div className="p-4 pt-2">
+                        <h4 className="font-display-xl text-[0.9rem] text-white uppercase leading-[1.2] tracking-tight mb-1">
+                          {member.name}
+                        </h4>
+                        <span className="font-label-caps text-[8px] text-white/40 tracking-[0.15em] uppercase">
+                          {member.role}
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Previous Cores — horizontal scroll strip */}
+            <div className="w-full">
+              <span className="font-label-caps text-[12px] text-primary tracking-[0.2em] uppercase block mb-6">
+                Previous Cores
+              </span>
+              <div className="relative w-full group/scroll">
+                {/* Scroll arrows */}
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('previous-cores-scroll');
+                    if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
+                  }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
+                </button>
+                <button
+                  onClick={() => {
+                    const el = document.getElementById('previous-cores-scroll');
+                    if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
+                  }}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+                </button>
+
+                <div id="previous-cores-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
+                  {previousCores.map((member, idx) => (
+                    <motion.div
+                      key={member.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: idx * 0.08, ease: 'easeOut' }}
+                      className="group flex-shrink-0 w-[200px] rounded-2xl overflow-hidden border border-white/5 bg-[#0A0A0A] hover:border-white/10 transition-colors duration-500"
+                    >
+                      <div className="aspect-square relative overflow-hidden">
+                        <img
+                          src={member.img}
+                          alt={member.name}
+                          loading="lazy"
+                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                         />
                       </div>
                       <div className="p-4 pt-2">
@@ -307,43 +365,43 @@ export default function HomePage() {
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .slice(0, 3)
                 .map((event, idx) => (
-                <motion.div
-                  key={event.id}
-                  onClick={() => {
-                    setSelectedEvent(event)
-                    setModalOpen(true)
-                  }}
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D] w-full max-w-[500px] aspect-square md:w-[500px] md:h-[500px]"
-                >
-                  <img src={event.img} alt={event.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
-                  <div className="absolute inset-0 p-8 flex flex-col justify-end text-left z-10">
-                    <div>
-                      <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-3 block group-hover:text-white/80 transition-colors duration-500">
-                        {event.date}
-                      </span>
-                      <h3 className="font-display-xl text-[2.25rem] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
-                        {event.title}
-                      </h3>
-                      <div className="grid grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
-                        <div className="overflow-hidden">
-                          <p className="font-quote-serif text-[1.1rem] italic text-white/80 mt-4 mb-6 line-clamp-2">
-                            "{event.subtitle || event.synopsis}"
-                          </p>
-                          <button className="flex items-center gap-2 font-label-caps text-[10px] tracking-[0.15em] uppercase text-white hover:text-white/70 transition-colors">
-                            View Session
-                            <span className="material-symbols-outlined text-[5px]">arrow_forward</span>
-                          </button>
+                  <motion.div
+                    key={event.id}
+                    onClick={() => {
+                      setSelectedEvent(event)
+                      setModalOpen(true)
+                    }}
+                    initial={{ opacity: 0, y: 32 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
+                    className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D] w-full max-w-[500px] aspect-square md:w-[500px] md:h-[500px]"
+                  >
+                    <img src={event.img} alt={event.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
+                    <div className="absolute inset-0 p-8 flex flex-col justify-end text-left z-10">
+                      <div>
+                        <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-3 block group-hover:text-white/80 transition-colors duration-500">
+                          {event.date}
+                        </span>
+                        <h3 className="font-display-xl text-[2.25rem] text-white uppercase leading-[1.1] tracking-tight mb-0 truncate w-full block">
+                          {event.title}
+                        </h3>
+                        <div className="grid grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
+                          <div className="overflow-hidden">
+                            <p className="font-quote-serif text-[1.1rem] italic text-white/80 mt-4 mb-6 line-clamp-2">
+                              "{event.subtitle || event.synopsis}"
+                            </p>
+                            <button className="flex items-center gap-2 font-label-caps text-[10px] tracking-[0.15em] uppercase text-white hover:text-white/70 transition-colors">
+                              View Session
+                              <span className="material-symbols-outlined text-[5px]">arrow_forward</span>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                ))}
             </div>
 
             <Link to="/archive" style={{ borderRadius: '9999px' }} className="group relative font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]">

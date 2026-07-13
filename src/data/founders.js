@@ -21,7 +21,7 @@ export const coreFounders = [
   },
 ];
 
-export const otherMembers = [
+export const currentCores = [
   {
     id: 'member-1',
     name: 'Sophia Crane',
@@ -45,7 +45,10 @@ export const otherMembers = [
     name: 'James Okoro',
     role: 'Head of Outreach',
     img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face',
-  },
+  }
+];
+
+export const previousCores = [
   {
     id: 'member-5',
     name: 'Aria Chen',
