@@ -7,6 +7,7 @@ import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 
 const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 const RegistrationModal = lazy(() => import('../components/ui/RegistrationModal'))
+import RecruitmentModal from '../components/ui/RecruitmentModal'
 import { events as localEvents } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
@@ -17,6 +18,7 @@ import { coreFounders, currentCores, previousCores } from '../data/founders'
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
+  const [recruitModalOpen, setRecruitModalOpen] = useState(false)
 
   const [promoOpen, setPromoOpen] = useState(false)
   const [registerModalOpen, setRegisterModalOpen] = useState(false)
@@ -180,12 +182,70 @@ export default function HomePage() {
                 <p className="font-body-md text-[1rem] md:text-[1.1rem] leading-relaxed text-white/70 max-w-md">
                   Welcome to the premier hub of expression and leadership. The Orators’ Society is the central engine for public speaking, specialized debate, and structural event execution. We build unignorable voices.
                 </p>
+                <button
+                  onClick={() => setRecruitModalOpen(true)}
+                  className="group mt-8 self-start flex items-center gap-3 px-7 py-3.5 rounded-full border border-primary/30 hover:border-primary bg-primary/5 hover:bg-primary/10 transition-all duration-400"
+                >
+                  <span className="font-label-caps text-[11px] tracking-[0.2em] uppercase text-primary group-hover:text-white transition-colors duration-400">
+                    Join the Society
+                  </span>
+                  <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-white transition-colors duration-400">arrow_forward</span>
+                </button>
               </div>
             </div>
           </div>
         </SectionWrapper>
 
-        {/* ── 3. The Founders ── */}
+        {/* ── 3. Our Foundations ── */}
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
+          <ArchitecturalGrid />
+          <div className="max-w-7xl w-full mx-auto relative z-10 flex flex-col items-center text-center">
+            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
+              OUR FOUNDATIONS
+            </span>
+            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter mb-16 max-w-4xl">
+              STRUCTURAL PILLARS
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+              {[
+                {
+                  title: "The Executive Core (OSC)",
+                  text: "The primary strategic organ of the society. Oversees full event conceptualization, masterclasses, and executive administration."
+                },
+                {
+                  title: "Specialized Sub-Committees",
+                  text: "Dedicated expert domains hosting the elite Debating Society (Deb Soc) and Model United Nations (MUN) assemblies."
+                },
+                {
+                  title: "Specialized Cores",
+                  text: "The architectural spine of our brand, managing high-velocity design production and premium digital presence. (Public speaking is not mandatory for these creative/social roles!)"
+                }
+              ].map((card, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
+                  className="group relative p-8 md:p-10 rounded-[2rem] border border-white/5 bg-[#0D0D0D] hover:bg-white/[0.03] transition-colors duration-500 text-left flex flex-col justify-start"
+                >
+                  <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center mb-8 group-hover:border-primary/50 transition-colors duration-500 bg-white/[0.02]">
+                    <span className="font-label-caps text-[14px] text-primary">0{idx + 1}</span>
+                  </div>
+                  <h3 className="font-display-xl text-[1.4rem] md:text-[1.6rem] text-white uppercase leading-[1.1] tracking-tight mb-4">
+                    {card.title}
+                  </h3>
+                  <p className="font-body-md text-[1rem] text-white/50 leading-relaxed group-hover:text-white/70 transition-colors duration-500">
+                    {card.text}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </SectionWrapper>
+
+        {/* ── 4. The Founders ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
           <ArchitecturalGrid />
           <div className="max-w-7xl w-full mx-auto relative z-10 flex flex-col items-center text-center">
@@ -412,6 +472,11 @@ export default function HomePage() {
           </div>
         </SectionWrapper>
       </main>
+
+      <RecruitmentModal 
+        isOpen={recruitModalOpen}
+        onClose={() => setRecruitModalOpen(false)}
+      />
     </PageLayout>
   )
 }

@@ -107,7 +107,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 24 }}
             transition={{ type: 'spring', stiffness: 340, damping: 32 }}
-            className="relative w-full h-[100dvh] md:h-auto md:max-h-[85vh] md:max-w-4xl bg-[#090909] border-t md:border border-white/10 rounded-t-[2rem] md:rounded-[2rem] shadow-2xl z-10 overflow-hidden flex flex-col md:flex-row"
+            className="relative w-full h-[100dvh] md:h-auto md:min-h-[75vh] md:max-h-[90vh] md:max-w-6xl xl:max-w-7xl bg-[#090909] border-t md:border border-white/10 rounded-t-[2rem] md:rounded-[2rem] shadow-2xl z-10 overflow-hidden flex flex-col md:flex-row"
           >
             {/* Progress Line */}
             <div className="absolute top-0 left-0 w-full h-[2px] bg-white/5 z-20">
@@ -127,8 +127,90 @@ export default function RecruitmentModal({ isOpen, onClose }) {
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
 
-            {/* Left Content Area (Form) */}
-            <div className="flex-1 p-8 md:p-12 lg:p-16 flex flex-col justify-center relative overflow-y-auto hide-scrollbar">
+            {/* Left Content Area (Context Text) - Hidden on Mobile */}
+            <div className="hidden lg:flex lg:w-[28%] xl:w-[25%] relative bg-[#050505] border-r border-white/10 overflow-hidden flex-col p-10 justify-center">
+              <AnimatePresence mode="wait">
+                {step === 1 && (
+                  <motion.div 
+                    key="text1"
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
+                    className="flex flex-col text-left absolute inset-0 p-10 justify-center"
+                  >
+                    <h4 className="font-display-xl text-[1.8rem] text-primary uppercase leading-[1.05] tracking-tight mb-6">
+                      Dynamic Recruitment &<br />Cohort Orientation (2026-27)
+                    </h4>
+                    <div className="w-8 h-[2px] bg-primary/40 mb-8" />
+                    <div>
+                      <h5 className="font-label-caps text-[11px] text-white/90 tracking-[0.25em] uppercase mb-2.5 relative">
+                        <span className="absolute -left-5 top-[calc(50%-3px)] w-1.5 h-1.5 rounded-full bg-primary/80" /> The Window
+                      </h5>
+                      <p className="font-body-md text-[13.5px] text-white/70 leading-relaxed">
+                        Applications remain open for a strict 2–3 day window. Shortlisting results will be finalized within 2–4 days of closure.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+                {step === 2 && (
+                  <motion.div 
+                    key="text2"
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
+                    className="flex flex-col text-left absolute inset-0 p-10 justify-center"
+                  >
+                    <h4 className="font-display-xl text-[1.8rem] text-primary uppercase leading-[1.05] tracking-tight mb-6">
+                      The Interview<br />Panels
+                    </h4>
+                    <div className="w-8 h-[2px] bg-primary/40 mb-8" />
+                    <div>
+                      <h5 className="font-label-caps text-[11px] text-white/90 tracking-[0.25em] uppercase mb-2.5 relative">
+                        <span className="absolute -left-5 top-[calc(50%-3px)] w-1.5 h-1.5 rounded-full bg-primary/80" /> The Panels
+                      </h5>
+                      <p className="font-body-md text-[13.5px] text-white/70 leading-relaxed">
+                        Standard interview evaluations span across Presidential, Core administrative, and General operational rounds.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+                {(step === 3 || isSuccess) && (
+                  <motion.div 
+                    key="text3"
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: 'tween', ease: 'easeInOut', duration: 0.3 }}
+                    className="flex flex-col text-left absolute inset-0 p-10 justify-center"
+                  >
+                    <h4 className="font-display-xl text-[1.8rem] text-primary uppercase leading-[1.05] tracking-tight mb-6">
+                      The Core Selection<br />Criteria
+                    </h4>
+                    <div className="w-8 h-[2px] bg-primary/40 mb-8" />
+                    <div>
+                      <h5 className="font-label-caps text-[11px] text-white/90 tracking-[0.25em] uppercase mb-2.5 relative">
+                        <span className="absolute -left-5 top-[calc(50%-3px)] w-1.5 h-1.5 rounded-full bg-primary/80" /> The Criteria
+                      </h5>
+                      <p className="font-body-md text-[13.5px] text-white/70 leading-relaxed">
+                        Applicants are evaluated on clarity of thought, verbal/visual communication structures, baseline execution capability, and team alignment.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              
+              {/* Decorative elements */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-30 pointer-events-none" />
+              <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-primary/10 rounded-full blur-[80px] pointer-events-none" />
+            </div>
+
+            {/* Center Content Area (Form) */}
+            <div className="flex-1 p-8 md:p-10 lg:p-12 flex flex-col justify-center relative overflow-y-auto hide-scrollbar">
               
               {/* faint podium watermark */}
               <span className="material-symbols-outlined absolute -bottom-6 -right-6 text-[12rem] text-white/[0.015] pointer-events-none select-none">
@@ -155,23 +237,23 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                   <h3 className="font-display-xl text-[2.5rem] text-white uppercase tracking-tight mb-4 leading-tight">
                     The floor <br/>has your case
                   </h3>
-                  <p className="text-white/50 font-body-md text-[15px] max-w-[22rem] mx-auto leading-relaxed">
+                  <p className="text-white/70 font-body-md text-[15px] max-w-[22rem] mx-auto leading-relaxed">
                     We review every petition thoroughly. Expect to hear from the core within the week.
                   </p>
                 </motion.div>
               ) : (
                 <>
                   <div className="mb-10 relative z-10 text-left">
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="w-8 h-[1px] bg-primary/50" />
-                      <p className="text-[10px] font-label-caps tracking-[0.25em] uppercase text-primary/70">
+                    <div className="mb-4 relative">
+                      <span className="absolute -left-10 top-[calc(50%-0.5px)] w-6 h-[1px] bg-primary/50" />
+                      <p className="text-[11px] font-label-caps tracking-[0.3em] uppercase text-primary/80">
                         Step 0{step} &middot; {step === 1 ? 'The Identity' : step === 2 ? 'The Discipline' : 'The Case'}
                       </p>
                     </div>
                     <h3 className="font-display-xl text-[2.5rem] leading-[1.05] text-white uppercase tracking-tight">
                       Make your case
                     </h3>
-                    <p className="text-[14px] text-white/50 font-body-md mt-3 max-w-[22rem] leading-relaxed">
+                    <p className="text-[14px] text-white/70 font-body-md mt-3 max-w-[22rem] leading-relaxed">
                       {step === 1 && "Enter your identity. We must know who approaches the podium."}
                       {step === 2 && "Declare your focus. What discipline drives your voice?"}
                       {step === 3 && "Submit your opening statement. Why take the floor?"}
@@ -201,7 +283,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               value={name}
                               onChange={(e) => setName(e.target.value)}
                               placeholder="John Doe"
-                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03]"
+                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/40 hover:bg-white/[0.03]"
                               required
                             />
                             <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
@@ -215,7 +297,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               value={email}
                               onChange={(e) => setEmail(e.target.value)}
                               placeholder="john@example.com"
-                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03]"
+                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/40 hover:bg-white/[0.03]"
                               required
                             />
                             <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
@@ -229,7 +311,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               value={phone}
                               onChange={(e) => setPhone(e.target.value)}
                               placeholder="+1 (555) 000-0000"
-                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03]"
+                              className="relative z-10 w-full bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-4 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/40 hover:bg-white/[0.03]"
                             />
                             <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
                           </div>
@@ -241,7 +323,10 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               className="group relative w-full font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-5 hover:bg-white/[0.08]"
                             >
                               <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
-                              Proceed to Discipline
+                              <span className="flex items-center gap-2.5">
+                                Proceed to Discipline
+                                <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>
+                              </span>
                             </button>
                           </div>
                         </motion.form>
@@ -271,7 +356,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                                   onClick={() => setInterestArea(interest)}
                                   className={`px-5 py-3 rounded-full text-[12px] font-label-caps tracking-wider transition-all duration-300 border ${
                                     interestArea === interest 
-                                      ? 'bg-primary/10 border-primary text-primary' 
+                                      ? 'bg-primary/10 border-primary text-primary font-bold shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]' 
                                       : 'bg-white/[0.02] border-white/10 text-white/60 hover:bg-white/[0.06] hover:text-white hover:border-white/30'
                                   }`}
                                 >
@@ -293,7 +378,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                                   onClick={() => setExperienceLevel(level)}
                                   className={`px-5 py-3 rounded-full text-[12px] font-label-caps tracking-wider transition-all duration-300 border ${
                                     experienceLevel === level 
-                                      ? 'bg-primary/10 border-primary text-primary' 
+                                      ? 'bg-primary/10 border-primary text-primary font-bold shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]' 
                                       : 'bg-white/[0.02] border-white/10 text-white/60 hover:bg-white/[0.06] hover:text-white hover:border-white/30'
                                   }`}
                                 >
@@ -319,7 +404,10 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               className="group relative flex-1 font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-5 hover:bg-white/[0.08] disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
-                              Finalize Case
+                              <span className="flex items-center gap-2.5">
+                                Finalize Case
+                                <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>
+                              </span>
                             </button>
                           </div>
                         </motion.form>
@@ -345,7 +433,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               value={motivationText}
                               onChange={(e) => setMotivationText(e.target.value)}
                               placeholder="Why do you seek the podium? What ideas drive your voice?"
-                              className="relative z-10 w-full h-[220px] resize-none bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-5 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/20 hover:bg-white/[0.03] leading-relaxed"
+                              className="relative z-10 w-full h-[220px] resize-none bg-white/[0.02] border-b border-white/10 rounded-t-xl px-5 py-5 text-white text-[15px] font-body-md tracking-wide focus:outline-none focus:bg-white/[0.04] transition-all placeholder:text-white/40 hover:bg-white/[0.03] leading-relaxed"
                               required
                             />
                             <div className="absolute bottom-0 left-0 w-0 h-[1px] bg-primary transition-all duration-500 group-focus-within:w-full z-20" />
@@ -367,14 +455,16 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                               className="group relative flex-1 font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-3 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-5 hover:bg-white/[0.08] disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                               <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
-                              <motion.span
-                                animate={struck ? { rotate: [0, -28, 0] } : { rotate: 0 }}
-                                transition={{ duration: 0.45, ease: 'easeInOut' }}
-                                className="material-symbols-outlined text-[18px] text-primary/70 group-hover:text-primary transition-colors origin-bottom-left"
-                              >
-                                gavel
-                              </motion.span>
-                              {isSubmitting ? 'Calling to order...' : 'Submit Petition'}
+                              <span className="flex items-center gap-2.5">
+                                <motion.span
+                                  animate={struck ? { rotate: [0, -28, 0] } : { rotate: 0 }}
+                                  transition={{ duration: 0.45, ease: 'easeInOut' }}
+                                  className="material-symbols-outlined text-[18px] text-primary/70 group-hover:text-primary transition-colors origin-bottom-left"
+                                >
+                                  gavel
+                                </motion.span>
+                                {isSubmitting ? 'Calling to order...' : 'Submit Petition'}
+                              </span>
                             </button>
                           </div>
                         </motion.form>
@@ -386,7 +476,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
             </div>
 
             {/* Right Content Area (Image) - Hidden on Mobile */}
-            <div className="hidden md:block md:w-2/5 relative bg-black border-l border-white/10 overflow-hidden">
+            <div className="hidden md:block md:w-[35%] lg:w-[28%] xl:w-[25%] relative bg-black border-l border-white/10 overflow-hidden">
               <AnimatePresence mode="crossfade">
                 {step === 1 && (
                   <motion.img
@@ -427,8 +517,8 @@ export default function RecruitmentModal({ isOpen, onClose }) {
               </AnimatePresence>
 
               {/* Gradient Overlay for seamless blend */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#090909] to-transparent w-24" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#090909]/40 via-transparent to-[#090909]/10" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[#090909] via-[#090909]/80 to-transparent w-48" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#090909]/80 via-transparent to-[#090909]/20" />
             </div>
 
           </motion.div>

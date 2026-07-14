@@ -1,7 +1,7 @@
 // Navbar.jsx — fixed pill-style top navigation bar with GlassSurface & Liquid Metal Logo
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useLocation } from 'react-router-dom'
 import GlassSurface from '../ui/GlassSurface'
 import LiquidMetal from '../ui/LiquidMetal'
 import logoAsset from '../../assets/logo.svg'
@@ -14,6 +14,33 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [recruitModalOpen, setRecruitModalOpen] = useState(false)
+  
+  const location = useLocation()
+  const [showWelcome, setShowWelcome] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome')
+    return !hasSeenWelcome && location.pathname === '/'
+  })
+
+  useEffect(() => {
+    if (location.pathname !== '/' || sessionStorage.getItem('hasSeenWelcome')) {
+      setShowWelcome(false)
+      return
+    }
+    
+    setShowWelcome(true)
+
+    const handleScroll = () => {
+      if (window.scrollY > window.innerHeight * 0.8) {
+        setShowWelcome(false)
+        sessionStorage.setItem('hasSeenWelcome', 'true')
+        window.removeEventListener('scroll', handleScroll)
+      }
+    }
+    
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [location.pathname])
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -36,6 +63,39 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Top Left Welcome Pop-up */}
+      <AnimatePresence>
+        {showWelcome && (
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20, transition: { duration: 0.4, ease: 'easeIn' } }}
+            transition={{ delay: 0.2, duration: 0.7, ease: 'easeOut' }}
+            className="fixed top-6 left-6 z-[60] pointer-events-auto hidden md:block"
+          >
+            <GlassSurface
+              width="max-content"
+              height={72}
+              borderRadius={999}
+              distortionScale={-40}
+              redOffset={0}
+              greenOffset={3}
+              blueOffset={6}
+              brightness={18}
+              blur={8}
+              backgroundOpacity={0.08}
+              saturation={0.3}
+            >
+              <div className="px-6 h-full flex items-center justify-center">
+                <p className="font-['Sora'] text-[11px] tracking-wide text-white/70">
+                  Welcome to <span className="font-semibold text-white">Orators Society!</span>
+                </p>
+              </div>
+            </GlassSurface>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="fixed inset-x-0 top-6 z-50 flex flex-col items-center pointer-events-none">
         <motion.div
           initial={{ opacity: 0, y: -24, scale: 0.98 }}
@@ -60,11 +120,11 @@ export default function Navbar() {
             {/* Logo Section */}
             <NavLink
               to="/"
-              className="flex items-center gap-2 sm:gap-4 group cursor-pointer hover:scale-105 transition-all duration-400 ease-in-out"
+              className="flex items-center group cursor-pointer hover:scale-105 transition-all duration-400 ease-in-out"
             >
               {/* Logo */}
-              <div className="w-28 h-28 sm:w-36 sm:h-36">
-                <LiquidMetal logo={logoAsset} liquidColor="#C5A872" />
+              <div className="w-28 h-28 sm:w-36 sm:h-36 flex-shrink-0">
+                <LiquidMetal logo={logoAsset} liquidColor="#C5A872" /> 
               </div>
             </NavLink>
 
