@@ -201,11 +201,11 @@ export default function Navbar() {
                   className={({ isActive }) => 
                     `block font-label-caps text-center text-sm py-4 px-6 rounded-full transition-all duration-300 ${
                       isActive 
-                        ? 'font-bold bg-white/10' 
+                        ? 'font-bold' 
                         : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                     }`
                   }
-                  style={({ isActive }) => isActive ? { color: text } : {}}
+                  style={({ isActive }) => isActive ? { color: text, backgroundColor: bg } : {}}
                 >
                   {label}
                 </NavLink>

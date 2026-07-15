@@ -14,6 +14,9 @@ export function DataProvider({ children }) {
   const [legacyTimeline, setLegacyTimeline] = useState(localLegacyTimeline);
   const [registrations, setRegistrations] = useState(localRegistrations);
   const [recruitments, setRecruitments] = useState([]);
+  const [globalSettings, setGlobalSettings] = useState({
+    recruitment_form_link: 'https://docs.google.com/forms/d/e/1FAIpQLSf4M0B81wN_rU7y2fA2K3H6H0i3fQz2t4yA4m0/viewform?usp=pp_url&entry.12345=DummyName&entry.67890=DummyEmail'
+  });
 
   const [loading, setLoading] = useState({
     events: false,
@@ -22,6 +25,7 @@ export function DataProvider({ children }) {
     legacyTimeline: false,
     registrations: false,
     recruitments: false,
+    globalSettings: false,
   });
 
   const fetchEvents = useCallback(async () => {
@@ -146,6 +150,34 @@ export function DataProvider({ children }) {
     }
   }, []);
 
+  const fetchGlobalSettings = useCallback(async () => {
+    if (!isSupabaseConfigured) return;
+    setLoading(prev => ({ ...prev, globalSettings: true }));
+    try {
+      const { data, error } = await supabase
+        .from('global_settings')
+        .select('*');
+      if (error) {
+        if (error.code === '42P01') {
+          console.warn('global_settings table does not exist yet. Please create it.');
+        } else {
+          throw error;
+        }
+      }
+      if (data) {
+        const settingsMap = { ...globalSettings };
+        data.forEach(item => {
+          settingsMap[item.key] = item.value;
+        });
+        setGlobalSettings(settingsMap);
+      }
+    } catch (err) {
+      console.error('Failed to load global settings:', err);
+    } finally {
+      setLoading(prev => ({ ...prev, globalSettings: false }));
+    }
+  }, []);
+
   const addRegistration = useCallback(async (eventId, name, email) => {
     const newReg = {
       event_id: eventId,
@@ -154,14 +186,26 @@ export function DataProvider({ children }) {
       created_at: new Date().toISOString()
     };
     
-    // Optimistic local update
-    setRegistrations(prev => [
-      { id: `temp_${Date.now()}`, ...newReg },
-      ...prev
-    ]);
-
     if (isSupabaseConfigured) {
       try {
+        const { data: existing, error: checkError } = await supabase
+          .from('event_registrations')
+          .select('id')
+          .eq('event_id', eventId)
+          .ilike('email', email)
+          .maybeSingle();
+
+        if (checkError) throw checkError;
+        if (existing) {
+          throw new Error('ALREADY_REGISTERED');
+        }
+
+        // Optimistic local update
+        setRegistrations(prev => [
+          { id: `temp_${Date.now()}`, ...newReg },
+          ...prev
+        ]);
+
         const { error } = await supabase
           .from('event_registrations')
           .insert([newReg]);
@@ -172,6 +216,11 @@ export function DataProvider({ children }) {
         console.error('Failed to add registration to Supabase:', err);
         throw err;
       }
+    } else {
+      setRegistrations(prev => [
+        { id: `temp_${Date.now()}`, ...newReg },
+        ...prev
+      ]);
     }
   }, [fetchRegistrations]);
 
@@ -252,8 +301,10 @@ export function DataProvider({ children }) {
       fetchRegistrations();
     } else if (type === 'petitions') {
       fetchRecruitments();
+    } else if (type === 'settings') {
+      fetchGlobalSettings();
     }
-  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments]);
+  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments, fetchGlobalSettings]);
 
   // Load all data once on mount
   useEffect(() => {
@@ -264,8 +315,9 @@ export function DataProvider({ children }) {
       fetchLegacyTimeline();
       fetchRegistrations();
       fetchRecruitments();
+      fetchGlobalSettings();
     }
-  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments]);
+  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments, fetchGlobalSettings]);
 
   return (
     <DataContext.Provider
@@ -276,12 +328,14 @@ export function DataProvider({ children }) {
         legacyTimeline,
         registrations,
         recruitments,
+        globalSettings,
         loading,
         refreshData,
         addRegistration,
         addRecruitment,
         deleteRegistration,
         deleteRecruitment,
+        fetchGlobalSettings,
       }}
     >
       {children}

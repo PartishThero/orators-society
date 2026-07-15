@@ -26,26 +26,25 @@ export default function BaseModal({ isOpen, onClose, item, children }) {
       {isOpen && item && (
         <motion.div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8">
           <motion.div
-            initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            animate={{ opacity: 1, backdropFilter: 'blur(24px)' }}
-            exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-            transition={{ duration: 0.8, ease: 'easeInOut' }}
-            className="absolute inset-0 bg-black/30"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={onClose}
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
           />
 
           <motion.div
-            initial={{ opacity: 0, y: 40, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.96 }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
-            className="relative z-10 w-full h-[100dvh] sm:h-[90vh] sm:max-w-[95vw] md:max-w-[80vw] md:h-[80vh] bg-black rounded-none sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-[0_30px_100px_rgba(0,0,0,0.9)] border border-white/5"
+            initial={{ opacity: 0, scale: 0.96, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 24 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 32 }}
+            className="relative z-10 w-full h-[100dvh] sm:h-[90vh] sm:max-w-[95vw] md:max-w-[80vw] md:h-[80vh] bg-[#141414] rounded-none sm:rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col md:flex-row shadow-[0_30px_100px_rgba(0,0,0,0.9)] border border-white/10"
           >
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 text-white/50 hover:text-primary transition-colors duration-400 group flex items-center justify-center p-3 rounded-full hover:bg-white/5 bg-black/50 backdrop-blur-md min-w-[44px] min-h-[44px]"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white transition-colors duration-400 group"
             >
-              <span className="material-symbols-outlined text-3xl group-hover:rotate-90 transition-transform duration-500">close</span>
+              <span className="material-symbols-outlined text-[20px] group-hover:rotate-90 transition-transform duration-500">close</span>
             </button>
 
             {/* Left Column: Dedicated Poster Image */}

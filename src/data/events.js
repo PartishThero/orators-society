@@ -10,7 +10,8 @@ export const events = [
     location: 'The Global Forum',
     height: 520,
     colSpan: 2,
-    status: 'live'
+    status: 'live',
+    google_form_link: 'https://docs.google.com/forms/d/e/1FAIpQLSf4M0B81wN_rU7y2fA2K3H6H0i3fQz2t4yA4m0/viewform?usp=pp_url&entry.12345=DummyName&entry.67890=DummyEmail'
   },
   {
     id: '2',

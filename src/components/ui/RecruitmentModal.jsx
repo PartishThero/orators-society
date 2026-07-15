@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useData } from '../../context/DataContext'
 
@@ -20,7 +20,43 @@ export default function RecruitmentModal({ isOpen, onClose }) {
   const [isSuccess, setIsSuccess] = useState(false)
   const [struck, setStruck] = useState(false)
 
-  const { addRecruitment } = useData()
+  const { addRecruitment, globalSettings } = useData()
+
+  useEffect(() => {
+    if (isOpen) {
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth
+      document.body.style.overflow = 'hidden'
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`
+      }
+    } else {
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+    }
+  }, [isOpen])
+
+  const constructGoogleFormUrl = (baseLink, userName, userEmail) => {
+    if (!baseLink) return '';
+    try {
+      const url = new URL(baseLink);
+      const entryKeys = Array.from(url.searchParams.keys()).filter(key => key.startsWith('entry.'));
+      
+      if (entryKeys.length >= 1) {
+        url.searchParams.set(entryKeys[0], userName);
+      }
+      if (entryKeys.length >= 2) {
+        url.searchParams.set(entryKeys[1], userEmail);
+      }
+      return url.toString();
+    } catch (err) {
+      console.error("Invalid Google Form URL", err);
+      return baseLink.replace('NAME', encodeURIComponent(userName)).replace('EMAIL', encodeURIComponent(userEmail));
+    }
+  };
 
   if (typeof document === 'undefined') return null
 
@@ -51,20 +87,24 @@ export default function RecruitmentModal({ isOpen, onClose }) {
         motivationText
       })
       setIsSuccess(true)
-      setTimeout(() => {
-        onClose()
+      setIsSuccess(true)
+      
+      if (!globalSettings?.recruitment_form_link) {
         setTimeout(() => {
-          setIsSuccess(false)
-          setStruck(false)
-          setStep(1)
-          setName('')
-          setEmail('')
-          setPhone('')
-          setInterestArea('')
-          setExperienceLevel('')
-          setMotivationText('')
-        }, 500)
-      }, 3000)
+          onClose()
+          setTimeout(() => {
+            setIsSuccess(false)
+            setStruck(false)
+            setStep(1)
+            setName('')
+            setEmail('')
+            setPhone('')
+            setInterestArea('')
+            setExperienceLevel('')
+            setMotivationText('')
+          }, 500)
+        }, 3000)
+      }
     } catch (err) {
       console.error(err)
       alert('Petition submission failed. Please try again.')
@@ -99,7 +139,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="absolute inset-0 bg-black/60 backdrop-blur-md"
           />
 
           <motion.div
@@ -120,11 +160,24 @@ export default function RecruitmentModal({ isOpen, onClose }) {
             </div>
 
             <button
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                setTimeout(() => {
+                  setIsSuccess(false)
+                  setStruck(false)
+                  setStep(1)
+                  setName('')
+                  setEmail('')
+                  setPhone('')
+                  setInterestArea('')
+                  setExperienceLevel('')
+                  setMotivationText('')
+                }, 500);
+              }}
               aria-label="Close"
-              className="absolute top-5 right-5 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-black/20 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-colors"
+              className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-white/5 border border-white/10 text-white/50 hover:text-white transition-colors duration-400 group"
             >
-              <span className="material-symbols-outlined text-[18px]">close</span>
+              <span className="material-symbols-outlined text-[20px] group-hover:rotate-90 transition-transform duration-500">close</span>
             </button>
 
             {/* Left Content Area (Context Text) - Hidden on Mobile */}
@@ -218,29 +271,46 @@ export default function RecruitmentModal({ isOpen, onClose }) {
               </span>
 
               {isSuccess ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center justify-center py-12 text-center"
-                >
-                  <motion.div
-                    initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
-                    animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 0.1 }}
-                    className="w-20 h-20 rounded-full bg-primary/10 border border-primary/40 flex items-center justify-center mb-8 text-primary"
+                globalSettings?.recruitment_form_link ? (
+                  <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} 
+                    className="flex flex-col items-center justify-center h-full w-full pt-6"
                   >
-                    <span className="material-symbols-outlined text-4xl">workspace_premium</span>
+                    <h3 className="font-display-xl text-[1.5rem] text-white uppercase tracking-tight mb-2 text-center">Complete Petition</h3>
+                    <p className="text-white/60 font-body-md text-[13px] mb-4 text-center px-4">Please fill out this form to complete your petition.</p>
+                    <div className="w-full flex-grow bg-white/[0.02] rounded-xl border border-white/10 overflow-hidden relative">
+                      <iframe
+                        src={constructGoogleFormUrl(globalSettings.recruitment_form_link, name, email)}
+                        className="w-full h-full border-0 absolute inset-0"
+                        title="Google Form Recruitment"
+                      />
+                    </div>
                   </motion.div>
-                  <p className="text-[11px] font-label-caps tracking-[0.25em] uppercase text-primary/70 mb-3">
-                    Petition Received
-                  </p>
-                  <h3 className="font-display-xl text-[2.5rem] text-white uppercase tracking-tight mb-4 leading-tight">
-                    The floor <br/>has your case
-                  </h3>
-                  <p className="text-white/70 font-body-md text-[15px] max-w-[22rem] mx-auto leading-relaxed">
-                    We review every petition thoroughly. Expect to hear from the core within the week.
-                  </p>
-                </motion.div>
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col items-center justify-center py-12 text-center"
+                  >
+                    <motion.div
+                      initial={{ scale: 0.5, rotate: -15, opacity: 0 }}
+                      animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 0.1 }}
+                      className="w-20 h-20 rounded-full bg-primary/10 border border-primary/40 flex items-center justify-center mb-8 text-primary"
+                    >
+                      <span className="material-symbols-outlined text-4xl">workspace_premium</span>
+                    </motion.div>
+                    <p className="text-[11px] font-label-caps tracking-[0.25em] uppercase text-primary/70 mb-3">
+                      Petition Received
+                    </p>
+                    <h3 className="font-display-xl text-[2.5rem] text-white uppercase tracking-tight mb-4 leading-tight">
+                      The floor <br/>has your case
+                    </h3>
+                    <p className="text-white/70 font-body-md text-[15px] max-w-[22rem] mx-auto leading-relaxed">
+                      We review every petition thoroughly. Expect to hear from the core within the week.
+                    </p>
+                  </motion.div>
+                )
               ) : (
                 <>
                   <div className="mb-10 relative z-10 text-left">

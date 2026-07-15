@@ -136,7 +136,7 @@ export default function ArchivePage() {
             setReturnToArchive(true)
             setRegisterItem(selectedItem)
             setModalOpen(false)
-            setTimeout(() => setRegisterModalOpen(true), 300)
+            setTimeout(() => setRegisterModalOpen(true), 100)
           }}
         />
         <RegistrationModal 
@@ -148,7 +148,7 @@ export default function ArchivePage() {
               setTimeout(() => {
                 setModalOpen(true);
                 setReturnToArchive(false);
-              }, 300);
+              }, 100);
             } else {
               setTimeout(() => setRegisterItem(null), 300); 
             }

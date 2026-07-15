@@ -13,6 +13,7 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
         ...item,
         themes: item.themes || [],
         gallery: item.gallery || [],
+        google_form_link: item.google_form_link || '',
         runner_up: item.runner_up || '',
         event_series: item.event_series || '',
         attendance: item.attendance || '',
@@ -53,11 +54,11 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
 
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} item={item}>
-      <ArchiveModalContent 
-        item={editItem} 
-        isAdminEdit={isAdminEdit} 
-        onFieldChange={handleFieldChange} 
-        onSave={handleSave} 
+      <ArchiveModalContent
+        item={editItem}
+        isAdminEdit={isAdminEdit}
+        onFieldChange={handleFieldChange}
+        onSave={handleSave}
         onRegister={onRegister}
       />
     </BaseModal>
@@ -65,6 +66,7 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
 }
 
 function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef, onRegister }) {
+  const [adminTab, setAdminTab] = useState('content');
   const themes = item.themes || [];
   const gallery = item.gallery || [];
   const isPast = (item.status || 'past') === 'past';
@@ -76,7 +78,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
 
   useEffect(() => {
     if (expandedImageIndex === null) return;
-    
+
     const handleKeyDown = (e) => {
       if (e.key === 'ArrowLeft') {
         setExpandedImageIndex(prev => prev > 0 ? prev - 1 : prev);
@@ -118,7 +120,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, width, height);
-          
+
           const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
           const dataUrl = canvas.toDataURL(mimeType, quality);
           resolve(dataUrl);
@@ -243,15 +245,33 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
   return (
     <div className="flex flex-col md:flex-row h-full w-full overflow-y-auto md:overflow-hidden">
       {/* Center Content Column (Scrollable) */}
-      <div 
+      <div
         ref={scrollRef}
         data-lenis-prevent
         className="w-full md:w-[75%] h-auto md:h-full overflow-visible md:overflow-y-auto hide-scrollbar flex flex-col relative pt-12 md:pt-24 px-8 md:px-16"
       >
+        {isAdminEdit && (
+          <div className="flex gap-2 mb-10 border-b border-white/10 pb-4">
+            <button
+              onClick={() => setAdminTab('content')}
+              className={`px-4 py-2 rounded-full font-label-caps text-[10px] uppercase tracking-wider transition-colors ${adminTab === 'content' ? 'bg-primary text-black font-semibold' : 'bg-white/[0.03] text-white/50 hover:text-white/80'}`}
+            >
+              Frontend Content
+            </button>
+            <button
+              onClick={() => setAdminTab('config')}
+              className={`px-4 py-2 rounded-full font-label-caps text-[10px] uppercase tracking-wider transition-colors ${adminTab === 'config' ? 'bg-primary text-black font-semibold' : 'bg-white/[0.03] text-white/50 hover:text-white/80'}`}
+            >
+              System Configuration
+            </button>
+          </div>
+        )}
+
         <div className="max-w-2xl pb-32">
-              
-          {/* Header (Year + Category) */}
-          <motion.div 
+          {(!isAdminEdit || adminTab === 'content') ? (
+            <>
+              {/* Header (Year + Category) */}
+          <motion.div
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}
             className="flex flex-col gap-1 mb-8"
           >
@@ -266,19 +286,19 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           </motion.div>
 
           {/* Large Title */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
             className="mb-8"
           >
             {isAdminEdit ? (
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] font-label-caps text-primary/60 uppercase">Live Title</span>
-                <input 
+                <input
                   type="text"
                   value={item.title || ''}
                   onChange={(e) => onFieldChange('title', e.target.value)}
                   placeholder="New Event Title"
-                  className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
+                  className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
                   required
                 />
               </div>
@@ -290,19 +310,19 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           </motion.div>
 
           {/* Memorable Quote */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
             className="mb-12"
           >
             {isAdminEdit ? (
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] font-label-caps text-primary/60 uppercase">Subtitle / Quote</span>
-                <input 
+                <input
                   type="text"
                   value={item.subtitle || ''}
                   onChange={(e) => onFieldChange('subtitle', e.target.value)}
                   placeholder="Add a subtitle here..."
-                  className="bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary italic font-quote-serif text-[1.2rem] w-full focus:outline-none focus:border-primary/50"
+                  className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-primary italic font-quote-serif text-[1.2rem] w-full focus:outline-none focus:border-primary/50"
                 />
               </div>
             ) : (
@@ -319,46 +339,46 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             item.rounds,
             item.judges
           ].some(val => val && val.trim() !== '')) && (
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}
-              className="mb-16 border-y border-white/5 py-6"
-            >
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: 'Duration', key: 'duration', placeholder: '120 Min', options: ['30 Min', '60 Min', '90 Min', '120 Min'] },
-                  { label: 'Participants', key: 'participants', placeholder: '14' },
-                  { label: 'Rounds', key: 'rounds', placeholder: '3', options: ['1', '2', '3', '4', '5'] },
-                  { label: 'Judges', key: 'judges', placeholder: 'Panel of 5', options: ['Single Judge', 'Panel of 3', 'Panel of 5', 'Audience Vote'] }
-                ].filter(d => isAdminEdit || (item[d.key] && item[d.key].trim() !== '')).map(d => (
-                  <div key={d.key} className="flex flex-col gap-1.5">
-                    <span className="font-label-caps text-[9px] text-white/40 tracking-[0.2em] uppercase">{d.label}:</span>
-                    {isAdminEdit ? (
-                      d.options ? (
-                        <select
-                          value={item[d.key] || ''}
-                          onChange={(e) => onFieldChange(d.key, e.target.value)}
-                          className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
-                        >
-                          <option value="" disabled className="bg-[#090909]">{d.placeholder}</option>
-                          {d.options.map(opt => <option key={opt} value={opt} className="bg-[#090909]">{opt}</option>)}
-                        </select>
+              <motion.div
+                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}
+                className="mb-16 border-y border-white/5 py-6"
+              >
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: 'Duration', key: 'duration', placeholder: '120 Min', options: ['30 Min', '60 Min', '90 Min', '120 Min'] },
+                    { label: 'Participants', key: 'participants', placeholder: '14' },
+                    { label: 'Rounds', key: 'rounds', placeholder: '3', options: ['1', '2', '3', '4', '5'] },
+                    { label: 'Judges', key: 'judges', placeholder: 'Panel of 5', options: ['Single Judge', 'Panel of 3', 'Panel of 5', 'Audience Vote'] }
+                  ].filter(d => isAdminEdit || (item[d.key] && item[d.key].trim() !== '')).map(d => (
+                    <div key={d.key} className="flex flex-col gap-1.5">
+                      <span className="font-label-caps text-[9px] text-white/60 tracking-[0.2em] uppercase">{d.label}:</span>
+                      {isAdminEdit ? (
+                        d.options ? (
+                          <select
+                            value={item[d.key] || ''}
+                            onChange={(e) => onFieldChange(d.key, e.target.value)}
+                            className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
+                          >
+                            <option value="" disabled className="bg-[#090909]">{d.placeholder}</option>
+                            {d.options.map(opt => <option key={opt} value={opt} className="bg-[#090909]">{opt}</option>)}
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            value={item[d.key] || ''}
+                            onChange={(e) => onFieldChange(d.key, e.target.value)}
+                            placeholder={d.placeholder}
+                            className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
+                          />
+                        )
                       ) : (
-                        <input 
-                          type="text"
-                          value={item[d.key] || ''}
-                          onChange={(e) => onFieldChange(d.key, e.target.value)}
-                          placeholder={d.placeholder}
-                          className="bg-white/[0.03] border border-white/10 rounded-lg px-2 py-1.5 text-white/90 text-[16px] focus:outline-none focus:border-primary/50 text-center font-mono"
-                        />
-                      )
-                    ) : (
-                      <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{item[d.key]}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
+                        <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{item[d.key]}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
           {/* Event Overview */}
           <motion.div
@@ -368,12 +388,12 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             {isAdminEdit ? (
               <div className="flex flex-col gap-1">
                 <span className="text-[9px] font-label-caps text-primary/60 uppercase">Main Synopsis (HTML / Paragraph format)</span>
-                <textarea 
+                <textarea
                   value={item.synopsis || ''}
                   onChange={(e) => onFieldChange('synopsis', e.target.value)}
                   placeholder="Add a detailed description here..."
                   rows="6"
-                  className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[16px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
+                  className="w-full bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[16px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
                   required
                 />
               </div>
@@ -406,12 +426,12 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-4">Themes</h5>
               {isAdminEdit ? (
                 <div className="flex flex-col gap-1">
-                  <input 
+                  <input
                     type="text"
                     value={themes.join(', ')}
                     onChange={(e) => onFieldChange('themes', e.target.value.split(',').map(t => t.trim()))}
                     placeholder="Privacy, Consent, Governance (Comma separated)"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50"
+                    className="w-full bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50"
                   />
                 </div>
               ) : (
@@ -431,13 +451,13 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
               <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Winning Argument</h5>
               {isAdminEdit ? (
-                <textarea 
+                <textarea
                   value={item.winning_argument || ''}
                   onChange={(e) => onFieldChange('winning_argument', e.target.value)}
                   placeholder="Add the winning argument pull-quote..."
                   rows="3"
                   disabled={!isPast}
-                  className={`w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50 ${!isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`w-full bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50 ${!isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
                 />
               ) : (
                 <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
@@ -451,149 +471,208 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           {((isAdminEdit) || (gallery.length > 0)) && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-20">
               <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-6">Gallery Images</h5>
-            {isAdminEdit ? (
-              <div className="flex flex-col gap-6">
-                
-                {/* ── CARD IMAGE UPLOAD ── */}
-                <div className="flex flex-col gap-2">
-                  <span className="text-[9px] font-label-caps text-white/40 uppercase">Card Image (Img URL or Upload)</span>
-                  <div 
-                    onDragEnter={handleCardDrag}
-                    onDragOver={handleCardDrag}
-                    onDragLeave={handleCardDrag}
-                    onDrop={handleCardDrop}
-                    onClick={() => document.getElementById('card-image-file').click()}
-                    className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[160px] ${
-                      cardDragActive 
-                        ? 'border-primary bg-primary/5 text-primary' 
+              {isAdminEdit ? (
+                <div className="flex flex-col gap-6">
+
+                  {/* ── CARD IMAGE UPLOAD ── */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[9px] font-label-caps text-white/60 uppercase">Card Image (Img URL or Upload)</span>
+                    <div
+                      onDragEnter={handleCardDrag}
+                      onDragOver={handleCardDrag}
+                      onDragLeave={handleCardDrag}
+                      onDrop={handleCardDrop}
+                      onClick={() => document.getElementById('card-image-file').click()}
+                      className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[160px] ${cardDragActive
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <input 
-                      id="card-image-file"
-                      type="file" 
-                      accept="image/*"
-                      onChange={handleCardFileSelect}
-                      className="hidden" 
-                    />
-                    {item.img ? (
-                      <div className="relative group w-full max-w-[200px] h-[130px] overflow-hidden rounded-lg border border-white/10">
-                        <img 
-                          src={item.img} 
-                          alt="Card preview" 
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                          <span className="text-[10px] font-label-caps tracking-wider text-white">Click/Drop to Replace</span>
+                        }`}
+                    >
+                      <input
+                        id="card-image-file"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleCardFileSelect}
+                        className="hidden"
+                      />
+                      {item.img ? (
+                        <div className="relative group w-full max-w-[200px] h-[130px] overflow-hidden rounded-lg border border-white/10">
+                          <img
+                            src={item.img}
+                            alt="Card preview"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                            <span className="text-[10px] font-label-caps tracking-wider text-white">Click/Drop to Replace</span>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <span className="text-[24px]">📁</span>
-                        <span className="text-[12px] font-label-caps tracking-wider text-center">
-                          Drag & Drop or Click to Upload Card Image
-                        </span>
-                        <span className="text-[10px] text-white/40">PNG, JPG, GIF</span>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="flex flex-col items-center gap-2">
+                          <span className="text-[24px]">📁</span>
+                          <span className="text-[12px] font-label-caps tracking-wider text-center">
+                            Drag & Drop or Click to Upload Card Image
+                          </span>
+                          <span className="text-[10px] text-white/60">PNG, JPG, GIF</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <input 
-                    type="url"
-                    value={item.img || ''}
-                    onChange={(e) => onFieldChange('img', e.target.value)}
-                    placeholder="https://picsum.photos/id/... (or paste direct URL here)"
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50 mb-3 font-mono"
-                  />
-                </div>
 
                 {/* ── GALLERY IMAGES UPLOAD ── */}
-                <div className={`flex flex-col gap-2 ${!isPast ? 'opacity-50 pointer-events-none select-none' : ''}`}>
-                  <span className="text-[9px] font-label-caps text-white/40 uppercase">Add Gallery Images</span>
-                  <div 
-                    onDragEnter={handleGalleryDrag}
-                    onDragOver={handleGalleryDrag}
-                    onDragLeave={handleGalleryDrag}
-                    onDrop={handleGalleryDrop}
-                    onClick={() => document.getElementById('gallery-images-files').click()}
-                    className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[120px] ${
-                      galleryDragActive 
-                        ? 'border-primary bg-primary/5 text-primary' 
+                  <div className={`flex flex-col gap-2 ${!isPast ? 'opacity-50 pointer-events-none select-none' : ''}`}>
+                    <span className="text-[9px] font-label-caps text-white/60 uppercase">Add Gallery Images</span>
+                    <div
+                      onDragEnter={handleGalleryDrag}
+                      onDragOver={handleGalleryDrag}
+                      onDragLeave={handleGalleryDrag}
+                      onDrop={handleGalleryDrop}
+                      onClick={() => document.getElementById('gallery-images-files').click()}
+                      className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[120px] ${galleryDragActive
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04]'
-                    }`}
-                  >
-                    <input 
-                      id="gallery-images-files"
-                      type="file" 
-                      accept="image/*"
-                      multiple
-                      onChange={handleGalleryFileSelect}
-                      className="hidden" 
-                    />
-                    <div className="flex flex-col items-center gap-2">
-                      <span className="text-[24px]">📂</span>
-                      <span className="text-[12px] font-label-caps tracking-wider text-center">
-                        Drag & Drop or Click to Add Gallery Images
-                      </span>
-                      <span className="text-[10px] text-white/40">Drop multiple files</span>
+                        }`}
+                    >
+                      <input
+                        id="gallery-images-files"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleGalleryFileSelect}
+                        className="hidden"
+                      />
+                      <div className="flex flex-col items-center gap-2">
+                        <span className="text-[24px]">📂</span>
+                        <span className="text-[12px] font-label-caps tracking-wider text-center">
+                          Drag & Drop or Click to Add Gallery Images
+                        </span>
+                        <span className="text-[10px] text-white/60">Drop multiple files</span>
+                      </div>
                     </div>
+
+                    {compressing && (
+                      <div className="text-[11px] font-label-caps text-primary tracking-wider animate-pulse text-center">
+                        Processing files...
+                      </div>
+                    )}
+
+                    {/* Thumbnail Management Grid */}
+                    {gallery.length > 0 && (
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
+                        {gallery.map((imgUrl, idx) => (
+                          <div key={idx} onClick={() => setExpandedImageIndex(idx)} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 bg-neutral-900 cursor-zoom-in">
+                            <img src={imgUrl} alt={`Gallery preview ${idx}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeGalleryImage(idx);
+                              }}
+                              className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
                   </div>
+                </div>
+              ) : (
+                <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-8 px-8 md:mx-0 md:px-0">
+                  {gallery.map((imgUrl, idx) => (
+                    <img key={idx} src={imgUrl} onClick={() => setExpandedImageIndex(idx)} alt={`Gallery preview ${idx}`} className="w-[280px] h-[185px] object-cover rounded-lg flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-400 cursor-pointer" />
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          )}
+        </>
+      ) : (
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col gap-8">
+              <h2 className="font-display-xl text-[2rem] text-white uppercase tracking-tighter">System Configuration</h2>
+              
+              <div className="bg-[#090909] border border-white/10 rounded-2xl p-6 md:p-8 flex flex-col gap-6">
+                
+                <div className="flex flex-col gap-2">
+                  <span className="font-label-caps text-[9px] text-white/60 uppercase tracking-widest">Event Status</span>
+                  <select
+                    value={item.status || 'past'}
+                    onChange={(e) => onFieldChange('status', e.target.value)}
+                    className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50"
+                  >
+                    <option value="past" className="bg-[#090909]">Past</option>
+                    <option value="live" className="bg-[#090909]">Live</option>
+                    <option value="upcoming" className="bg-[#090909]">Upcoming</option>
+                  </select>
+                </div>
 
-                  {compressing && (
-                    <div className="text-[11px] font-label-caps text-primary tracking-wider animate-pulse text-center">
-                      Processing files...
-                    </div>
-                  )}
+                <div className="flex flex-col gap-2">
+                  <span className="font-label-caps text-[9px] text-white/60 uppercase tracking-widest">Google Form Link</span>
+                  <input
+                    type="url"
+                    value={item.google_form_link || ''}
+                    onChange={(e) => onFieldChange('google_form_link', e.target.value)}
+                    placeholder="https://docs.google.com/forms/..."
+                    className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono"
+                  />
+                  <span className="text-[10px] text-white/40 mt-1">Used if Save Registrations to DB is disabled or as a fallback.</span>
+                </div>
 
-                  {/* Thumbnail Management Grid */}
-                  {gallery.length > 0 && (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
-                      {gallery.map((imgUrl, idx) => (
-                        <div key={idx} onClick={() => setExpandedImageIndex(idx)} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 bg-neutral-900 cursor-zoom-in">
-                          <img src={imgUrl} alt={`Gallery preview ${idx}`} className="w-full h-full object-cover" />
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeGalleryImage(idx);
-                            }}
-                            className="absolute top-2 right-2 w-6 h-6 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center text-[10px] font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Raw Text Area Fallback */}
-                  <div className="flex flex-col gap-1.5 mt-2">
-                    <span className="text-[9px] font-label-caps text-white/40 uppercase">Or edit raw Comma-separated URLs</span>
-                    <textarea 
-                      value={gallery.join(', ')}
-                      onChange={(e) => onFieldChange('gallery', e.target.value.split(',').map(u => u.trim()).filter(Boolean))}
-                      placeholder="https://url1, https://url2"
-                      rows="2"
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50 resize-none font-mono"
-                    />
+                <div className="flex flex-col gap-2 border-t border-white/5 pt-6 mt-2">
+                  <span className="font-label-caps text-[9px] text-white/60 uppercase tracking-widest">Save Registrations to DB</span>
+                  <div className="flex items-center gap-4 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => onFieldChange('save_to_database', item.save_to_database === false ? true : false)}
+                      className={`w-12 h-6 rounded-full p-1 transition-colors ${item.save_to_database !== false ? 'bg-primary' : 'bg-white/20'}`}
+                    >
+                      <motion.div
+                        layout
+                        className="w-4 h-4 rounded-full bg-white shadow-sm"
+                        animate={{ x: item.save_to_database !== false ? 24 : 0 }}
+                      />
+                    </button>
+                    <span className="text-[12px] font-mono text-white/70">{item.save_to_database !== false ? 'Enabled' : 'Disabled'}</span>
                   </div>
                 </div>
 
+                <div className="flex flex-col gap-4 border-t border-white/5 pt-6 mt-2">
+                  <span className="font-label-caps text-[10px] text-primary tracking-widest uppercase">Grid Layout Settings</span>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <span className="font-label-caps text-[9px] text-white/60 uppercase">Card Height (px)</span>
+                      <input
+                        type="number"
+                        value={item.height || 400}
+                        onChange={(e) => onFieldChange('height', parseInt(e.target.value) || 400)}
+                        className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50"
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <span className="font-label-caps text-[9px] text-white/60 uppercase">Column Span (1-3)</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="3"
+                        value={item.col_span || 1}
+                        onChange={(e) => onFieldChange('col_span', parseInt(e.target.value) || 1)}
+                        className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
               </div>
-            ) : (
-              <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-8 px-8 md:mx-0 md:px-0">
-                {gallery.map((imgUrl, idx) => (
-                  <img key={idx} src={imgUrl} onClick={() => setExpandedImageIndex(idx)} alt={`Gallery preview ${idx}`} className="w-[280px] h-[185px] object-cover rounded-lg flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-400 cursor-pointer" />
-                ))}
-              </div>
-            )}
-          </motion.div>
+            </motion.div>
           )}
 
           {/* Admin Save Button */}
           {isAdminEdit && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-8 pt-8 border-t border-white/10 flex gap-4">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={onSave}
                 className="w-full bg-primary text-black font-label-caps uppercase text-[11px] font-bold py-4 rounded-xl hover:bg-white transition-colors tracking-widest shadow-lg shadow-primary/10"
               >
@@ -606,26 +685,27 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
       </div>
 
       {/* Right Column: Sticky Metadata Sidebar */}
-      <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-black relative">
+      <div className="w-full md:w-[25%] border-t md:border-t-0 md:border-l border-white/5 bg-[#141414] relative">
         <div data-lenis-prevent className="sticky top-0 h-auto md:h-full max-h-none md:max-h-[80vh] overflow-y-auto hide-scrollbar flex flex-col p-8 md:p-12">
           <motion.div
             initial="hidden"
             animate="visible"
             className="flex flex-row md:flex-col gap-8 md:gap-10 overflow-x-auto md:overflow-visible pb-4 md:pb-0"
           >
-            {(!isAdminEdit && !isPast) && (
+            {!isAdminEdit && (
               <div className="mb-8 md:mb-10 w-full">
-                <button 
+                <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (onRegister) onRegister();
+                    if (!isPast && onRegister) onRegister();
                   }}
+                  disabled={isPast}
                   style={{ borderRadius: '9999px' }}
-                  className="group relative w-full font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/5 px-8 py-4 hover:bg-white/[0.08]"
+                  className={`group relative w-full font-label-caps tracking-[0.2em] text-[11px] uppercase transition-colors duration-400 flex items-center justify-center gap-4 border px-8 py-4 ${isPast ? 'bg-white/5 border-white/5 text-white/30 cursor-not-allowed' : 'bg-white/[0.03] backdrop-blur-md border-white/5 text-white/80 hover:text-white hover:bg-white/[0.08]'}`}
                 >
-                  <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />
-                  Register for Event
-                  <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>
+                  {!isPast && <span className="w-8 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-12 transition-all duration-400" />}
+                  {isPast ? 'Registrations Closed' : 'Register for Event'}
+                  {!isPast && <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>}
                 </button>
               </div>
             )}
@@ -639,22 +719,22 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               { label: 'Attendance', key: 'attendance', placeholder: '450 Guests', pastOnly: true },
               { label: 'Speaker Count', key: 'speaker_count', placeholder: '14', pastOnly: true },
             ].filter(data => isAdminEdit || (item[data.key] && item[data.key].trim() !== '')).map((data, i, arr) => (
-              <div 
+              <div
                 key={data.label}
                 className="flex flex-col gap-2 min-w-[120px] md:min-w-0"
               >
-                <span className="font-label-caps text-[9px] tracking-[0.2em] uppercase text-white/40">
+                <span className="font-label-caps text-[9px] tracking-[0.2em] uppercase text-white/60">
                   {data.label}
                 </span>
-                
+
                 {isAdminEdit ? (
-                  <input 
+                  <input
                     type="text"
                     value={item[data.key] || ''}
                     onChange={(e) => onFieldChange(data.key, e.target.value)}
                     placeholder={data.placeholder}
                     disabled={data.pastOnly && !isPast}
-                    className={`bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono ${data.pastOnly && !isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono ${data.pastOnly && !isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
                 ) : (
                   <span className="font-body-md text-[16px] font-semibold text-white">
@@ -667,49 +747,6 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               </div>
             ))}
 
-            {/* Layout parameters (Admins only see this in edit mode) */}
-            {isAdminEdit && (
-              <div className="flex flex-col gap-4 border-t border-white/10 pt-4">
-                <span className="font-label-caps text-[10px] text-primary tracking-widest uppercase">Grid Layout Settings</span>
-                
-                <div className="flex flex-col gap-2">
-                  <span className="font-label-caps text-[9px] text-white/40 uppercase">Card Height (px)</span>
-                  <input 
-                    type="number"
-                    value={item.height || 400}
-                    onChange={(e) => onFieldChange('height', parseInt(e.target.value) || 400)}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <span className="font-label-caps text-[9px] text-white/40 uppercase">Column Span (1-3)</span>
-                  <input 
-                    type="number"
-                    min="1"
-                    max="3"
-                    value={item.col_span || 1}
-                    onChange={(e) => onFieldChange('col_span', parseInt(e.target.value) || 1)}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <span className="font-label-caps text-[9px] text-white/40 uppercase">Event Status</span>
-                  <select 
-                    value={item.status || 'past'}
-                    onChange={(e) => onFieldChange('status', e.target.value)}
-                    className="bg-white/[0.03] border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50"
-                  >
-                    <option value="past" className="bg-[#090909]">Past</option>
-                    <option value="live" className="bg-[#090909]">Live</option>
-                    <option value="upcoming" className="bg-[#090909]">Upcoming</option>
-                  </select>
-                </div>
-              </div>
-            )}
-
-
 
           </motion.div>
         </div>
@@ -717,7 +754,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
 
       {/* Lightbox / Expanded Image overlay */}
       {expandedImageIndex !== null && gallery[expandedImageIndex] && (
-        <div 
+        <div
           className="fixed inset-0 z-[150] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 select-none"
           onClick={() => setExpandedImageIndex(null)}
         >
@@ -735,15 +772,15 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             </button>
           )}
 
-          <div 
+          <div
             className="relative flex items-center justify-center max-w-[92vw] max-h-[88vh] pointer-events-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <AnimatePresence mode="wait">
-              <motion.img 
+              <motion.img
                 key={expandedImageIndex}
-                src={gallery[expandedImageIndex]} 
-                alt="Expanded gallery preview" 
+                src={gallery[expandedImageIndex]}
+                alt="Expanded gallery preview"
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.6}
@@ -783,7 +820,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           )}
 
           {/* Close Button */}
-          <button 
+          <button
             type="button"
             onClick={() => setExpandedImageIndex(null)}
             className="absolute top-6 right-6 w-10 h-10 rounded-full border border-white/10 hover:border-white/20 bg-black/40 hover:bg-black/60 flex items-center justify-center text-white text-[16px] transition-colors z-[160]"

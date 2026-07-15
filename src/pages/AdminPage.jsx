@@ -11,7 +11,7 @@ import ArchiveModal from '../components/ui/ArchiveModal';
 import { useData } from '../context/DataContext';
 
 export default function AdminPage() {
-  const { refreshData, events: allEvents, legacyEvents: allLegacyEvents } = useData();
+  const { refreshData, events: allEvents, legacyEvents: allLegacyEvents, globalSettings, fetchGlobalSettings } = useData();
 
   const getEventTitle = (eventId) => {
     const event = [...(allEvents || []), ...(allLegacyEvents || [])].find(e => e.id === eventId);
@@ -39,6 +39,9 @@ export default function AdminPage() {
   const [legacyTimeline, setLegacyTimeline] = useState([]);
   const [registrations, setRegistrations] = useState([]);
   const [recruitments, setRecruitments] = useState([]);
+  const [adminSettings, setAdminSettings] = useState({
+    recruitment_form_link: ''
+  });
   const [dataLoading, setDataLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
@@ -113,9 +116,18 @@ export default function AdminPage() {
     fetchData();
   }, [session, activeTab]);
 
-  async function fetchData() {
-    setDataLoading(true);
-    setStatusMessage(null);
+  // Sync settings when they load
+  useEffect(() => {
+    if (globalSettings) {
+      setAdminSettings({
+        recruitment_form_link: globalSettings.recruitment_form_link || ''
+      });
+    }
+  }, [globalSettings]);
+
+  async function fetchData(showLoading = true, clearStatus = true) {
+    if (showLoading) setDataLoading(true);
+    if (clearStatus) setStatusMessage(null);
     try {
       if (activeTab === 'events') {
         const { data, error } = await supabase
@@ -267,7 +279,8 @@ export default function AdminPage() {
         location: e.location || '',
         height: e.height || 400,
         col_span: e.colSpan || 1,
-        status: e.status || 'past'
+        status: e.status || 'past',
+        google_form_link: e.google_form_link || null
       }));
 
       if (mappedEvents.length > 0) {
@@ -287,7 +300,8 @@ export default function AdminPage() {
         location: e.location || '',
         height: e.height || 400,
         col_span: e.colSpan || 1,
-        status: e.status || 'past'
+        status: e.status || 'past',
+        google_form_link: e.google_form_link || null
       }));
 
       if (mappedLegacy.length > 0) {
@@ -343,6 +357,10 @@ export default function AdminPage() {
 
   // Open Add/Edit Modal
   function openAddModal() {
+    if (activeTab === 'settings') {
+      handleSaveSettings();
+      return;
+    }
     if (activeTab === 'whitelist') {
       setEditingItem(null);
       setFormData({
@@ -388,6 +406,7 @@ export default function AdminPage() {
         height: 500,
         col_span: 2,
         status: 'past',
+        google_form_link: '',
         themes: [],
         gallery: []
       });
@@ -515,6 +534,41 @@ export default function AdminPage() {
     }
   }
 
+  async function handleSaveSettings() {
+    setStatusMessage(null);
+    try {
+      // We store each key-value pair in global_settings table
+      const keys = Object.keys(adminSettings);
+      for (const key of keys) {
+        // Upsert by checking if it exists
+        const { data: existing } = await supabase
+          .from('global_settings')
+          .select('id')
+          .eq('key', key)
+          .maybeSingle();
+
+        if (existing) {
+          const { error } = await supabase
+            .from('global_settings')
+            .update({ value: adminSettings[key] })
+            .eq('id', existing.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from('global_settings')
+            .insert([{ key, value: adminSettings[key] }]);
+          if (error) throw error;
+        }
+      }
+      
+      setStatusMessage({ type: 'success', text: 'Settings saved successfully.' });
+      fetchGlobalSettings();
+    } catch (err) {
+      console.error(err);
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to save settings.' });
+    }
+  }
+
   // Handle live visual editor save (for Masonry cards)
   async function handleLiveSave(updatedItem) {
     setStatusMessage(null);
@@ -542,7 +596,8 @@ export default function AdminPage() {
         themes: updatedItem.themes,
         winning_argument: updatedItem.winning_argument,
         gallery: updatedItem.gallery,
-        status: updatedItem.status || 'past'
+        status: updatedItem.status || 'past',
+        google_form_link: updatedItem.google_form_link || null
       };
 
       if (updatedItem.id) {
@@ -587,15 +642,19 @@ export default function AdminPage() {
       else if (type === 'Registration') table = 'event_registrations';
       else if (type === 'Recruitment') table = 'society_petitions';
       
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from(table)
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error('Database returned 0 rows deleted. Check your Supabase RLS policies for DELETE permissions on ' + table);
+      }
 
       setStatusMessage({ type: 'success', text: 'Item deleted successfully.' });
-      fetchData();
+      fetchData(false, false);
       refreshData(activeTab);
     } catch (err) {
       console.error(err);
@@ -812,81 +871,71 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
 
                   {/* Top Bar with Navigation & Actions */}
                   <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-white/5 pb-6">
-                    {/* Tab Navigation */}
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3 max-w-full overflow-hidden">
-                      <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
-                        {[
-                          { id: 'events', label: 'Active Events' },
-                          { id: 'legacy', label: 'Legacy Events' },
-                          { id: 'archive_timeline', label: 'Archive Timeline' },
-                          { id: 'legacy_timeline', label: 'Legacy Timeline' }
-                        ].map((tab) => (
-                          <button
-                            key={tab.id}
-                            onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
-                            className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                              activeTab === tab.id ? 'text-black font-semibold' : 'text-white/40 hover:text-white/80'
-                            }`}
-                          >
-                            {tab.label}
-                            {activeTab === tab.id && (
-                              <motion.div
-                                layoutId="activeTabPill"
-                                className="absolute inset-0 bg-primary rounded-full -z-10"
-                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="hidden md:block w-px h-6 bg-white/10 mx-1" />
-
-                      <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
-                        {[
-                          { id: 'registrations', label: 'Registrations' },
-                          { id: 'petitions', label: 'Petitions' },
-                          { id: 'whitelist', label: 'Admin Whitelist' }
-                        ].map((tab) => (
-                          <button
-                            key={tab.id}
-                            onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
-                            className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
-                              activeTab === tab.id ? 'text-black font-semibold' : 'text-white/40 hover:text-white/80'
-                            }`}
-                          >
-                            {tab.label}
-                            {activeTab === tab.id && (
-                              <motion.div
-                                layoutId="activeTabPill"
-                                className="absolute inset-0 bg-primary rounded-full -z-10"
-                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                              />
-                            )}
-                          </button>
-                        ))}
-                      </div>
+                    <div className="flex flex-col lg:flex-row lg:flex-wrap items-start lg:items-center gap-3 max-w-full overflow-hidden">
+                      {[[
+                        { id: 'events', label: 'Active Events' },
+                        { id: 'legacy', label: 'Legacy Events' }
+                      ], [
+                        { id: 'archive_timeline', label: 'Archive Timeline' },
+                        { id: 'legacy_timeline', label: 'Legacy Timeline' }
+                      ], [
+                        { id: 'whitelist', label: 'Admin Whitelist' },
+                        { id: 'settings', label: 'Global Settings' }
+                      ], [
+                        { id: 'registrations', label: 'Registrations' },
+                        { id: 'petitions', label: 'Petitions' }
+                      ]].map((group, groupIdx) => (
+                        <div key={groupIdx} className="flex items-center gap-3">
+                          <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
+                            {group.map((tab) => (
+                              <button
+                                key={tab.id}
+                                onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                                className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                                  activeTab === tab.id ? 'text-black' : 'text-white/40 hover:text-white/80'
+                                }`}
+                              >
+                                {tab.label}
+                                {activeTab === tab.id && (
+                                  <motion.div
+                                    layoutId="activeTabPill"
+                                    className="absolute inset-0 bg-primary rounded-full -z-10"
+                                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                  />
+                                )}
+                              </button>
+                            ))}
+                          </div>
+                          {groupIdx < 3 && (
+                            <div className="hidden lg:block w-px h-6 bg-white/10 mx-1" />
+                          )}
+                        </div>
+                      ))}
                     </div>
 
                     {/* Action buttons */}
                     <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6 w-full xl:w-auto overflow-x-auto hide-scrollbar">
-                      <button
-                        onClick={openAddModal}
-                        className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
-                      >
-                        {activeTab === 'whitelist' 
-                          ? '+ Whitelist Email' 
-                          : activeTab === 'archive_timeline' 
-                          ? '+ Add Archive Year' 
-                          : activeTab === 'legacy_timeline' 
-                          ? '+ Add Legacy Year' 
-                          : activeTab === 'registrations'
-                          ? 'View Only'
-                          : activeTab === 'petitions'
-                          ? 'View Only'
-                          : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`
-                        }
-                      </button>
+                      {activeTab === 'registrations' || activeTab === 'petitions' ? (
+                        <div className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-white/5 text-white/50 font-bold border border-white/10 select-none">
+                          View Only
+                        </div>
+                      ) : (
+                        <button
+                          onClick={openAddModal}
+                          className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
+                        >
+                          {activeTab === 'whitelist' 
+                            ? '+ Whitelist Email' 
+                            : activeTab === 'archive_timeline' 
+                            ? '+ Add Archive Year' 
+                            : activeTab === 'legacy_timeline' 
+                            ? '+ Add Legacy Year' 
+                            : activeTab === 'settings'
+                            ? 'Save Settings'
+                            : `+ Add ${activeTab === 'events' ? 'Event' : 'Legacy'}`
+                          }
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -955,6 +1004,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                               <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Title / Subtitle</th>
                               <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Date & Venue</th>
                               <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Winner</th>
+                              <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55">Form Link</th>
                               <th className="p-5 font-label-caps text-[10px] tracking-wider text-white/55 text-right">Actions</th>
                             </tr>
                           </thead>
@@ -989,6 +1039,15 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                       : 'bg-primary/10 border-primary/20 text-primary'
                                     }`}>
                                       {item.winner || 'N/A'}
+                                    </span>
+                                  </td>
+                                  <td className="p-5">
+                                    <span className="text-white/50 text-[12px] block truncate max-w-[120px]">
+                                      {item.google_form_link ? (
+                                        <a href={item.google_form_link} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                          Setup
+                                        </a>
+                                      ) : 'Not Setup'}
                                     </span>
                                   </td>
                                   <td className="p-5 text-right">
@@ -1257,6 +1316,33 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             ))}
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {/* Settings Tab */}
+                    {activeTab === 'settings' && (
+                      <div className="flex flex-col p-6 min-h-[400px]">
+                        <div className="flex justify-between items-center mb-8">
+                          <h2 className="font-display-xl text-[1.5rem] uppercase text-white">Global Settings</h2>
+                        </div>
+                        
+                        <div className="flex flex-col gap-6 max-w-2xl">
+                          <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-6 relative overflow-hidden group hover:bg-white/[0.04] transition-colors">
+                            <h4 className="font-display-xl text-[1.2rem] text-white uppercase mb-2">Recruitment Form</h4>
+                            <p className="text-[12px] text-white/50 font-body-md mb-6">
+                              Configure the Google Form link used for new society petitions.
+                            </p>
+                            
+                            <label className="block text-[9px] font-label-caps text-white/60 uppercase mb-2">Google Form Link</label>
+                            <input 
+                              type="url"
+                              value={adminSettings.recruitment_form_link}
+                              onChange={(e) => setAdminSettings(prev => ({ ...prev, recruitment_form_link: e.target.value }))}
+                              placeholder="https://docs.google.com/forms/..."
+                              className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-white/80 text-[16px] focus:outline-none focus:border-primary/50 font-mono"
+                            />
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>

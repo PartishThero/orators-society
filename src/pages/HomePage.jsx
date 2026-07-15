@@ -102,7 +102,7 @@ export default function HomePage() {
                 onClick={() => {
                   setPromoOpen(false);
                   sessionStorage.setItem('promo_dismissed', 'true');
-                  setTimeout(() => setRegisterModalOpen(true), 300);
+                  setTimeout(() => setRegisterModalOpen(true), 100);
                 }}
                 style={{ borderRadius: '9999px' }}
                 className="group relative w-full font-label-caps tracking-[0.2em] text-[10px] uppercase text-white/80 hover:text-white transition-colors duration-400 flex items-center justify-center gap-3 bg-white/[0.03] backdrop-blur-md border border-white/5 px-6 py-3 hover:bg-white/[0.08]"
