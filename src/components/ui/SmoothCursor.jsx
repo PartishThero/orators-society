@@ -45,8 +45,8 @@ const DefaultCursorSVG = () => {
             values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
             result="hardAlpha"
           />
-          <feOffset dy={2.25825} />
-          <feGaussianBlur stdDeviation={2.25825} />
+          <feOffset dy={3} />
+          <feGaussianBlur stdDeviation={3} />
           <feComposite in2="hardAlpha" operator="out" />
           <feColorMatrix
             type="matrix"

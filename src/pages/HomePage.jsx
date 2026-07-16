@@ -45,9 +45,9 @@ export default function HomePage() {
 
   return (
     <PageLayout grainientProps={{
-      color1: "#23426D",
-      color2: "#C5A872",
-      color3: "#E2E8F0",
+      color1: "#3e70b6",
+      color2: "#bc9449",
+      color3: "#e6e1c1",
       timeSpeed: 2.15
     }}>
       <Suspense fallback={null}>

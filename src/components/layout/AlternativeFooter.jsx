@@ -147,7 +147,7 @@ export default function AlternativeFooter() {
                     <span className="w-6 h-[1px] bg-white/30 group-hover:bg-primary group-hover:w-10 transition-all duration-400" />
                     Submit Request
                     <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">arrow_forward</span>
-                  </button>
+                  </button> 
                 </div>
               </form>
             </div>
@@ -158,13 +158,15 @@ export default function AlternativeFooter() {
 
       {/* ── Sub Bar: Copyright & Created by Partish! ── */}
       <div className="w-full bg-black mt-12 py-4 flex justify-center border-t border-white/10 relative z-10">
-        <div className="w-full max-w-7xl flex flex-row justify-between items-center gap-4 px-[clamp(1.5rem,7vw,5rem)] text-on-surface-variant/60 font-label-caps text-[9px] tracking-[0.2em] uppercase">
+        <div className="w-full max-w-7xl flex flex-row justify-between items-center gap-4 px-[clamp(1.5rem,7vw,5rem)] text-on-surface-variant/60 font-label-caps text-[10px] tracking-[0.2em] uppercase">
           <span>
             {footerData.copyright}
           </span>
-          <span className="text-primary font-bold">
-            Created with love!
-          </span>
+          <a className='cursor-pointer' href="https://main-portfolio-olive-chi.vercel.app/" target="_blank" rel="noopener noreferrer">
+            <span className="flex items-center gap-1.5 text-primary font-bold">
+              Created by Partish <img src="/heart pixel.png" alt="heart" className="w-8 h-8 object-contain ml-0.5" />
+            </span>
+          </a>
         </div>
       </div>
     </motion.footer>

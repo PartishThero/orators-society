@@ -702,8 +702,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
       includeGrainient={true}
       hideFooter={true}
       grainientProps={{
-        color1: "#2e433a",
-        color2: "#2A4035",
+        color1: "#1c4634",
+        color2: "#476757",
         color3: "#58795a",
         timeSpeed: 1.5
       }}
@@ -871,27 +871,46 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
 
                   {/* Top Bar with Navigation & Actions */}
                   <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 border-b border-white/5 pb-6">
-                    <div className="flex flex-col lg:flex-row lg:flex-wrap items-start lg:items-center gap-3 max-w-full overflow-hidden">
-                      {[[
-                        { id: 'events', label: 'Active Events' },
-                        { id: 'legacy', label: 'Legacy Events' }
-                      ], [
-                        { id: 'archive_timeline', label: 'Archive Timeline' },
-                        { id: 'legacy_timeline', label: 'Legacy Timeline' }
-                      ], [
-                        { id: 'whitelist', label: 'Admin Whitelist' },
-                        { id: 'settings', label: 'Global Settings' }
-                      ], [
-                        { id: 'registrations', label: 'Registrations' },
-                        { id: 'petitions', label: 'Petitions' }
-                      ]].map((group, groupIdx) => (
-                        <div key={groupIdx} className="flex items-center gap-3">
-                          <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md overflow-x-auto hide-scrollbar max-w-full">
-                            {group.map((tab) => (
+                    <div className="flex flex-nowrap items-start gap-5 w-full overflow-x-auto hide-scrollbar pb-2">
+                      {/* EVENTS & FORMS GROUP (Two-Tier) */}
+                      <div className="flex flex-col gap-2 flex-shrink-0">
+                        <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md w-fit">
+                          {[
+                            { id: 'events', label: 'Active Events' },
+                            { id: 'legacy', label: 'Legacy Events' },
+                            { id: 'archive_timeline', label: 'Archive Timeline' },
+                            { id: 'legacy_timeline', label: 'Legacy Timeline' }
+                          ].map((tab) => (
+                            <button
+                              key={tab.id}
+                              onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                              className={`relative px-5 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                                activeTab === tab.id ? 'text-black' : 'text-white/40 hover:text-white/80'
+                              }`}
+                            >
+                              {tab.label}
+                              {activeTab === tab.id && (
+                                <motion.div
+                                  layoutId="activeTabPill"
+                                  className="absolute inset-0 bg-primary rounded-full -z-10"
+                                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center gap-2 pl-6">
+                          <div className="w-3 h-4 border-l border-b border-white/20 rounded-bl-md -mt-2 mb-1" />
+                          <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md w-fit">
+                            {[
+                              { id: 'registrations', label: 'Registrations' },
+                              { id: 'petitions', label: 'Petitions' }
+                            ].map((tab) => (
                               <button
                                 key={tab.id}
                                 onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
-                                className={`relative px-4 py-2 rounded-full text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                                className={`relative px-5 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
                                   activeTab === tab.id ? 'text-black' : 'text-white/40 hover:text-white/80'
                                 }`}
                               >
@@ -906,23 +925,48 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                               </button>
                             ))}
                           </div>
-                          {groupIdx < 3 && (
-                            <div className="hidden lg:block w-px h-6 bg-white/10 mx-1" />
-                          )}
                         </div>
-                      ))}
+                      </div>
+
+                      {/* Divider */}
+                      <div className="hidden md:block w-px h-6 bg-white/10 mt-3 flex-shrink-0" />
+
+                      {/* CONFIG GROUP */}
+                      <div className="flex flex-nowrap items-center gap-1 bg-white/[0.02] border border-white/5 rounded-full p-1 backdrop-blur-md w-fit flex-shrink-0">
+                        {[
+                          { id: 'whitelist', label: 'Admin Whitelist' },
+                          { id: 'settings', label: 'Global Settings' }
+                        ].map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => { setActiveTab(tab.id); setStatusMessage(null); }}
+                            className={`relative px-5 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-[11px] font-label-caps uppercase tracking-wider transition-all z-10 ${
+                              activeTab === tab.id ? 'text-black' : 'text-white/40 hover:text-white/80'
+                            }`}
+                          >
+                            {tab.label}
+                            {activeTab === tab.id && (
+                              <motion.div
+                                layoutId="activeTabPill"
+                                className="absolute inset-0 bg-primary rounded-full -z-10"
+                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                              />
+                            )}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6 w-full xl:w-auto overflow-x-auto hide-scrollbar">
+                    <div className="flex gap-4 xl:border-l xl:border-white/10 xl:pl-6 flex-shrink-0 h-fit mt-1">
                       {activeTab === 'registrations' || activeTab === 'petitions' ? (
-                        <div className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-white/5 text-white/50 font-bold border border-white/10 select-none">
+                        <div className="px-6 py-2.5 rounded-full whitespace-nowrap flex-shrink-0 text-[10px] font-label-caps uppercase tracking-wider bg-white/5 text-white/50 font-bold border border-white/10 select-none">
                           View Only
                         </div>
                       ) : (
                         <button
                           onClick={openAddModal}
-                          className="px-6 py-3 rounded-full text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
+                          className="px-6 py-2.5 rounded-full whitespace-nowrap flex-shrink-0 text-[10px] font-label-caps uppercase tracking-wider bg-primary text-black font-bold hover:bg-white transition-all shadow-lg hover:shadow-primary/10"
                         >
                           {activeTab === 'whitelist' 
                             ? '+ Whitelist Email' 

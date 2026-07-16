@@ -11,9 +11,9 @@ export default function GalleryPage() {
 
   return (
     <PageLayout grainientProps={{
-      color1: "#1A2A40",
+      color1: "#401a1a",
       color2: "#E05769",
-      color3: "#E2E8F0",
+      color3: "#cc6f6f",
       timeSpeed: 2.15
     }}>
       <motion.main
