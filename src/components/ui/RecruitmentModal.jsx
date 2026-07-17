@@ -6,7 +6,8 @@ const INTERESTS = ['Debate', 'Public Speaking', 'Spoken Word', 'Operations']
 const EXPERIENCE_LEVELS = ['Novice', 'Intermediate', 'Advanced', 'Professional']
 
 export default function RecruitmentModal({ isOpen, onClose }) {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(0)
+  const [recruitmentType, setRecruitmentType] = useState('active')
   
   // Form State
   const [name, setName] = useState('')
@@ -84,7 +85,8 @@ export default function RecruitmentModal({ isOpen, onClose }) {
         phone,
         interestArea,
         experienceLevel,
-        motivationText
+        motivationText,
+        recruitmentType
       })
       setIsSuccess(true)
       setIsSuccess(true)
@@ -95,7 +97,8 @@ export default function RecruitmentModal({ isOpen, onClose }) {
           setTimeout(() => {
             setIsSuccess(false)
             setStruck(false)
-            setStep(1)
+            setStep(0)
+            setRecruitmentType('active')
             setName('')
             setEmail('')
             setPhone('')
@@ -165,7 +168,8 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                 setTimeout(() => {
                   setIsSuccess(false)
                   setStruck(false)
-                  setStep(1)
+                  setStep(0)
+                  setRecruitmentType('active')
                   setName('')
                   setEmail('')
                   setPhone('')
@@ -183,7 +187,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
             {/* Left Content Area (Context Text) - Hidden on Mobile */}
             <div className="hidden lg:flex lg:w-[28%] xl:w-[25%] relative bg-[#050505] border-r border-white/10 overflow-hidden flex-col p-10 justify-center">
               <AnimatePresence mode="wait">
-                {step === 1 && (
+                {(step === 0 || step === 1) && (
                   <motion.div 
                     key="text1"
                     variants={variants}
@@ -194,15 +198,22 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                     className="flex flex-col text-left absolute inset-0 p-10 justify-center"
                   >
                     <h4 className="font-display-xl text-[1.8rem] text-primary uppercase leading-[1.05] tracking-tight mb-6">
-                      Dynamic Recruitment &<br />Cohort Orientation (2026-27)
+                      {recruitmentType === 'off-season' ? (
+                        <>Off-Season<br />Talent Pool</>
+                      ) : (
+                        <>Dynamic Recruitment &<br />Cohort Orientation (2026-27)</>
+                      )}
                     </h4>
                     <div className="w-8 h-[2px] bg-primary/40 mb-8" />
                     <div>
                       <h5 className="font-label-caps text-[11px] text-white/90 tracking-[0.25em] uppercase mb-2.5 relative">
-                        <span className="absolute -left-5 top-[calc(50%-3px)] w-1.5 h-1.5 rounded-full bg-primary/80" /> The Window
+                        <span className="absolute -left-5 top-[calc(50%-3px)] w-1.5 h-1.5 rounded-full bg-primary/80" /> 
+                        {recruitmentType === 'off-season' ? 'The Registry' : 'The Window'}
                       </h5>
                       <p className="font-body-md text-[13.5px] text-white/70 leading-relaxed">
-                        Applications remain open for a strict 2–3 day window. Shortlisting results will be finalized within 2–4 days of closure.
+                        {recruitmentType === 'off-season' 
+                          ? "Applying outside our primary window. Submit details to the Talent Pool record maintained by the Social Secretary. Niche vacancies and specialized roles are scouted directly from this registry."
+                          : "Applications remain open for a strict 2–3 day window. Shortlisting results will be finalized within 2–4 days of closure."}
                       </p>
                     </div>
                   </motion.div>
@@ -311,9 +322,41 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                     </p>
                   </motion.div>
                 )
+              ) : step === 0 ? (
+                <div className="flex flex-col justify-center h-full z-10 relative">
+                  <div className="mb-10 text-left">
+                    <h3 className="font-display-xl text-[2.5rem] leading-[1.05] text-white uppercase tracking-tight mb-3">
+                      Select Path
+                    </h3>
+                    <p className="text-[14px] text-white/70 font-body-md leading-relaxed">
+                      Choose your recruitment approach.
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    <button 
+                      onClick={() => { setRecruitmentType('active'); setStep(1); }}
+                      className="group relative flex flex-col items-start p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-primary/50 transition-all text-left"
+                    >
+                      <h4 className="font-display-xl text-[1.5rem] text-white uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">
+                        Active Recruitment Cycle
+                      </h4>
+                      <p className="text-[13px] text-white/60 font-body-md">For the main 2026-27 cohort intake.</p>
+                    </button>
+                    <button 
+                      onClick={() => { setRecruitmentType('off-season'); setStep(1); }}
+                      className="group relative flex flex-col items-start p-6 rounded-2xl border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] hover:border-primary/50 transition-all text-left"
+                    >
+                      <h4 className="font-display-xl text-[1.5rem] text-white uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">
+                        Off-Season Talent Pool
+                      </h4>
+                      <p className="text-[13px] text-white/60 font-body-md">Apply outside the primary window for niche roles.</p>
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <>
-                  <div className="mb-10 relative z-10 text-left">
+                  <button onClick={() => setStep(0)} className="absolute top-8 left-8 z-20 text-white/50 hover:text-white transition-colors hidden md:flex items-center gap-2 text-[11px] font-label-caps uppercase tracking-widest"><span className="material-symbols-outlined text-[16px]">arrow_back</span> Back</button>
+                  <div className="mb-10 relative z-10 text-left md:mt-8">
                     <div className="mb-4 relative">
                       <span className="absolute -left-10 top-[calc(50%-0.5px)] w-6 h-[1px] bg-primary/50" />
                       <p className="text-[11px] font-label-caps tracking-[0.3em] uppercase text-primary/80">

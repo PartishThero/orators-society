@@ -13,7 +13,6 @@ import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
 import Masonry from '../components/sections/Masonry'
 import { useData } from '../context/DataContext'
-import { coreFounders, currentCores, previousCores } from '../data/founders'
 
 export default function HomePage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -45,9 +44,9 @@ export default function HomePage() {
 
   return (
     <PageLayout grainientProps={{
-      color1: "#3e70b6",
-      color2: "#bc9449",
-      color3: "#e6e1c1",
+      color1: "#2e4c74",
+      color2: "#6D7A8D",
+      color3: "#334a5d",
       timeSpeed: 2.15
     }}>
       <Suspense fallback={null}>
@@ -204,6 +203,63 @@ export default function HomePage() {
               OUR FOUNDATIONS
             </span>
             <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter mb-16 max-w-4xl">
+              MEET OUR CLUB COORDINATORS
+            </h2>
+
+            {/* Club Coordinators Masonry-like Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-5xl mb-32">
+              {[
+                {
+                  name: "Dr. Noor Nigar",
+                  role: "Club Coordinator",
+                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                  marginTop: "",
+                  img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&h=200&q=80"
+                },
+                {
+                  name: "Fiza Farzeen",
+                  role: "Club Coordinator",
+                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                  marginTop: "",
+                  img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80"
+                }
+              ].map((person, idx) => (
+                <motion.div
+                  key={`coord-${idx}`}
+                  initial={{ opacity: 0, y: 32 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
+                  /* Note for height/width: Modify 'md:h-[450px]' for height or change the grid columns above for width */
+                  className={`group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full aspect-[4/5] md:aspect-auto md:h-[450px] ${person.marginTop}`}
+                >
+                  <img
+                    src={person.img}
+                    alt={person.name}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
+                  
+                  <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end text-left z-10">
+                    <h3 className="font-display-xl text-[1.8rem] md:text-[2.2rem] text-white uppercase leading-[1.1] tracking-tight mb-1">
+                      {person.name}
+                    </h3>
+                    <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-0 block">
+                      {person.role}
+                    </span>
+                    <div className="grid grid-rows-[0fr] opacity-0 group-hover:grid-rows-[1fr] group-hover:opacity-100 transition-all duration-[600ms] ease-[cubic-bezier(0.25,1,0.5,1)]">
+                      <div className="overflow-hidden">
+                        <p className="font-body-md text-[0.95rem] text-white/70 leading-relaxed pt-4">
+                          {person.desc}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <h2 className="font-display-xl text-[clamp(3.5rem,5vw,5.5rem)] leading-[0.9] text-white uppercase tracking-tighter mb-16 max-w-4xl">
               STRUCTURAL PILLARS
             </h2>
 
@@ -228,7 +284,7 @@ export default function HomePage() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="group relative p-8 md:p-10 rounded-[2rem] border border-white/5 bg-[#0D0D0D] hover:bg-white/[0.03] transition-colors duration-500 text-left flex flex-col justify-start"
+                  className="group relative p-8 md:p-10 rounded-[2rem] border border-white/5 bg-black/20 backdrop-blur-md hover:bg-white/[0.05] transition-colors duration-500 text-left flex flex-col justify-start"
                 >
                   <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center mb-8 group-hover:border-primary/50 transition-colors duration-500 bg-white/[0.02]">
                     <span className="font-label-caps text-[14px] text-primary">0{idx + 1}</span>
@@ -241,170 +297,6 @@ export default function HomePage() {
                   </p>
                 </motion.div>
               ))}
-            </div>
-          </div>
-        </SectionWrapper>
-
-        {/* ── 4. The Founders ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
-          <ArchitecturalGrid />
-          <div className="max-w-7xl w-full mx-auto relative z-10 flex flex-col items-center text-center">
-            <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
-              THE ARCHITECTS
-            </span>
-            <h2 className="font-display-xl text-[clamp(3.5rem,6vw,6rem)] leading-[0.9] text-white uppercase tracking-tighter mb-6 max-w-4xl">
-              OUR FOUNDERS
-            </h2>
-            <p className="font-body-md text-[1rem] md:text-[1.05rem] text-white/50 max-w-lg mb-20 leading-relaxed">
-              The voices who laid the foundation. The minds who built the arena.
-            </p>
-
-            {/* Core Founders — 3 centered cards */}
-            <div className="flex flex-wrap justify-center gap-8 mb-24 w-full">
-              {coreFounders.map((founder, idx) => (
-                <motion.div
-                  key={founder.id}
-                  initial={{ opacity: 0, y: 32 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="group relative w-[280px] rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D]"
-                >
-                  <div className="aspect-[3/4] relative overflow-hidden">
-                    <img
-                      src={founder.img}
-                      alt={founder.name}
-                      loading="lazy"
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90" />
-                  </div>
-                  <div className="absolute inset-0 flex flex-col justify-end p-6 z-10">
-                    <span className="font-label-caps text-[9px] text-primary tracking-[0.2em] uppercase mb-2 block">
-                      {founder.role}
-                    </span>
-                    <h3 className="font-display-xl text-[1.4rem] text-white uppercase leading-[1.1] tracking-tight">
-                      {founder.name}
-                    </h3>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {/* Current Cores — horizontal scroll strip */}
-            <div className="w-full mb-16">
-              <span className="font-label-caps text-[12px] text-primary tracking-[0.2em] uppercase block mb-6">
-                Current Cores
-              </span>
-              <div className="relative w-full group/scroll">
-                {/* Scroll arrows */}
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('current-cores-scroll');
-                    if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
-                  }}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
-                >
-                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                </button>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('current-cores-scroll');
-                    if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
-                  }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
-                >
-                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                </button>
-
-                <div id="current-cores-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
-                  {currentCores.map((member, idx) => (
-                    <motion.div
-                      key={member.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: idx * 0.08, ease: 'easeOut' }}
-                      className="group flex-shrink-0 w-[200px] rounded-2xl overflow-hidden border border-white/5 bg-[#0A0A0A] hover:border-white/10 transition-colors duration-500"
-                    >
-                      <div className="aspect-square relative overflow-hidden">
-                        <img
-                          src={member.img}
-                          alt={member.name}
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                        />
-                      </div>
-                      <div className="p-4 pt-2">
-                        <h4 className="font-display-xl text-[0.9rem] text-white uppercase leading-[1.2] tracking-tight mb-1">
-                          {member.name}
-                        </h4>
-                        <span className="font-label-caps text-[8px] text-white/40 tracking-[0.15em] uppercase">
-                          {member.role}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Previous Cores — horizontal scroll strip */}
-            <div className="w-full">
-              <span className="font-label-caps text-[12px] text-primary tracking-[0.2em] uppercase block mb-6">
-                Previous Cores
-              </span>
-              <div className="relative w-full group/scroll">
-                {/* Scroll arrows */}
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('previous-cores-scroll');
-                    if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
-                  }}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
-                >
-                  <span className="material-symbols-outlined text-[18px]">chevron_left</span>
-                </button>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('previous-cores-scroll');
-                    if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
-                  }}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/60 backdrop-blur-md border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-black/80 transition-all opacity-0 group-hover/scroll:opacity-100"
-                >
-                  <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                </button>
-
-                <div id="previous-cores-scroll" className="flex gap-5 overflow-x-auto pb-4 hide-scrollbar px-4">
-                  {previousCores.map((member, idx) => (
-                    <motion.div
-                      key={member.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: idx * 0.08, ease: 'easeOut' }}
-                      className="group flex-shrink-0 w-[200px] rounded-2xl overflow-hidden border border-white/5 bg-[#0A0A0A] hover:border-white/10 transition-colors duration-500"
-                    >
-                      <div className="aspect-square relative overflow-hidden">
-                        <img
-                          src={member.img}
-                          alt={member.name}
-                          loading="lazy"
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-                        />
-                      </div>
-                      <div className="p-4 pt-2">
-                        <h4 className="font-display-xl text-[0.9rem] text-white uppercase leading-[1.2] tracking-tight mb-1">
-                          {member.name}
-                        </h4>
-                        <span className="font-label-caps text-[8px] text-white/40 tracking-[0.15em] uppercase">
-                          {member.role}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </SectionWrapper>
