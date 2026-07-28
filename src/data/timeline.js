@@ -18,7 +18,7 @@ export const archiveTimelineEvents = [
     ],
   },
   {
-    year: '2024',
+    year: '2026',
     title: 'Foundation of the modern rhetorical framework.',
     badge: 'secondary',
     entries: [
@@ -42,13 +42,13 @@ export const legacyTimelineEvents = [
     active: false,
   },
   {
-    year: '2024',
+    year: '2026',
     title: 'The TEDx Alliance',
     body: "Orator Society becomes the official curation partner for the city's main TEDx event.",
     active: false,
   },
   {
-    year: '2023',
+    year: '2025',
     title: 'The Endowment',
     body: 'Secured permanent funding to ensure no voice is silenced by lack of resources.',
     active: false,

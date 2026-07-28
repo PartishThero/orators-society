@@ -276,8 +276,8 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             className="flex flex-col gap-1 mb-8"
           >
             <div className="flex gap-4 items-center">
-              <span className="font-label-caps text-primary/80 tracking-[0.3em] text-[10px] uppercase">
-                {item.date?.split(',')[1]?.trim() || '2024'}
+              <span className="font-label-caps tracking-[0.3em] uppercase text-primary/80">
+                {item.date?.split(',')[1]?.trim() || '2026'}
               </span>
               <span className="font-label-caps text-white/50 tracking-[0.2em] text-[12px] uppercase">
                 Featured Debate
@@ -714,7 +714,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               { label: 'Winner', key: 'winner', placeholder: 'House of Logic', pastOnly: true },
               { label: 'Runner Up', key: 'runner_up', placeholder: 'Coalition for Transparency', pastOnly: true },
               { label: 'Event Series', key: 'event_series', placeholder: 'The Disruption Series' },
-              { label: 'Date / Year', key: 'date', placeholder: 'Oct 26, 2024' },
+              { label: 'Date / Year', key: 'date', placeholder: 'Oct 26, 2026' },
               { label: 'Venue / Location', key: 'location', placeholder: 'The Grand Forum' },
               { label: 'Attendance', key: 'attendance', placeholder: '450 Guests', pastOnly: true },
               { label: 'Speaker Count', key: 'speaker_count', placeholder: '14', pastOnly: true },

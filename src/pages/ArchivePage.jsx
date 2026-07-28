@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
+import { useState, useEffect, lazy, Suspense, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
@@ -8,6 +8,7 @@ import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
 import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
 import { useData } from '../context/DataContext'
+import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
 
 const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 const RegistrationModal = lazy(() => import('../components/ui/RegistrationModal'))
@@ -19,7 +20,44 @@ export default function ArchivePage() {
   const [registerItem, setRegisterItem] = useState(null)
   const [returnToArchive, setReturnToArchive] = useState(false)
   const [activeFilter, setActiveFilter] = useState('All Events')
-  const { events: eventsList, archiveTimeline: timelineList } = useData()
+  const { events: eventsList, archiveTimeline: timelineList, loading } = useData()
+
+  const sortedAndFilteredEvents = useMemo(() => {
+    // 1. Filter
+    let filtered = eventsList;
+    if (activeFilter !== 'All Events') {
+      filtered = eventsList.filter(e => (e.status || 'past').toLowerCase() === activeFilter.toLowerCase());
+    }
+    
+    // 2. Parse Date Helper
+    const parseDate = (dateStr) => {
+      if (!dateStr) return 0;
+      // Handle date ranges like 'Jun 9-10, 2026' -> 'Jun 9, 2026'
+      let cleanStr = dateStr.replace(/-[\d]+(\s*,)/, '$1'); 
+      // If it's just a year like '2026', return Date of Jan 1, 2026
+      if (/^\d{4}$/.test(cleanStr.trim())) {
+        return new Date(cleanStr.trim(), 0, 1).getTime();
+      }
+      const parsed = new Date(cleanStr);
+      return !isNaN(parsed.getTime()) ? parsed.getTime() : 0;
+    };
+
+    // 3. Sort Descending
+    return [...filtered].sort((a, b) => {
+      return parseDate(b.date) - parseDate(a.date);
+    });
+  }, [eventsList, activeFilter]);
+
+  const handleItemClick = useCallback(item => {
+    setSelectedItem(item)
+    setModalOpen(true)
+  }, [])
+
+  const handleRegisterClick = useCallback(item => {
+    setReturnToArchive(false)
+    setRegisterItem(item)
+    setRegisterModalOpen(true)
+  }, [])
 
   return (
     <PageLayout grainientProps={{
@@ -90,30 +128,23 @@ export default function ArchivePage() {
             ))}
           </div>
 
-          <Masonry
-            items={
-              activeFilter === 'All Events' 
-                ? eventsList 
-                : eventsList.filter(e => (e.status || 'past').toLowerCase() === activeFilter.toLowerCase())
-            }
-            ease="power3.out"
-            duration={0.75}
-            stagger={0.06}
-            animateFrom="bottom"
-            scaleOnHover={true}
-            hoverScale={0.96}
-            blurToFocus={true}
-            colorShiftOnHover={false}
-            onItemClick={useCallback(item => {
-              setSelectedItem(item)
-              setModalOpen(true)
-            }, [])}
-            onRegisterClick={useCallback(item => {
-              setReturnToArchive(false)
-              setRegisterItem(item)
-              setRegisterModalOpen(true)
-            }, [])}
-          />
+          {loading.events ? (
+            <MasonrySkeleton />
+          ) : (
+            <Masonry
+              items={sortedAndFilteredEvents}
+              ease="power3.out"
+              duration={0.75}
+              stagger={0.06}
+              animateFrom="bottom"
+              scaleOnHover={true}
+              hoverScale={0.96}
+              blurToFocus={false}
+              colorShiftOnHover={false}
+              onItemClick={handleItemClick}
+              onRegisterClick={handleRegisterClick}
+            />
+          )}
         </SectionWrapper>
 
         {/* ── 4. Continuum Timeline ── */}
@@ -122,7 +153,11 @@ export default function ArchivePage() {
           <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
             THE CONTINUUM
           </h3>
-          <TimelineSection items={timelineList} />
+          {loading.archiveTimeline ? (
+            <TimelineSkeleton />
+          ) : (
+            <TimelineSection items={timelineList} />
+          )}
         </SectionWrapper>
 
       </main>

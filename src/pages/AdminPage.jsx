@@ -133,7 +133,8 @@ export default function AdminPage() {
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .order('id', { ascending: false });
         if (error) throw error;
         setEvents(data || []);
       } else if (activeTab === 'legacy') {

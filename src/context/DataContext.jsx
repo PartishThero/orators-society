@@ -8,10 +8,10 @@ import { registrations as localRegistrations } from '../data/registrations';
 const DataContext = createContext(null);
 
 export function DataProvider({ children }) {
-  const [events, setEvents] = useState(localEvents);
-  const [legacyEvents, setLegacyEvents] = useState(localLegacyEvents);
-  const [archiveTimeline, setArchiveTimeline] = useState(localArchiveTimeline);
-  const [legacyTimeline, setLegacyTimeline] = useState(localLegacyTimeline);
+  const [events, setEvents] = useState(isSupabaseConfigured ? [] : localEvents);
+  const [legacyEvents, setLegacyEvents] = useState(isSupabaseConfigured ? [] : localLegacyEvents);
+  const [archiveTimeline, setArchiveTimeline] = useState(isSupabaseConfigured ? [] : localArchiveTimeline);
+  const [legacyTimeline, setLegacyTimeline] = useState(isSupabaseConfigured ? [] : localLegacyTimeline);
   const [registrations, setRegistrations] = useState(localRegistrations);
   const [recruitments, setRecruitments] = useState([]);
   const [globalSettings, setGlobalSettings] = useState({
@@ -19,13 +19,13 @@ export function DataProvider({ children }) {
   });
 
   const [loading, setLoading] = useState({
-    events: false,
-    legacyEvents: false,
-    archiveTimeline: false,
-    legacyTimeline: false,
-    registrations: false,
-    recruitments: false,
-    globalSettings: false,
+    events: isSupabaseConfigured,
+    legacyEvents: isSupabaseConfigured,
+    archiveTimeline: isSupabaseConfigured,
+    legacyTimeline: isSupabaseConfigured,
+    registrations: isSupabaseConfigured,
+    recruitments: isSupabaseConfigured,
+    globalSettings: isSupabaseConfigured,
   });
 
   const fetchEvents = useCallback(async () => {
@@ -35,7 +35,8 @@ export function DataProvider({ children }) {
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .order('id', { ascending: false });
       if (error) throw error;
       if (data && data.length > 0) {
         const formatted = data.map(item => ({
@@ -306,18 +307,54 @@ export function DataProvider({ children }) {
     }
   }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments, fetchGlobalSettings]);
 
-  // Load all data once on mount
+  // Load all data once on mount concurrently to avoid React render waterfalls
   useEffect(() => {
     if (isSupabaseConfigured) {
-      fetchEvents();
-      fetchLegacyEvents();
-      fetchArchiveTimeline();
-      fetchLegacyTimeline();
-      fetchRegistrations();
-      fetchRecruitments();
-      fetchGlobalSettings();
+      const initializeData = async () => {
+        setLoading({
+          events: true, legacyEvents: true, archiveTimeline: true, 
+          legacyTimeline: true, registrations: true, recruitments: true, globalSettings: true
+        });
+
+        const [
+          eventsRes, legacyRes, archiveTimelineRes, legacyTimelineRes,
+          registrationsRes, recruitmentsRes, settingsRes
+        ] = await Promise.all([
+          supabase.from('events').select('*').order('created_at', { ascending: false }).order('id', { ascending: false }),
+          supabase.from('legacy_events').select('*').order('created_at', { ascending: false }),
+          supabase.from('archive_timeline').select('*').order('year', { ascending: false }),
+          supabase.from('legacy_timeline').select('*').order('year', { ascending: false }),
+          supabase.from('event_registrations').select('*').order('created_at', { ascending: false }),
+          supabase.from('society_petitions').select('*').order('created_at', { ascending: false }),
+          supabase.from('global_settings').select('*')
+        ]);
+
+        if (eventsRes.data) setEvents(eventsRes.data.map(item => ({...item, colSpan: item.col_span})));
+        if (legacyRes.data) setLegacyEvents(legacyRes.data.map(item => ({...item, colSpan: item.col_span})));
+        if (archiveTimelineRes.data) setArchiveTimeline(archiveTimelineRes.data);
+        if (legacyTimelineRes.data) setLegacyTimeline(legacyTimelineRes.data);
+        if (registrationsRes.data) setRegistrations(registrationsRes.data);
+        if (recruitmentsRes.data) setRecruitments(recruitmentsRes.data);
+        
+        if (settingsRes.data) {
+          setGlobalSettings(prev => {
+            const settingsMap = { ...prev };
+            settingsRes.data.forEach(item => {
+              settingsMap[item.key] = item.value;
+            });
+            return settingsMap;
+          });
+        }
+
+        setLoading({
+          events: false, legacyEvents: false, archiveTimeline: false, 
+          legacyTimeline: false, registrations: false, recruitments: false, globalSettings: false
+        });
+      };
+      
+      initializeData().catch(err => console.error("Initialization failed:", err));
     }
-  }, [fetchEvents, fetchLegacyEvents, fetchArchiveTimeline, fetchLegacyTimeline, fetchRegistrations, fetchRecruitments, fetchGlobalSettings]);
+  }, []);
 
   return (
     <DataContext.Provider

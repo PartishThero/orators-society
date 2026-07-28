@@ -10,6 +10,7 @@ import { legacyItems } from '../data/legacy'
 import { legacyTimelineEvents } from '../data/timeline'
 import { spotlightData } from '../data/spotlight'
 import { useData } from '../context/DataContext'
+import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
 
 const governingCore = [
   { name: "Shrest Sharma", role: "Society President", desc: "Strategic direction & budget authorizations. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=500&q=80" },
@@ -29,8 +30,12 @@ const foundationalPillar = [
 export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState(null)
-  const { legacyEvents: legacyList, legacyTimeline: timelineList } = useData()
+  const { legacyEvents: legacyList, legacyTimeline: timelineList, loading } = useData()
 
+  const handleItemClick = useCallback(item => {
+    setSelectedItem(item)
+    setModalOpen(true)
+  }, [])
 
   return (
     <PageLayout grainientProps={{
@@ -177,6 +182,9 @@ color1: "#1A2A40", // Navy Blue anchor
               </h2>
             </div>
 
+            {loading.legacyEvents ? (
+            <MasonrySkeleton />
+          ) : (
             <Masonry
               items={legacyList}
               ease="power3.out"
@@ -185,13 +193,11 @@ color1: "#1A2A40", // Navy Blue anchor
               animateFrom="bottom"
               scaleOnHover={true}
               hoverScale={0.96}
-              blurToFocus={true}
+              blurToFocus={false}
               colorShiftOnHover={false}
-              onItemClick={useCallback(item => {
-                setSelectedItem(item)
-                setModalOpen(true)
-              }, [])}
+              onItemClick={handleItemClick}
             />
+          )}
           </div>
         </SectionWrapper>
 
@@ -206,7 +212,11 @@ color1: "#1A2A40", // Navy Blue anchor
               LEGACY TIMELINE
             </h2>
           </div>
-          <TimelineSection items={timelineList} />
+          {loading.legacyTimeline ? (
+            <TimelineSkeleton />
+          ) : (
+            <TimelineSection items={timelineList} />
+          )}
         </SectionWrapper>
 
         {/* ── 4. Spotlight Section ── */}

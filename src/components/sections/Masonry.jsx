@@ -29,7 +29,7 @@ const useMeasure = () => {
       if (timeoutId) clearTimeout(timeoutId)
       timeoutId = setTimeout(() => {
         setSize({ width, height })
-      }, 50)
+      }, 200)
     })
     ro.observe(ref.current)
     return () => {
@@ -51,7 +51,7 @@ const Masonry = ({
   animateFrom = 'bottom',
   scaleOnHover = true,
   hoverScale = 0.95,
-  blurToFocus = true,
+  blurToFocus = false,
   colorShiftOnHover = false,
   onItemClick = () => {},
   onRegisterClick = () => {}
