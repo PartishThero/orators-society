@@ -66,19 +66,26 @@ export default function BaseModal({
               onDrop={onImageDrop}
               onClick={isAdminEdit ? onImageClick : undefined}
             >
-              <motion.img
-                initial={{ scale: 1.1 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 1.5, ease: 'easeOut' }}
-                src={item.img}
-                alt={item.title || 'Modal background'}
-                className="w-full h-full object-cover opacity-80"
-              />
+              {item.img ? (
+                <motion.img
+                  initial={{ scale: 1.1 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 1.5, ease: 'easeOut' }}
+                  src={item.img}
+                  alt={item.title || 'Modal poster'}
+                  className="w-full h-full object-cover opacity-80"
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-white/[0.02]">
+                  <span className="material-symbols-outlined text-[48px] text-white/10 mb-4">image</span>
+                </div>
+              )}
+              
               <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent to-black" />
               <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png")', backgroundSize: '200px' }} />
               
               {isAdminEdit && (
-                <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${isImageDragging ? 'bg-primary/20 backdrop-blur-sm opacity-100' : 'bg-black/60 hover:bg-black/40 opacity-0 hover:opacity-100 backdrop-blur-sm'}`}>
+                <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${isImageDragging ? 'bg-primary/20 backdrop-blur-sm opacity-100' : (!item.img ? 'bg-black/20 opacity-100 hover:bg-black/40' : 'bg-black/60 hover:bg-black/40 opacity-0 hover:opacity-100 backdrop-blur-sm')}`}>
                   <span className="material-symbols-outlined text-[32px] text-white mb-2">upload_file</span>
                   <span className="text-[12px] font-label-caps tracking-wider text-white">Click or Drop Poster Here</span>
                 </div>

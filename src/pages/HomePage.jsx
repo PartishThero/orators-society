@@ -118,7 +118,6 @@ export default function HomePage() {
       <main className="flex-grow">
         {/* ── 1. Hero ── */}
         <SectionWrapper className="items-center text-center px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-20">
-          <div className="absolute top-1/2 bottom-0 left-1/2 w-[1px] bg-gradient-to-b from-transparent to-white/[0.08] -translate-x-1/2 pointer-events-none hidden lg:block z-0" />
           <motion.div
             className="max-w-7xl w-full mx-auto z-10 flex flex-col items-center gap-6"
             initial={{ opacity: 0, y: 20 }}
@@ -146,9 +145,6 @@ export default function HomePage() {
 
         {/* ── 2. Philosophy (Architectural Grid) ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-20 md:py-32">
-
-          <div className="absolute top-1/2 left-1/2 w-[1px] h-4 bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
-          <div className="absolute top-1/2 left-1/2 w-4 h-[1px] bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
 
           <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 relative z-10 gap-12 lg:gap-0">
             <div className="relative pr-0 lg:pr-20 w-full max-w-md mx-auto lg:ml-auto pb-6 lg:pb-0 z-20">

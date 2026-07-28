@@ -47,8 +47,6 @@ color1: "#1A2A40", // Navy Blue anchor
       <main className="flex-grow">
         {/* ── 1. Hero ── */}
         <SectionWrapper className="items-center text-center px-[clamp(1.5rem,7vw,10rem)] py-20">
-          <div className="absolute top-1/2 bottom-0 left-1/2 w-[1px] bg-gradient-to-b from-transparent to-white/[0.08] -translate-x-1/2 pointer-events-none hidden lg:block z-0" />
-
           <motion.div
             className="max-w-6xl mx-auto z-10 flex flex-col items-center gap-6"
             initial={{ opacity: 0, y: 20 }}

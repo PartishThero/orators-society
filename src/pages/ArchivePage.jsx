@@ -75,7 +75,6 @@ export default function ArchivePage() {
 
         {/* ── 1. Hero ── */}
         <SectionWrapper className="items-center justify-center text-center px-[clamp(1.5rem,7vw,10rem)]">
-          <div className="absolute top-1/2 bottom-0 left-1/2 w-[1px] bg-gradient-to-b from-transparent to-white/[0.08] -translate-x-1/2 pointer-events-none hidden lg:block z-0" />
           <motion.div
             className="max-w-6xl mx-auto z-10 flex flex-col items-center gap-6"
             initial={{ opacity: 0, y: 20 }}
@@ -96,7 +95,7 @@ export default function ArchivePage() {
 
 
         {/* ── 3. Discourse Catalog Masonry ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] relative z-10">
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] relative z-10 archive-tint">
           
           <div className="mb-12 md:mb-24 flex flex-col items-center text-center relative z-20">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
@@ -135,6 +134,18 @@ export default function ArchivePage() {
 
           {loading.events ? (
             <MasonrySkeleton />
+          ) : sortedAndFilteredEvents.length === 0 ? (
+            <div className="w-full flex flex-col items-center justify-center py-20 text-center relative z-20">
+              <span className="material-symbols-outlined text-[48px] text-white/10 mb-4">search_off</span>
+              <h3 className="text-white/60 font-display-xl text-[2rem] uppercase tracking-tighter mb-2">No {activeFilter} Events</h3>
+              <p className="text-white/40 font-body-md text-[14px] max-w-md">There are currently no events matching this category. Please check back later or explore our past events.</p>
+              <button 
+                onClick={() => setActiveFilter('All Events')}
+                className="mt-6 px-6 py-2 bg-white/5 border border-white/10 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors font-label-caps text-[12px] tracking-wider uppercase"
+              >
+                View All Events
+              </button>
+            </div>
           ) : (
             <Masonry
               items={sortedAndFilteredEvents}
@@ -153,17 +164,18 @@ export default function ArchivePage() {
         </SectionWrapper>
 
         {/* ── 4. Continuum Timeline ── */}
-        <SectionWrapper className="relative z-10 py-16 md:py-24">
-          
-          <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
-            THE CONTINUUM
-          </h3>
-          {loading.archiveTimeline ? (
-            <TimelineSkeleton />
-          ) : (
-            <TimelineSection items={timelineList} events={eventsList} onEventClick={handleItemClick} />
-          )}
-        </SectionWrapper>
+        {activeFilter === 'All Events' && (
+          <SectionWrapper className="relative z-10 py-16 md:py-24">
+            <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
+              THE CONTINUUM
+            </h3>
+            {loading.archiveTimeline ? (
+              <TimelineSkeleton />
+            ) : (
+              <TimelineSection items={timelineList} events={eventsList} onEventClick={handleItemClick} />
+            )}
+          </SectionWrapper>
+        )}
 
       </main>
 

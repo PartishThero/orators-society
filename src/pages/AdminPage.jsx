@@ -11,7 +11,7 @@ import ArchiveModal from '../components/ui/ArchiveModal';
 import { useData } from '../context/DataContext';
 
 export default function AdminPage() {
-  const { refreshData, events: allEvents, legacyEvents: allLegacyEvents, globalSettings, fetchGlobalSettings } = useData();
+  const { refreshData, events: allEvents, legacyEvents: allLegacyEvents, globalSettings, fetchGlobalSettings, loading: contextLoading } = useData();
 
   const getEventTitle = (eventId) => {
     const event = [...(allEvents || []), ...(allLegacyEvents || [])].find(e => e.id === eventId);
@@ -1146,9 +1146,13 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             </tr>
                           </thead>
                           <tbody>
-                            {displayEvents.length === 0 ? (
+                            {(activeTab === 'events' ? contextLoading.events : contextLoading.legacyEvents) ? (
                               <tr>
-                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found in this table.</td>
+                                <td colSpan="6" className="p-8 text-center text-white/40 font-mono text-[14px]">Loading records...</td>
+                              </tr>
+                            ) : displayEvents.length === 0 ? (
+                              <tr>
+                                <td colSpan="6" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found in this table.</td>
                               </tr>
                             ) : (
                               displayEvents.map((item) => (
@@ -1227,7 +1231,11 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             </tr>
                           </thead>
                           <tbody>
-                            {archiveTimeline.length === 0 ? (
+                            {contextLoading.archiveTimeline ? (
+                              <tr>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">Loading records...</td>
+                              </tr>
+                            ) : archiveTimeline.length === 0 ? (
                               <tr>
                                 <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found.</td>
                               </tr>
@@ -1282,7 +1290,11 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             </tr>
                           </thead>
                           <tbody>
-                            {legacyTimeline.length === 0 ? (
+                            {contextLoading.legacyTimeline ? (
+                              <tr>
+                                <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">Loading records...</td>
+                              </tr>
+                            ) : legacyTimeline.length === 0 ? (
                               <tr>
                                 <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found.</td>
                               </tr>

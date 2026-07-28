@@ -30,9 +30,6 @@ export default function Footer() {
       transition={{ duration: 0.75, ease: 'easeOut' }}
       className="w-full relative z-10 flex flex-col min-h-[100dvh] justify-between overflow-hidden pt-24 md:pt-32 border-t border-white/10"
     >
-      {/* Continuous Vertical Line */}
-      <div className="absolute top-0 bottom-0 left-1/2 w-[1px] bg-white/[0.08] -translate-x-1/2 pointer-events-none hidden lg:block z-0" />
-
       {/* ── Dynamic Gradient Background ── */}
       <div className="absolute top-0 left-0 w-full h-full -z-20">
         <Grainient

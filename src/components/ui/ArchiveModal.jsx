@@ -143,16 +143,7 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
   if (!isOpen) return null;
 
   return (
-    <BaseModal 
-      isOpen={isOpen} 
-      onClose={onClose} 
-      item={editItem}
-      isAdminEdit={isAdminEdit}
-      onImageDrag={handleCardDrag}
-      onImageDrop={handleCardDrop}
-      isImageDragging={cardDragActive}
-      onImageClick={() => document.getElementById('card-image-file')?.click()}
-    >
+    <>
       {/* ── CARD IMAGE HIDDEN UPLOAD ── */}
       <input
         id="card-image-file"
@@ -161,17 +152,27 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
         onChange={handleCardFileSelect}
         className="hidden"
       />
-      
-      <ArchiveModalContent
+      <BaseModal 
+        isOpen={isOpen} 
+        onClose={onClose} 
         item={editItem}
         isAdminEdit={isAdminEdit}
-        onFieldChange={handleFieldChange}
-        onSave={handleSave}
-        onRegister={onRegister}
-        compressing={compressing}
-        setCompressing={setCompressing}
-      />
-    </BaseModal>
+        onImageDrag={handleCardDrag}
+        onImageDrop={handleCardDrop}
+        isImageDragging={cardDragActive}
+        onImageClick={() => document.getElementById('card-image-file')?.click()}
+      >
+        <ArchiveModalContent
+          item={editItem}
+          isAdminEdit={isAdminEdit}
+          onFieldChange={handleFieldChange}
+          onSave={handleSave}
+          onRegister={onRegister}
+          compressing={compressing}
+          setCompressing={setCompressing}
+        />
+      </BaseModal>
+    </>
   )
 }
 
@@ -509,6 +510,44 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                       </div>
                     </div>
 
+                    <div className="mt-2 mb-2 bg-white/[0.02] border border-white/5 rounded-xl p-4 relative overflow-hidden group">
+                      <span className="text-[9px] font-label-caps text-white/60 uppercase mb-2 block">Or Link a Google Drive Folder</span>
+                      <div className="flex gap-2">
+                        <input
+                          type="url"
+                          placeholder="https://drive.google.com/drive/folders/..."
+                          className="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-3 py-2 text-white/80 text-[12px] focus:outline-none focus:border-primary/50 font-mono"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              const val = e.target.value.trim();
+                              if (val) {
+                                onFieldChange('gallery', [...gallery, val]);
+                                e.target.value = '';
+                              }
+                            }
+                          }}
+                        />
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            const input = e.target.previousSibling;
+                            const val = input.value.trim();
+                            if (val) {
+                              onFieldChange('gallery', [...gallery, val]);
+                              input.value = '';
+                            }
+                          }}
+                          className="bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-lg px-4 py-2 text-[10px] font-label-caps uppercase tracking-wider transition-colors"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      <p className="text-[9px] text-white/40 mt-2 font-mono">
+                        (e.g., https://drive.google.com/drive/folders/1ZzRySc3KA3CcRxhY8ck1-w1qBQlB1Nwu)
+                      </p>
+                    </div>
+
                     {compressing && (
                       <div className="text-[11px] font-label-caps text-primary tracking-wider animate-pulse text-center">
                         Processing files...
@@ -518,9 +557,18 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     {/* Thumbnail Management Grid */}
                     {gallery.length > 0 && (
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-2">
-                        {gallery.map((imgUrl, idx) => (
-                          <div key={idx} onClick={() => setExpandedImageIndex(idx)} className="relative group aspect-video rounded-lg overflow-hidden border border-white/10 bg-neutral-900 cursor-zoom-in">
-                            <img src={imgUrl} alt={`Gallery preview ${idx}`} className="w-full h-full object-cover" />
+                        {gallery.map((imgUrl, idx) => {
+                          const isDriveLink = imgUrl.includes('drive.google.com/drive/folders/');
+                          return (
+                          <div key={idx} onClick={() => !isDriveLink && setExpandedImageIndex(idx)} className={`relative group aspect-video rounded-lg overflow-hidden border border-white/10 bg-neutral-900 ${!isDriveLink ? 'cursor-zoom-in' : ''}`}>
+                            {isDriveLink ? (
+                              <div className="w-full h-full flex flex-col items-center justify-center p-2 bg-primary/10">
+                                <span className="text-2xl mb-1">📁</span>
+                                <span className="text-[9px] font-mono text-primary text-center break-all line-clamp-2 px-1">Drive Folder</span>
+                              </div>
+                            ) : (
+                              <img src={imgUrl} alt={`Gallery preview ${idx}`} className="w-full h-full object-cover" />
+                            )}
                             <button
                               type="button"
                               onClick={(e) => {
@@ -532,7 +580,8 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                               ✕
                             </button>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
 

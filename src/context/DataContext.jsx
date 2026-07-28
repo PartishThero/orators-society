@@ -28,6 +28,17 @@ export function DataProvider({ children }) {
     globalSettings: isSupabaseConfigured,
   });
 
+  const parseDate = (dateStr) => {
+    if (!dateStr) return 0;
+    let cleanStr = dateStr.replace(/^(Early|Mid|Late)\s+/i, '');
+    cleanStr = cleanStr.replace(/[-–]\d+(\s*,)/, '$1'); 
+    if (/^\d{4}$/.test(cleanStr.trim())) {
+      return new Date(cleanStr.trim(), 0, 1).getTime();
+    }
+    const parsed = new Date(cleanStr);
+    return !isNaN(parsed.getTime()) ? parsed.getTime() : 0;
+  };
+
   const fetchEvents = useCallback(async () => {
     if (!isSupabaseConfigured) return;
     setLoading(prev => ({ ...prev, events: true }));
@@ -39,10 +50,22 @@ export function DataProvider({ children }) {
         .order('id', { ascending: false });
       if (error) throw error;
       if (data && data.length > 0) {
-        const formatted = data.map(item => ({
-          ...item,
-          colSpan: item.col_span
-        }));
+        const now = Date.now();
+        const formatted = data.map(item => {
+          let dynamicStatus = item.status || 'past';
+          if (dynamicStatus.toLowerCase() === 'upcoming') {
+            const dateVal = parseDate(item.date);
+            // If the date is valid and in the past (adding 1 day buffer)
+            if (dateVal && dateVal + 86400000 < now) {
+              dynamicStatus = 'past';
+            }
+          }
+          return {
+            ...item,
+            colSpan: item.col_span,
+            status: dynamicStatus
+          };
+        });
         setEvents(formatted);
       }
     } catch (err) {

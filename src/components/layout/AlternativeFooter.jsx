@@ -28,8 +28,6 @@ export default function AlternativeFooter() {
       transition={{ duration: 0.8, ease: 'easeOut' }}
       className="w-full relative z-10 flex flex-col items-center justify-end pt-24"
     >
-      {/* Continuous Vertical Line running from top down to the floating pill */}
-      <div className="absolute top-0 h-24 left-1/2 w-[1px] bg-white/[0.08] -translate-x-1/2 pointer-events-none hidden lg:block z-0" />
       {/* Floating Pill Container (CSS-based glassmorphism for zero-lag performance) */}
       <div className="w-full max-w-7xl px-[clamp(1.5rem,7vw,5rem)] relative">
         <div
