@@ -32,8 +32,13 @@ export default function ArchivePage() {
     // 2. Parse Date Helper
     const parseDate = (dateStr) => {
       if (!dateStr) return 0;
-      // Handle date ranges like 'Jun 9-10, 2026' -> 'Jun 9, 2026'
-      let cleanStr = dateStr.replace(/-[\d]+(\s*,)/, '$1'); 
+      
+      // Remove abstract prefixes like "Early", "Mid", "Late"
+      let cleanStr = dateStr.replace(/^(Early|Mid|Late)\s+/i, '');
+
+      // Handle date ranges with either hyphen or en-dash: 'Jun 9-10, 2026' or 'Jun 9–10, 2026' -> 'Jun 9, 2026'
+      cleanStr = cleanStr.replace(/[-–]\d+(\s*,)/, '$1'); 
+      
       // If it's just a year like '2026', return Date of Jan 1, 2026
       if (/^\d{4}$/.test(cleanStr.trim())) {
         return new Date(cleanStr.trim(), 0, 1).getTime();
