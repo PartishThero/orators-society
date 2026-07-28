@@ -2,7 +2,17 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useEffect, useRef, cloneElement } from 'react'
 import { createPortal } from 'react-dom'
 
-export default function BaseModal({ isOpen, onClose, item, children }) {
+export default function BaseModal({ 
+  isOpen, 
+  onClose, 
+  item, 
+  children,
+  isAdminEdit,
+  onImageDrag,
+  onImageDrop,
+  isImageDragging,
+  onImageClick
+}) {
   const scrollRef = useRef(null)
   
   const { scrollYProgress } = useScroll({ container: scrollRef })
@@ -48,7 +58,14 @@ export default function BaseModal({ isOpen, onClose, item, children }) {
             </button>
 
             {/* Left Column: Dedicated Poster Image */}
-            <div className="w-full md:w-[35%] h-[200px] md:h-full relative overflow-hidden bg-black flex-shrink-0">
+            <div 
+              className={`w-full md:w-[35%] h-[200px] md:h-full relative overflow-hidden bg-black flex-shrink-0 ${isAdminEdit ? 'cursor-pointer' : ''}`}
+              onDragEnter={onImageDrag}
+              onDragOver={onImageDrag}
+              onDragLeave={onImageDrag}
+              onDrop={onImageDrop}
+              onClick={isAdminEdit ? onImageClick : undefined}
+            >
               <motion.img
                 initial={{ scale: 1.1 }}
                 animate={{ scale: 1 }}
@@ -59,6 +76,13 @@ export default function BaseModal({ isOpen, onClose, item, children }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t md:bg-gradient-to-r from-transparent to-black" />
               <div className="absolute inset-0 opacity-10 pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url("https://upload.wikimedia.org/wikipedia/commons/7/76/1k_Dissolve_Noise_Texture.png")', backgroundSize: '200px' }} />
+              
+              {isAdminEdit && (
+                <div className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-300 ${isImageDragging ? 'bg-primary/20 backdrop-blur-sm opacity-100' : 'bg-black/60 hover:bg-black/40 opacity-0 hover:opacity-100 backdrop-blur-sm'}`}>
+                  <span className="material-symbols-outlined text-[32px] text-white mb-2">upload_file</span>
+                  <span className="text-[12px] font-label-caps tracking-wider text-white">Click or Drop Poster Here</span>
+                </div>
+              )}
             </div>
 
             {/* Right Column: Content Area */}

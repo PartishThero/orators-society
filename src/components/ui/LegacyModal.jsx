@@ -33,7 +33,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             className="flex flex-col gap-1 mb-8"
           >
             <span className="font-label-caps text-primary/80 tracking-[0.3em] text-[10px] uppercase">
-              {item.date?.split(',')[1]?.trim() || '2026'}
+              {item.date?.split(',')[1]?.trim() || ''}
             </span>
             <span className="font-label-caps text-white/50 tracking-[0.2em] text-[12px] uppercase">
               Hall of Voices Inductee
@@ -140,7 +140,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
           >
             {[
               { label: 'Primary Achievement', value: item.winner || 'National Champion' },
-              { label: 'Induction Year', value: item.date?.split(',')[1]?.trim() || '2026' },
+              { label: 'Induction Year', value: item.date?.split(',')[1]?.trim() || '' },
               { label: 'Format Specialty', value: 'British Parliamentary' },
               { label: 'Major Tournaments', value: '7' },
               { label: 'Signature Event', value: item.location || 'The Grand Forum' },

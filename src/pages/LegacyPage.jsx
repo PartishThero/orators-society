@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
-import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
+
 import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
 const LegacyModal = lazy(() => import('../components/ui/LegacyModal'))
@@ -13,19 +13,19 @@ import { useData } from '../context/DataContext'
 import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
 
 const governingCore = [
-  { name: "Shrest Sharma", role: "Society President", desc: "Strategic direction & budget authorizations. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Sneha Agarwal", role: "Society Secretary", desc: "Administration, communications & transparency. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Smit Rupani", role: "Core Member", desc: "Executive Organizer. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Avishkar Wagh", role: "Core Member", desc: "Executive Organizer. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Koushik", role: "Core Member", desc: "Executive Organizer. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Samadrita", role: "Core Member", desc: "Social & Engagement Organ. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Sneha Raj", role: "Core Member", desc: "Creative & Visual Architecture. Lorem ipsum dolor sit amet, consectetur adipiscing elit.", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&h=500&q=80" }
+  { name: "Shrest Sharma", role: "Society President", desc: "Strategic direction & budget authorizations. Ensuring the society's long-term vision is met with precision and excellence.", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Sneha Agarwal", role: "Society Secretary", desc: "Administration, communications & transparency. Overseeing day-to-day operations and member relations.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Smit Rupani", role: "Core Member", desc: "Executive Organizer. Coordinating high-level logistics and event execution.", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Avishkar Wagh", role: "Core Member", desc: "Executive Organizer. Driving operational success and resource management.", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Koushik", role: "Core Member", desc: "Executive Organizer. Specializing in technical setups and on-ground coordination.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Samadrita", role: "Core Member", desc: "Social & Engagement Organ. Facilitating community building and outreach programs.", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Sneha Raj", role: "Core Member", desc: "Creative & Visual Architecture. Leading the design and aesthetic direction of society materials.", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&h=500&q=80" }
 ];
 
 const foundationalPillar = [
-  { name: "Sai Sevithaa", role: "Founding Core Member", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Kushal S.", role: "Founding Core Member", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Tanishka Mangure", role: "Founding Core Member", desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&h=500&q=80" }
+  { name: "Sai Sevithaa", role: "Founding Core Member", desc: "A visionary founder who laid the groundwork for the society's culture and debate formats.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Kushal S.", role: "Founding Core Member", desc: "Instrumental in establishing the core principles and initial outreach strategies of the society.", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&h=500&q=80" },
+  { name: "Tanishka Mangure", role: "Founding Core Member", desc: "Pioneered the early event structures and fostered a community of passionate debaters.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&h=500&q=80" }
 ];
 export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -70,7 +70,7 @@ color1: "#1A2A40", // Navy Blue anchor
 
         {/* ── 1.5. Core Members ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
-          <ArchitecturalGrid />
+
           <div className="max-w-7xl mx-auto relative z-10 w-full flex flex-col items-center text-center">
             
             {/* Governing Executive Core */}
@@ -171,7 +171,7 @@ color1: "#1A2A40", // Navy Blue anchor
 
         {/* ── 2. Hall of Voices ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
-          <ArchitecturalGrid />
+
           <div className="max-w-7xl mx-auto relative z-10 w-full">
             <div className="mb-24 flex flex-col items-center text-center relative z-20">
               <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
@@ -203,7 +203,7 @@ color1: "#1A2A40", // Navy Blue anchor
 
         {/* ── 3. Legacy Timeline ── */}
         <SectionWrapper className="border-y border-white/10 py-24 md:py-32">
-          <ArchitecturalGrid />
+
           <div className="mb-24 flex flex-col items-center text-center relative z-20">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
               THE CONTINUUM
@@ -221,7 +221,7 @@ color1: "#1A2A40", // Navy Blue anchor
 
         {/* ── 4. Spotlight Section ── */}
         <SectionWrapper className="py-24">
-          <ArchitecturalGrid />
+
           <div className="max-w-7xl mx-auto px-[clamp(1.5rem,7vw,10rem)] w-full relative z-10 flex flex-col md:flex-row items-center gap-16 md:gap-24">
             <div className="flex-1">
               <span className="font-label-caps text-[12px] tracking-[0.2em] text-primary uppercase block mb-8 font-semibold">

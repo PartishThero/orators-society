@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
 import PageLayout from '../components/layout/PageLayout';
 import SectionWrapper from '../components/layout/SectionWrapper';
-import ArchitecturalGrid from '../components/layout/ArchitecturalGrid';
+
 import { events as localEvents } from '../data/events';
 import { legacyItems as localLegacyEvents } from '../data/legacy';
 import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
@@ -45,6 +45,7 @@ export default function AdminPage() {
   const [dataLoading, setDataLoading] = useState(false);
   const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
 
   // Form Modal States
   const [showModal, setShowModal] = useState(false);
@@ -110,11 +111,11 @@ export default function AdminPage() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch data based on active tab
+  // Fetch all data initially
   useEffect(() => {
     if (!session) return;
-    fetchData();
-  }, [session, activeTab]);
+    fetchAllData();
+  }, [session]);
 
   // Sync settings when they load
   useEffect(() => {
@@ -124,6 +125,51 @@ export default function AdminPage() {
       });
     }
   }, [globalSettings]);
+
+  async function fetchAllData() {
+    setDataLoading(true);
+    setStatusMessage(null);
+    try {
+      const [
+        { data: evData, error: evErr },
+        { data: legData, error: legErr },
+        { data: wlData, error: wlErr },
+        { data: arcData, error: arcErr },
+        { data: legArcData, error: legArcErr },
+        { data: regData, error: regErr },
+        { data: recData, error: recErr }
+      ] = await Promise.all([
+        supabase.from('events').select('*').order('created_at', { ascending: false }).order('id', { ascending: false }),
+        supabase.from('legacy_events').select('*').order('created_at', { ascending: false }),
+        supabase.from('allowed_admins').select('*').order('created_at', { ascending: false }),
+        supabase.from('archive_timeline').select('*').order('year', { ascending: false }),
+        supabase.from('legacy_timeline').select('*').order('year', { ascending: false }),
+        supabase.from('event_registrations').select('*').order('created_at', { ascending: false }),
+        supabase.from('society_petitions').select('*').order('created_at', { ascending: false })
+      ]);
+      
+      if (evErr) throw evErr;
+      if (legErr) throw legErr;
+      if (wlErr) throw wlErr;
+      if (arcErr) throw arcErr;
+      if (legArcErr) throw legArcErr;
+      if (regErr) throw regErr;
+      if (recErr) throw recErr;
+
+      setEvents(evData || []);
+      setLegacyEvents(legData || []);
+      setWhitelist(wlData || []);
+      setArchiveTimeline(arcData || []);
+      setLegacyTimeline(legArcData || []);
+      setRegistrations(regData || []);
+      setRecruitments(recData || []);
+    } catch (err) {
+      console.error('Error fetching data:', err);
+      setStatusMessage({ type: 'error', text: err.message || 'Failed to load data.' });
+    } finally {
+      setDataLoading(false);
+    }
+  }
 
   async function fetchData(showLoading = true, clearStatus = true) {
     if (showLoading) setDataLoading(true);
@@ -373,8 +419,8 @@ export default function AdminPage() {
       setFormData({
         year: new Date().getFullYear().toString(),
         title: '',
-        badge: 'outline',
-        entriesText: 'architecture:Structural Rhetoric Overhaul\nworkspace_premium:Record Attendance'
+        badge: 'primary',
+        entriesText: ''
       });
       setShowModal(true);
     } else if (activeTab === 'legacy_timeline') {
@@ -423,11 +469,11 @@ export default function AdminPage() {
       });
       setShowModal(true);
     } else if (activeTab === 'archive_timeline') {
-      const entriesText = (item.entries || []).map(e => `${e.icon}:${e.label}`).join('\n');
+      const entriesText = (item.entries || []).map(e => e.label).join('\n');
       setFormData({
         year: item.year,
         title: item.title,
-        badge: item.badge || 'outline',
+        badge: item.badge || 'primary',
         entriesText
       });
       setShowModal(true);
@@ -472,14 +518,9 @@ export default function AdminPage() {
       } else if (activeTab === 'archive_timeline') {
         const parsedEntries = (formData.entriesText || '')
           .split('\n')
-          .map(line => {
-            const parts = line.split(':');
-            if (parts.length >= 2) {
-              return { icon: parts[0].trim(), label: parts.slice(1).join(':').trim() };
-            }
-            return null;
-          })
-          .filter(Boolean);
+          .map(line => line.trim())
+          .filter(Boolean)
+          .map(label => ({ icon: 'emoji_events', label }));
 
         const payload = {
           year: formData.year,
@@ -698,6 +739,39 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
     );
   }
 
+  const getSortedEvents = (list) => {
+    const parseDate = (dateStr) => {
+      if (!dateStr) return 0;
+      let cleanStr = dateStr.replace(/^(Early|Mid|Late)\s+/i, '').replace(/[-–]\d+(\s*,)/, '$1'); 
+      if (/^\d{4}$/.test(cleanStr.trim())) return new Date(cleanStr.trim(), 0, 1).getTime();
+      const parsed = new Date(cleanStr);
+      return !isNaN(parsed.getTime()) ? parsed.getTime() : 0;
+    };
+  
+    return [...list].sort((a, b) => {
+      if (sortConfig.key === 'created_at') {
+        const dateA = new Date(a.created_at).getTime();
+        const dateB = new Date(b.created_at).getTime();
+        return sortConfig.direction === 'desc' ? dateB - dateA : dateA - dateB;
+      } else if (sortConfig.key === 'date') {
+        const dateA = parseDate(a.date);
+        const dateB = parseDate(b.date);
+        return sortConfig.direction === 'desc' ? dateB - dateA : dateA - dateB;
+      } else if (sortConfig.key === 'title') {
+        const titleA = (a.title || '').toLowerCase();
+        const titleB = (b.title || '').toLowerCase();
+        if (titleA < titleB) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (titleA > titleB) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      }
+      return 0;
+    });
+  };
+
+  const displayEvents = (activeTab === 'events' || activeTab === 'legacy') 
+    ? getSortedEvents(activeTab === 'events' ? events : legacyEvents) 
+    : [];
+
   return (
     <PageLayout 
       includeGrainient={true}
@@ -710,7 +784,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
       }}
     >
       <main className="flex-grow">
-        <ArchitecturalGrid />
+
 
         <SectionWrapper className="px-[clamp(1.5rem,5vw,8rem)] py-16 md:py-24 z-10 relative">
           <div className="max-w-7xl w-full mx-auto">
@@ -774,7 +848,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="admin@orator-society.org"
-                          className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                          className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                           required
                         />
                       </div>
@@ -786,7 +860,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           placeholder="••••••••"
-                          className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                          className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                           required
                         />
                       </div>
@@ -799,7 +873,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="••••••••"
-                            className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                            className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                             required
                           />
                         </div>
@@ -1041,7 +1115,25 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
 
                     {/* Events or Legacy Events Tab */}
                     {(activeTab === 'events' || activeTab === 'legacy') && (
-                      <div className="overflow-x-auto">
+                      <div className="flex flex-col">
+                        <div className="flex justify-end p-4 border-b border-white/5 bg-white/[0.01]">
+                          <select 
+                            className="bg-[#0A0A0A] text-white/70 border border-white/10 rounded-lg px-4 py-2 text-[12px] font-mono focus:outline-none focus:border-primary/50 transition-colors cursor-pointer"
+                            value={`${sortConfig.key}-${sortConfig.direction}`}
+                            onChange={(e) => {
+                              const [key, direction] = e.target.value.split('-');
+                              setSortConfig({ key, direction });
+                            }}
+                          >
+                            <option value="created_at-desc">Sort: Default (Newest Added)</option>
+                            <option value="created_at-asc">Sort: Oldest Added</option>
+                            <option value="date-desc">Sort: Date (Newest Event)</option>
+                            <option value="date-asc">Sort: Date (Oldest Event)</option>
+                            <option value="title-asc">Sort: Title (A-Z)</option>
+                            <option value="title-desc">Sort: Title (Z-A)</option>
+                          </select>
+                        </div>
+                        <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                           <thead>
                             <tr className="border-b border-white/10 bg-white/[0.02]">
@@ -1054,12 +1146,12 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                             </tr>
                           </thead>
                           <tbody>
-                            {(activeTab === 'events' ? events : legacyEvents).length === 0 ? (
+                            {displayEvents.length === 0 ? (
                               <tr>
                                 <td colSpan="5" className="p-8 text-center text-white/40 font-mono text-[14px]">No records found in this table.</td>
                               </tr>
                             ) : (
-                              (activeTab === 'events' ? events : legacyEvents).map((item) => (
+                              displayEvents.map((item) => (
                                 <tr key={item.id} className="border-b border-white/5 hover:bg-white/[0.01] transition-colors">
                                   <td className="p-5">
                                     <img 
@@ -1074,8 +1166,8 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                                     <span className="text-white/45 text-[12px] block line-clamp-1 mt-0.5">{item.subtitle || item.synopsis || 'No description available'}</span>
                                   </td>
                                   <td className="p-5">
-                                    <span className="text-white text-[13px] block">{item.date || 'TBD'}</span>
-                                    <span className="text-white/45 text-[12px] block">{item.location || 'TBA'}</span>
+                                    <span className="text-white text-[13px] block">{item.date || 'Date to be announced'}</span>
+                                    <span className="text-white/45 text-[12px] block">{item.location || 'Location to be announced'}</span>
                                   </td>
                                   <td className="p-5">
                                     <span className={`text-[10px] font-label-caps uppercase px-2.5 py-1 rounded-full inline-block border ${
@@ -1117,7 +1209,9 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                           </tbody>
                         </table>
                       </div>
+                      </div>
                     )}
+
 
                     {/* Archive Timeline Tab */}
                     {activeTab === 'archive_timeline' && (
@@ -1441,7 +1535,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       value={formData.whitelistEmail}
                       onChange={(e) => setFormData({ ...formData, whitelistEmail: e.target.value })}
                       placeholder="admin@orator-society.org"
-                      className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3.5 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                      className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3.5 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                       required
                     />
                   </div>
@@ -1456,7 +1550,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                         required
                       />
                     </div>
@@ -1467,7 +1561,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="Challenging the constructs of parallel realities."
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                         required
                       />
                     </div>
@@ -1476,7 +1570,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       <select 
                         value={formData.badge}
                         onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                       >
                         <option value="primary" className="bg-[#090909]">Primary (Gold)</option>
                         <option value="secondary" className="bg-[#090909]">Secondary (Deep Gold)</option>
@@ -1484,15 +1578,15 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Key Metric Items (one per line as icon:label)</label>
+                      <label className="block text-[10px] font-label-caps uppercase tracking-wider text-white/50 mb-2">Events (one per line)</label>
                       <textarea 
                         value={formData.entriesText}
                         onChange={(e) => setFormData({ ...formData, entriesText: e.target.value })}
-                        placeholder="public:First Global Symposium&#10;forum:124 Discourse Sessions"
-                        rows="3"
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 resize-none font-mono placeholder:text-white/20"
+                        placeholder={`EXPLORO — 3rd Edition (Mar 12, 2026)\nVERITAS CLASH WORKSHOP (Nov 24, 2025)\nWAR OF WORDS — 2nd Edition (Sep 29–30, 2025)`}
+                        rows="8"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[13px] focus:outline-none focus:border-primary resize-none font-mono placeholder:text-white/30 leading-relaxed"
                       />
-                      <span className="text-[10px] text-white/40 block mt-1">Available icons: public, forum, architecture, workspace_premium, group, emoji_events</span>
+                      <span className="text-[10px] text-white/40 block mt-1">Each line becomes one event entry. Include the date in parentheses e.g. EVENT NAME (Dec 23, 2025)</span>
                     </div>
                   </>
                 )}
@@ -1506,7 +1600,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.year}
                         onChange={(e) => setFormData({ ...formData, year: e.target.value })}
                         placeholder="2026"
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                         required
                       />
                     </div>
@@ -1517,7 +1611,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="The Inaugural Spark"
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 transition-colors placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary placeholder:text-white/30"
                         required
                       />
                     </div>
@@ -1528,7 +1622,7 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
                         onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                         placeholder="First inter-university championship won..."
                         rows="3"
-                        className="w-full bg-white/[0.03] border-b border-white/10 rounded-none px-1 py-3 text-white text-[16px] focus:outline-none focus:border-primary/60 resize-none placeholder:text-white/20"
+                        className="w-full bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white text-[15px] focus:outline-none focus:border-primary resize-none placeholder:text-white/30"
                         required
                       />
                     </div>

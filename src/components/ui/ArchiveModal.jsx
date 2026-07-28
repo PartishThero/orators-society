@@ -2,6 +2,45 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BaseModal from './BaseModal'
 
+const compressAndGetBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
+        const dataUrl = canvas.toDataURL(mimeType, quality);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+
 export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave, onRegister }) {
   if (typeof document === 'undefined') return null
 
@@ -34,102 +73,8 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
     }));
   };
 
-  const handleSave = () => {
-    if (onSave) {
-      const isPast = (editItem.status || 'past') === 'past';
-      const finalItem = { ...editItem };
-      if (!isPast) {
-        finalItem.winner = '';
-        finalItem.runner_up = '';
-        finalItem.winning_argument = '';
-        finalItem.attendance = '';
-        finalItem.speaker_count = '';
-        finalItem.gallery = [];
-      }
-      onSave(finalItem);
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <BaseModal isOpen={isOpen} onClose={onClose} item={item}>
-      <ArchiveModalContent
-        item={editItem}
-        isAdminEdit={isAdminEdit}
-        onFieldChange={handleFieldChange}
-        onSave={handleSave}
-        onRegister={onRegister}
-      />
-    </BaseModal>
-  )
-}
-
-function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef, onRegister }) {
-  const [adminTab, setAdminTab] = useState('content');
-  const themes = item.themes || [];
-  const gallery = item.gallery || [];
-  const isPast = (item.status || 'past') === 'past';
-
   const [cardDragActive, setCardDragActive] = useState(false);
-  const [galleryDragActive, setGalleryDragActive] = useState(false);
   const [compressing, setCompressing] = useState(false);
-  const [expandedImageIndex, setExpandedImageIndex] = useState(null);
-
-  useEffect(() => {
-    if (expandedImageIndex === null) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === 'ArrowLeft') {
-        setExpandedImageIndex(prev => prev > 0 ? prev - 1 : prev);
-      } else if (e.key === 'ArrowRight') {
-        setExpandedImageIndex(prev => prev < gallery.length - 1 ? prev + 1 : prev);
-      } else if (e.key === 'Escape') {
-        setExpandedImageIndex(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [expandedImageIndex, gallery.length]);
-
-  const compressAndGetBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target.result;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxWidth) {
-              height = Math.round((height * maxWidth) / width);
-              width = maxWidth;
-            }
-          } else {
-            if (height > maxHeight) {
-              width = Math.round((width * maxHeight) / height);
-              height = maxHeight;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-          const dataUrl = canvas.toDataURL(mimeType, quality);
-          resolve(dataUrl);
-        };
-        img.onerror = (err) => reject(err);
-      };
-      reader.onerror = (err) => reject(err);
-    });
-  };
 
   const handleCardDrag = (e) => {
     e.preventDefault();
@@ -152,7 +97,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
         try {
           setCompressing(true);
           const base64 = await compressAndGetBase64(file);
-          onFieldChange('img', base64);
+          handleFieldChange('img', base64);
         } catch (err) {
           console.error("Error loading image file:", err);
         } finally {
@@ -169,7 +114,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
         try {
           setCompressing(true);
           const base64 = await compressAndGetBase64(file);
-          onFieldChange('img', base64);
+          handleFieldChange('img', base64);
         } catch (err) {
           console.error("Error loading image file:", err);
         } finally {
@@ -178,6 +123,84 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
       }
     }
   };
+
+  const handleSave = () => {
+    if (onSave) {
+      const isPast = (editItem.status || 'past') === 'past';
+      const finalItem = { ...editItem };
+      if (!isPast) {
+        finalItem.winner = '';
+        finalItem.runner_up = '';
+        finalItem.winning_argument = '';
+        finalItem.attendance = '';
+        finalItem.speaker_count = '';
+        finalItem.gallery = [];
+      }
+      onSave(finalItem);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <BaseModal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      item={editItem}
+      isAdminEdit={isAdminEdit}
+      onImageDrag={handleCardDrag}
+      onImageDrop={handleCardDrop}
+      isImageDragging={cardDragActive}
+      onImageClick={() => document.getElementById('card-image-file')?.click()}
+    >
+      {/* ── CARD IMAGE HIDDEN UPLOAD ── */}
+      <input
+        id="card-image-file"
+        type="file"
+        accept="image/*"
+        onChange={handleCardFileSelect}
+        className="hidden"
+      />
+      
+      <ArchiveModalContent
+        item={editItem}
+        isAdminEdit={isAdminEdit}
+        onFieldChange={handleFieldChange}
+        onSave={handleSave}
+        onRegister={onRegister}
+        compressing={compressing}
+        setCompressing={setCompressing}
+      />
+    </BaseModal>
+  )
+}
+
+function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollRef, onRegister, compressing, setCompressing }) {
+  const [adminTab, setAdminTab] = useState('content');
+  const themes = item.themes || [];
+  const gallery = item.gallery || [];
+  const isPast = (item.status || 'past') === 'past';
+
+
+
+  const [galleryDragActive, setGalleryDragActive] = useState(false);
+  const [expandedImageIndex, setExpandedImageIndex] = useState(null);
+
+  useEffect(() => {
+    if (expandedImageIndex === null) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft') {
+        setExpandedImageIndex(prev => prev > 0 ? prev - 1 : prev);
+      } else if (e.key === 'ArrowRight') {
+        setExpandedImageIndex(prev => prev < gallery.length - 1 ? prev + 1 : prev);
+      } else if (e.key === 'Escape') {
+        setExpandedImageIndex(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [expandedImageIndex, gallery.length]);
 
   const handleGalleryDrag = (e) => {
     e.preventDefault();
@@ -277,10 +300,10 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
           >
             <div className="flex gap-4 items-center">
               <span className="font-label-caps tracking-[0.3em] uppercase text-primary/80">
-                {item.date?.split(',')[1]?.trim() || '2026'}
+                {item.date?.split(',')[1]?.trim() || ''}
               </span>
               <span className="font-label-caps text-white/50 tracking-[0.2em] text-[12px] uppercase">
-                Featured Debate
+                {item.event_series || 'Archived Event'}
               </span>
             </div>
           </motion.div>
@@ -298,7 +321,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   value={item.title || ''}
                   onChange={(e) => onFieldChange('title', e.target.value)}
                   placeholder="New Event Title"
-                  className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary/50"
+                  className="bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white font-display-xl text-[1.8rem] uppercase w-full focus:outline-none focus:border-primary placeholder:text-white/30"
                   required
                 />
               </div>
@@ -322,7 +345,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   value={item.subtitle || ''}
                   onChange={(e) => onFieldChange('subtitle', e.target.value)}
                   placeholder="Add a subtitle here..."
-                  className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-primary italic font-quote-serif text-[1.2rem] w-full focus:outline-none focus:border-primary/50"
+                  className="bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-primary italic font-quote-serif text-[1.2rem] w-full focus:outline-none focus:border-primary placeholder:text-primary/30"
                 />
               </div>
             ) : (
@@ -393,7 +416,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                   onChange={(e) => onFieldChange('synopsis', e.target.value)}
                   placeholder="Add a detailed description here..."
                   rows="6"
-                  className="w-full bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white/90 text-[16px] leading-relaxed resize-none focus:outline-none focus:border-primary/50"
+                  className="bg-transparent border-b border-white/20 rounded-none px-2 py-3 text-white/80 text-[14px] leading-relaxed resize-none w-full focus:outline-none focus:border-primary placeholder:text-white/30"
                   required
                 />
               </div>
@@ -446,27 +469,6 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
             </motion.div>
           )}
 
-          {/* Winning Argument Pull-Quote */}
-          {((isAdminEdit) || (item.winning_argument && item.winning_argument.trim() !== '')) && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
-              <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Winning Argument</h5>
-              {isAdminEdit ? (
-                <textarea
-                  value={item.winning_argument || ''}
-                  onChange={(e) => onFieldChange('winning_argument', e.target.value)}
-                  placeholder="Add the winning argument pull-quote..."
-                  rows="3"
-                  disabled={!isPast}
-                  className={`w-full bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-primary text-[16px] leading-relaxed italic resize-none focus:outline-none focus:border-primary/50 ${!isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
-                />
-              ) : (
-                <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
-                  "{item.winning_argument}"
-                </p>
-              )}
-            </motion.div>
-          )}
-
           {/* Gallery Preview */}
           {((isAdminEdit) || (gallery.length > 0)) && (
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-20">
@@ -474,49 +476,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
               {isAdminEdit ? (
                 <div className="flex flex-col gap-6">
 
-                  {/* ── CARD IMAGE UPLOAD ── */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[9px] font-label-caps text-white/60 uppercase">Card Image (Img URL or Upload)</span>
-                    <div
-                      onDragEnter={handleCardDrag}
-                      onDragOver={handleCardDrag}
-                      onDragLeave={handleCardDrag}
-                      onDrop={handleCardDrop}
-                      onClick={() => document.getElementById('card-image-file').click()}
-                      className={`relative border-2 border-dashed rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all duration-300 min-h-[160px] ${cardDragActive
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04]'
-                        }`}
-                    >
-                      <input
-                        id="card-image-file"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleCardFileSelect}
-                        className="hidden"
-                      />
-                      {item.img ? (
-                        <div className="relative group w-full max-w-[200px] h-[130px] overflow-hidden rounded-lg border border-white/10">
-                          <img
-                            src={item.img}
-                            alt="Card preview"
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                            <span className="text-[10px] font-label-caps tracking-wider text-white">Click/Drop to Replace</span>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="flex flex-col items-center gap-2">
-                          <span className="text-[24px]">📁</span>
-                          <span className="text-[12px] font-label-caps tracking-wider text-center">
-                            Drag & Drop or Click to Upload Card Image
-                          </span>
-                          <span className="text-[10px] text-white/60">PNG, JPG, GIF</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+
 
                 {/* ── GALLERY IMAGES UPLOAD ── */}
                   <div className={`flex flex-col gap-2 ${!isPast ? 'opacity-50 pointer-events-none select-none' : ''}`}>
@@ -651,11 +611,11 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <span className="font-label-caps text-[9px] text-white/60 uppercase">Column Span (1-3)</span>
+                      <span className="font-label-caps text-[9px] text-white/60 uppercase">Column Span (1-5)</span>
                       <input
                         type="number"
                         min="1"
-                        max="3"
+                        max="5"
                         value={item.col_span || 1}
                         onChange={(e) => onFieldChange('col_span', parseInt(e.target.value) || 1)}
                         className="bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-xl px-4 py-3 text-white text-[16px] focus:outline-none focus:border-primary/50"
@@ -734,7 +694,7 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
                     onChange={(e) => onFieldChange(data.key, e.target.value)}
                     placeholder={data.placeholder}
                     disabled={data.pastOnly && !isPast}
-                    className={`bg-white/[0.03] hover:bg-white/[0.05] transition-colors border border-white/10 rounded-lg px-2.5 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary/50 font-mono ${data.pastOnly && !isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`bg-transparent border-b border-white/20 rounded-none px-2 py-1.5 text-white text-[16px] focus:outline-none focus:border-primary font-mono placeholder:text-white/30 ${data.pastOnly && !isPast ? 'opacity-50 cursor-not-allowed' : ''}`}
                   />
                 ) : (
                   <span className="font-body-md text-[16px] font-semibold text-white">
@@ -832,3 +792,4 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
     </div>
   )
 }
+

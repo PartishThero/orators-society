@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
-import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
+
 
 const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 const RegistrationModal = lazy(() => import('../components/ui/RegistrationModal'))
@@ -146,7 +146,7 @@ export default function HomePage() {
 
         {/* ── 2. Philosophy (Architectural Grid) ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-20 md:py-32">
-          <ArchitecturalGrid showHorizontal={true} />
+
           <div className="absolute top-1/2 left-1/2 w-[1px] h-4 bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
           <div className="absolute top-1/2 left-1/2 w-4 h-[1px] bg-white/30 -translate-x-1/2 -translate-y-1/2 pointer-events-none hidden lg:block z-10" />
 
@@ -197,7 +197,7 @@ export default function HomePage() {
 
         {/* ── 3. Our Foundations ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
-          <ArchitecturalGrid />
+
           <div className="max-w-7xl w-full mx-auto relative z-10 flex flex-col items-center text-center">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
               OUR FOUNDATIONS
@@ -212,14 +212,14 @@ export default function HomePage() {
                 {
                   name: "Dr. Noor Nigar",
                   role: "Club Coordinator",
-                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                  desc: "Guiding the Orator Society with unwavering support, Dr. Nigar ensures that the club's academic and extracurricular goals align perfectly with the institution's values.",
                   marginTop: "",
                   img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&h=200&q=80"
                 },
                 {
                   name: "Fiza Farzeen",
                   role: "Club Coordinator",
-                  desc: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+                  desc: "As a cornerstone of the society's operations, Fiza brings exceptional leadership and organizational skills to mentor our aspiring debaters and speakers.",
                   marginTop: "",
                   img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80"
                 }
@@ -303,7 +303,7 @@ export default function HomePage() {
 
         {/* ── 4. From the Archives (Gallery Wall) ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
-          <ArchitecturalGrid />
+
           <div className="max-w-8xl w-full mx-auto relative z-10 flex flex-col justify-center items-center text-center h-full">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
               FROM THE ARCHIVES

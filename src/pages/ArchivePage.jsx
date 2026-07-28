@@ -4,7 +4,7 @@ import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import Masonry from '../components/sections/Masonry'
 import TimelineSection from '../components/sections/TimelineSection'
-import ArchitecturalGrid from '../components/layout/ArchitecturalGrid'
+
 import { events as localEvents } from '../data/events'
 import { archiveTimelineEvents } from '../data/timeline'
 import { useData } from '../context/DataContext'
@@ -97,7 +97,7 @@ export default function ArchivePage() {
 
         {/* ── 3. Discourse Catalog Masonry ── */}
         <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] relative z-10">
-          <ArchitecturalGrid />
+          
           <div className="mb-12 md:mb-24 flex flex-col items-center text-center relative z-20">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-3 md:mb-6 block font-semibold">
               THE VAULT
@@ -154,14 +154,14 @@ export default function ArchivePage() {
 
         {/* ── 4. Continuum Timeline ── */}
         <SectionWrapper className="relative z-10 py-16 md:py-24">
-          <ArchitecturalGrid />
+          
           <h3 className="font-headline-lg-mobile text-on-surface mb-6 md:mb-12 px-[clamp(1.5rem,7vw,10rem)] uppercase text-center">
             THE CONTINUUM
           </h3>
           {loading.archiveTimeline ? (
             <TimelineSkeleton />
           ) : (
-            <TimelineSection items={timelineList} />
+            <TimelineSection items={timelineList} events={eventsList} onEventClick={handleItemClick} />
           )}
         </SectionWrapper>
 

@@ -201,7 +201,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                       {recruitmentType === 'off-season' ? (
                         <>Off-Season<br />Talent Pool</>
                       ) : (
-                        <>Dynamic Recruitment &<br />Cohort Orientation (2026-27)</>
+                        <>Dynamic Recruitment &<br />Cohort Orientation</>
                       )}
                     </h4>
                     <div className="w-8 h-[2px] bg-primary/40 mb-8" />
@@ -340,7 +340,7 @@ export default function RecruitmentModal({ isOpen, onClose }) {
                       <h4 className="font-display-xl text-[1.5rem] text-white uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">
                         Active Recruitment Cycle
                       </h4>
-                      <p className="text-[13px] text-white/60 font-body-md">For the main 2026-27 cohort intake.</p>
+                      <p className="text-[13px] text-white/60 font-body-md">For the main cohort intake.</p>
                     </button>
                     <button 
                       onClick={() => { setRecruitmentType('off-season'); setStep(1); }}
