@@ -20,6 +20,7 @@ export default function ArchivePage() {
   const [registerItem, setRegisterItem] = useState(null)
   const [returnToArchive, setReturnToArchive] = useState(false)
   const [activeFilter, setActiveFilter] = useState('All Events')
+  const [visibleCount, setVisibleCount] = useState(5)
   const { events: eventsList, archiveTimeline: timelineList, loading } = useData()
 
   const sortedAndFilteredEvents = useMemo(() => {
@@ -52,6 +53,19 @@ export default function ArchivePage() {
       return parseDate(b.date) - parseDate(a.date);
     });
   }, [eventsList, activeFilter]);
+
+  // Reset visible count whenever the filter changes
+  useEffect(() => {
+    setVisibleCount(5)
+  }, [activeFilter])
+
+  // Items actually passed to Masonry (the rendered slice)
+  const visibleEvents = useMemo(
+    () => sortedAndFilteredEvents.slice(0, visibleCount),
+    [sortedAndFilteredEvents, visibleCount]
+  )
+
+  const hasMore = visibleCount < sortedAndFilteredEvents.length
 
   const handleItemClick = useCallback(item => {
     setSelectedItem(item)
@@ -147,19 +161,46 @@ export default function ArchivePage() {
               </button>
             </div>
           ) : (
-            <Masonry
-              items={sortedAndFilteredEvents}
-              ease="power3.out"
-              duration={0.75}
-              stagger={0.06}
-              animateFrom="bottom"
-              scaleOnHover={true}
-              hoverScale={0.96}
-              blurToFocus={false}
-              colorShiftOnHover={false}
-              onItemClick={handleItemClick}
-              onRegisterClick={handleRegisterClick}
-            />
+            <>
+              <Masonry
+                items={visibleEvents}
+                ease="power3.out"
+                duration={0.75}
+                stagger={0.06}
+                animateFrom="bottom"
+                scaleOnHover={true}
+                hoverScale={0.96}
+                blurToFocus={false}
+                colorShiftOnHover={false}
+                onItemClick={handleItemClick}
+                onRegisterClick={handleRegisterClick}
+              />
+
+              {/* Pagination / Expand Row */}
+              <div className="mt-12 flex flex-col items-center gap-4 relative z-20">
+                <p className="font-label-caps text-[10px] tracking-[0.2em] uppercase text-white/30">
+                  Showing {Math.min(visibleCount, sortedAndFilteredEvents.length)} of {sortedAndFilteredEvents.length} events
+                </p>
+
+                {hasMore && (
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 5)}
+                    style={{ borderRadius: '9999px' }}
+                    className="group relative font-label-caps tracking-[0.2em] text-[11px] uppercase text-white/70 hover:text-white transition-colors duration-400 flex items-center gap-4 bg-white/[0.03] backdrop-blur-md border border-white/10 px-8 py-4 hover:bg-white/[0.08] hover:border-white/20"
+                  >
+                    <span className="w-6 h-[1px] bg-white/20 group-hover:bg-primary group-hover:w-10 transition-all duration-400" />
+                    Load More Events
+                    <span className="material-symbols-outlined text-[16px] text-primary/60 group-hover:text-primary transition-colors group-hover:translate-y-0.5 duration-300">expand_more</span>
+                  </button>
+                )}
+
+                {!hasMore && sortedAndFilteredEvents.length > 5 && (
+                  <p className="font-label-caps text-[10px] tracking-[0.2em] uppercase text-white/20">
+                    — End of Archive —
+                  </p>
+                )}
+              </div>
+            </>
           )}
         </SectionWrapper>
 

@@ -28,7 +28,7 @@ export default function HomePage() {
     if (!eventsList || eventsList.length === 0) return null;
     return eventsList.find(e => (e.status || 'past').toLowerCase() === 'live')
       || eventsList.find(e => (e.status || 'past').toLowerCase() === 'upcoming')
-      || eventsList[0];
+      || null;
   }, [eventsList]);
 
   useEffect(() => {

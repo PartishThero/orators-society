@@ -1,23 +1,38 @@
 import React from 'react';
 
 export const MasonrySkeleton = () => {
-  // A few predefined heights to mimic the masonry brick layout
-  const skeletonHeights = [
-    'h-[300px]', 'h-[400px]', 'h-[350px]', 'h-[450px]', 'h-[320px]',
-    'h-[380px]', 'h-[420px]', 'h-[300px]', 'h-[460px]', 'h-[340px]'
+  // Column spans out of 5: 3, 2 | 2, 3 | 5
+  const rows = [
+    [
+      { span: 3, height: 'h-[420px]' },
+      { span: 2, height: 'h-[420px]' },
+    ],
+    [
+      { span: 2, height: 'h-[380px]' },
+      { span: 3, height: 'h-[380px]' },
+    ],
+    [
+      { span: 5, height: 'h-[300px]' },
+    ],
   ];
 
   return (
-    <div className="w-full columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-      {skeletonHeights.map((height, index) => (
-        <div 
-          key={index} 
-          className={`w-full ${height} bg-white/[0.03] rounded-2xl animate-pulse break-inside-avoid shadow-[0px_18px_80px_-32px_rgba(0,0,0,0.25)] border border-white/[0.05]`}
-        />
+    <div className="w-full flex flex-col gap-3">
+      {rows.map((row, rowIdx) => (
+        <div key={rowIdx} className="w-full grid grid-cols-5 gap-3">
+          {row.map((card, cardIdx) => (
+            <div
+              key={cardIdx}
+              className={`${card.height} bg-white/[0.03] rounded-2xl animate-pulse border border-white/[0.05] shadow-[0px_18px_80px_-32px_rgba(0,0,0,0.25)]`}
+              style={{ gridColumn: `span ${card.span}` }}
+            />
+          ))}
+        </div>
       ))}
     </div>
   );
 };
+
 
 export const TimelineSkeleton = () => {
   return (
