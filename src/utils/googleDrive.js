@@ -3,7 +3,7 @@ export async function fetchDriveFiles(folderId) {
   
   if (!apiKey) {
     console.error("VITE_GOOGLE_DRIVE_API_KEY is not defined");
-    return [];
+    throw new Error('MISSING_API_KEY');
   }
   
   try {
@@ -14,7 +14,10 @@ export async function fetchDriveFiles(folderId) {
     const response = await fetch(url);
     if (!response.ok) {
       console.error("Error fetching Google Drive files", await response.text());
-      return [];
+      if (response.status === 403 || response.status === 404) {
+        throw new Error('ACCESS_DENIED');
+      }
+      throw new Error('FETCH_FAILED');
     }
     
     const data = await response.json();
@@ -24,6 +27,6 @@ export async function fetchDriveFiles(folderId) {
     }));
   } catch (err) {
     console.error(err);
-    return [];
+    throw err;
   }
 }

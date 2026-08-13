@@ -7,13 +7,19 @@ import { useState, useEffect } from 'react'
 function DriveGallerySection({ event }) {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeFile, setActiveFile] = useState(null);
 
   useEffect(() => {
     async function loadFiles() {
-      const driveFiles = await fetchDriveFiles(event.driveFolderId);
-      setFiles(driveFiles);
-      setLoading(false);
+      try {
+        const driveFiles = await fetchDriveFiles(event.driveFolderId);
+        setFiles(driveFiles);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     }
     loadFiles();
   }, [event.driveFolderId]);
@@ -28,12 +34,23 @@ function DriveGallerySection({ event }) {
       ))}
     </div>
   );
-  if (files.length === 0) return (
+  
+  if (error === 'MISSING_API_KEY') return (
+    <div className="w-full rounded-2xl border border-white/5 bg-white/[0.02] flex flex-col items-center justify-center py-16 text-center">
+      <span className="text-3xl mb-4 opacity-50">🔑</span>
+      <h3 className="text-white/80 font-display-xl uppercase text-[1.2rem] tracking-wider mb-2">System Configuration Required</h3>
+      <p className="text-white/40 text-[11px] max-w-md font-mono leading-relaxed">
+        Google Drive API Key is missing. Please add <strong className="text-white/60">VITE_GOOGLE_DRIVE_API_KEY</strong> to your .env file to enable fetching files from Google Drive folders.
+      </p>
+    </div>
+  );
+
+  if (error === 'ACCESS_DENIED' || files.length === 0) return (
     <div className="w-full rounded-2xl border border-white/5 bg-white/[0.02] flex flex-col items-center justify-center py-16 text-center">
       <span className="text-3xl mb-4 opacity-50">🔒</span>
       <h3 className="text-white/80 font-display-xl uppercase text-[1.2rem] tracking-wider mb-2">Access Restricted or Empty</h3>
       <p className="text-white/40 text-[11px] max-w-md font-mono leading-relaxed">
-        The connected Google Drive folder could not be loaded. If you are an admin, please ensure the folder is set to <strong className="text-white/60">"Anyone with the link"</strong> in Google Drive share settings.
+        The connected Google Drive folder could not be loaded or contains no images/videos. If you are an admin, please ensure the folder is set to <strong className="text-white/60">"Anyone with the link"</strong> in Google Drive share settings.
       </p>
     </div>
   );
