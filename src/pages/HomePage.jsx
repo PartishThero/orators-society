@@ -11,7 +11,6 @@ import RecruitmentModal from '../components/ui/RecruitmentModal'
 import { events as localEvents } from '../data/events'
 import { philosophyData } from '../data/philosophy'
 import { sectionVariants } from '../styles/theme'
-import Masonry from '../components/sections/Masonry'
 import { useData } from '../context/DataContext'
 
 export default function HomePage() {
@@ -148,21 +147,10 @@ export default function HomePage() {
 
           <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 relative z-10 gap-12 lg:gap-0">
             <div className="relative pr-0 lg:pr-20 w-full max-w-md mx-auto lg:ml-auto pb-6 lg:pb-0 z-20">
-              <Masonry
-                items={[
-                  {
-                    id: 'philosophy-img',
-                    img: 'motto.jpeg',
-                    colSpan: 5
-                  }
-                ]}
-                stagger={0}
-                animateFrom="bottom"
-                scaleOnHover={true}
-                hoverScale={0.97}
-                blurToFocus={true}
-                colorShiftOnHover={false}
-              />
+              <div className="group relative w-full h-[400px] lg:h-[500px] rounded-[1rem] overflow-hidden shadow-2xl border border-white/10">
+                <img src="motto.jpeg" alt="Our Philosophy" className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+              </div>
             </div>
 
             <div className="relative pl-0 lg:pl-20 flex flex-col justify-center gap-6 lg:gap-8 z-20">

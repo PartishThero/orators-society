@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 
-import Masonry from '../components/sections/Masonry'
+import HorizontalCatalog from '../components/sections/HorizontalCatalog'
 import TimelineSection from '../components/sections/TimelineSection'
 const LegacyModal = lazy(() => import('../components/ui/LegacyModal'))
 import { legacyItems } from '../data/legacy'
@@ -183,18 +183,12 @@ color1: "#1A2A40", // Navy Blue anchor
             {loading.legacyEvents ? (
             <MasonrySkeleton />
           ) : (
-            <Masonry
-              items={legacyList}
-              ease="power3.out"
-              duration={0.75}
-              stagger={0.06}
-              animateFrom="bottom"
-              scaleOnHover={true}
-              hoverScale={0.96}
-              blurToFocus={false}
-              colorShiftOnHover={false}
-              onItemClick={handleItemClick}
-            />
+            <div className="w-[100vw] relative left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]">
+              <HorizontalCatalog
+                items={legacyList}
+                onItemClick={handleItemClick}
+              />
+            </div>
           )}
           </div>
         </SectionWrapper>
