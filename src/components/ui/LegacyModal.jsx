@@ -36,7 +36,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
               {item.date?.split(',')[1]?.trim() || ''}
             </span>
             <span className="font-label-caps text-white/50 tracking-[0.2em] text-[12px] uppercase">
-              Hall of Voices Inductee
+              Society Ambassador
             </span>
           </motion.div>
 
@@ -54,35 +54,19 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             "{item.subtitle}"
           </motion.p>
 
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-wrap gap-x-8 gap-y-4 mb-16 border-y border-white/5 py-4"
-          >
-            {[
-              { l: 'Major Titles', v: '3' },
-              { l: 'Formats', v: 'BP, AP' },
-              { l: 'Win Rate', v: '87%' },
-              { l: 'Status', v: 'Alumni' }
-            ].map(d => (
-              <div key={d.l} className="flex gap-2 items-center">
-                <span className="font-label-caps text-[9px] text-white/40 tracking-[0.2em] uppercase">{d.l}:</span>
-                <span className="font-label-caps text-[10px] text-white/80 tracking-wider uppercase">{d.v}</span>
-              </div>
-            ))}
-          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.7 }}
             className="font-body-md text-white/70 text-[1.05rem] leading-[1.8] space-y-6 mb-16"
           >
             <p>
-              {item.bio || `Known for a ruthless deconstruction of opposing arguments, ${item.title} reshaped the society's approach to competitive rhetoric.`}
+              {item.bio || `Representing our college at the ${item.location || 'external tournament'}, ${item.title} delivered an outstanding performance against top-tier competitive circuits.`}
             </p>
             <p>
-              Their tenure is marked by legendary performances that challenged traditional paradigms, often turning the audience's assumptions against themselves in the final rebuttal.
+              Their presence marked a significant milestone for our society's outreach, demonstrating the strength of our rhetorical training on a broader stage.
             </p>
             <p>
-              Today, their speeches remain a cornerstone of our training curriculum, continuing to influence new generations of speakers navigating complex moral and policy debates.
+              The experience gained from this representation continues to enrich our internal practices, setting a high benchmark for future delegations.
             </p>
           </motion.div>
 
@@ -97,9 +81,9 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
           </motion.div>
 
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
-            <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Signature Argument</h5>
+            <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Tournament Reflection</h5>
             <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
-              "If we concede the premise that truth is merely a consensus of the majority, then we have already lost the debate before stepping up to the podium."
+              "Competing against diverse perspectives outside our own walls tested the very core of our arguments. It wasn't just about winning the room, but understanding the universal resonance of our ideas."
             </p>
           </motion.div>
 
@@ -139,12 +123,10 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             className="flex flex-row md:flex-col gap-8 md:gap-10 overflow-x-auto md:overflow-visible pb-4 md:pb-0"
           >
             {[
-              { label: 'Primary Achievement', value: item.winner || 'National Champion' },
-              { label: 'Induction Year', value: item.date?.split(',')[1]?.trim() || '' },
-              { label: 'Format Specialty', value: 'British Parliamentary' },
-              { label: 'Major Tournaments', value: '7' },
-              { label: 'Signature Event', value: item.location || 'The Grand Forum' },
-              { label: 'Current Role', value: 'Alumni Coach' },
+              { label: 'Achievement', value: item.winner || 'Tournament Finalist' },
+              { label: 'Event Attended', value: item.location || 'External Tournament' },
+              { label: 'Year', value: item.date?.split(',')[1]?.trim() || item.date || '' },
+              { label: 'Format', value: 'British Parliamentary' }
             ].map((data, i) => (
               <motion.div 
                 key={data.label}
@@ -158,7 +140,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
                 <span className="font-body-md text-[13px] text-white/90">
                   {data.value}
                 </span>
-                {i < 5 && (
+                {i < 3 && (
                   <div className="hidden md:block w-full h-[1px] bg-white/5 mt-8" />
                 )}
               </motion.div>

@@ -8,6 +8,7 @@ import { events as localEvents } from '../data/events';
 import { legacyItems as localLegacyEvents } from '../data/legacy';
 import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
 import ArchiveModal from '../components/ui/ArchiveModal';
+import LegacyAdminModal from '../components/ui/LegacyAdminModal';
 import { useData } from '../context/DataContext';
 
 export default function AdminPage() {
@@ -1675,12 +1676,20 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`}
         )}
       </AnimatePresence>
 
-      {/* ── LIVE PREVIEW VISUAL EDITOR MODAL (Events & Legacy) ── */}
+      {/* ── LIVE PREVIEW VISUAL EDITOR MODAL (Events) ── */}
       <ArchiveModal 
-        isOpen={showModal && activeTab !== 'whitelist' && activeTab !== 'archive_timeline' && activeTab !== 'legacy_timeline'} 
+        isOpen={showModal && activeTab === 'events'} 
         onClose={() => setShowModal(false)} 
         item={editingItem} 
         isAdminEdit={true} 
+        onSave={handleLiveSave} 
+      />
+      
+      {/* ── LIVE PREVIEW VISUAL EDITOR MODAL (Legacy) ── */}
+      <LegacyAdminModal 
+        isOpen={showModal && activeTab === 'legacy'} 
+        onClose={() => setShowModal(false)} 
+        item={editingItem} 
         onSave={handleLiveSave} 
       />
     </PageLayout>
