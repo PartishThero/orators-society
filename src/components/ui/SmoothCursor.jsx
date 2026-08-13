@@ -72,8 +72,8 @@ const DefaultCursorSVG = () => {
 export function SmoothCursor({
   cursor = <DefaultCursorSVG />,
   springConfig = {
-    damping: 45,
-    stiffness: 400,
+    damping: 65,
+    stiffness: 500,
     mass: 1,
     restDelta: 0.001,
   },
@@ -187,18 +187,11 @@ export function SmoothCursor({
       }
     }
 
-    let rafId = 0
     const throttledPointerMove = (e) => {
       if (!isTrackablePointer(e.pointerType)) {
         return
       }
-
-      if (rafId) return
-
-      rafId = requestAnimationFrame(() => {
-        smoothPointerMove(e)
-        rafId = 0
-      })
+      smoothPointerMove(e)
     }
 
     const handlePointerDown = (e) => {
@@ -237,7 +230,6 @@ export function SmoothCursor({
       window.removeEventListener("pointerdown", handlePointerDown)
       window.removeEventListener("pointerup", handlePointerUp)
       document.head.removeChild(styleEl)
-      if (rafId) cancelAnimationFrame(rafId)
       if (timeout !== null) {
         clearTimeout(timeout)
       }
