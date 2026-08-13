@@ -4,22 +4,14 @@ import BaseModal from './BaseModal'
 export default function LegacyModal({ isOpen, onClose, item }) {
   if (typeof document === 'undefined') return null
 
-  const mockExpertise = item?.themes || ['Rhetorical Theory', 'Policy Debate', 'Public Philosophy', 'Advocacy']
-  const mockGallery = item?.gallery || [
-    'https://picsum.photos/id/1025/400/300?grayscale',
-    'https://picsum.photos/id/1035/400/300?grayscale',
-    'https://picsum.photos/id/1005/400/300?grayscale',
-    'https://picsum.photos/id/1041/400/300?grayscale'
-  ]
-
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} item={item}>
-      <LegacyModalContent item={item} mockExpertise={mockExpertise} mockGallery={mockGallery} />
+      <LegacyModalContent item={item} scrollRef={null} />
     </BaseModal>
   )
 }
 
-function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
+function LegacyModalContent({ item, scrollRef }) {
   return (
     <>
       <div 
@@ -32,9 +24,6 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
             className="flex flex-col gap-1 mb-8"
           >
-            <span className="font-label-caps text-primary/80 tracking-[0.3em] text-[10px] uppercase">
-              {item.date?.split(',')[1]?.trim() || ''}
-            </span>
             <span className="font-label-caps text-white/50 tracking-[0.2em] text-[12px] uppercase">
               Society Ambassador
             </span>
@@ -47,12 +36,6 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             {item.title}
           </motion.h2>
 
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.5 }}
-            className="font-quote-serif text-[1.5rem] md:text-[2rem] leading-[1.1] text-primary italic mb-12 border-l-2 border-primary/30 pl-6"
-          >
-            "{item.subtitle}"
-          </motion.p>
 
 
           <motion.div
@@ -70,47 +53,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
             </p>
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.8 }} className="mb-16">
-            <div className="flex flex-wrap gap-3">
-              {mockExpertise.map(theme => (
-                <span key={theme} className="font-label-caps text-[10px] tracking-[0.15em] uppercase px-4 py-2 rounded-full border border-white/10 bg-white/5 text-white/80">
-                  {theme}
-                </span>
-              ))}
-            </div>
-          </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.9 }} className="mb-16 p-8 md:p-10 rounded-2xl bg-black border border-white/5 shadow-inner">
-            <h5 className="font-label-caps text-[10px] text-primary/70 tracking-[0.2em] uppercase mb-4">Tournament Reflection</h5>
-            <p className="font-body-md text-white/90 text-[1.1rem] leading-relaxed italic">
-              "Competing against diverse perspectives outside our own walls tested the very core of our arguments. It wasn't just about winning the room, but understanding the universal resonance of our ideas."
-            </p>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.0 }} className="mb-20">
-            <h5 className="font-label-caps text-[10px] text-white/50 tracking-[0.2em] uppercase mb-6">Gallery Preview</h5>
-            <div className="flex gap-4 overflow-x-auto hide-scrollbar pb-4 -mx-8 px-8 md:mx-0 md:px-0">
-              {mockGallery.map((imgUrl, idx) => (
-                <img key={idx} src={imgUrl} alt={`Gallery preview ${idx}`} className="w-[180px] h-[120px] object-cover rounded-lg flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity duration-400 cursor-pointer" />
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 1.1 }}
-            className="flex flex-col sm:flex-row gap-8 border-t border-white/10 pt-10"
-          >
-            {[
-              { label: 'Explore Gallery', icon: 'photo_library' },
-              { label: 'Read Transcripts', icon: 'description' },
-              { label: 'View Match History', icon: 'emoji_events' }
-            ].map(btn => (
-              <button key={btn.label} className="group flex items-center gap-3 font-label-caps tracking-[0.15em] text-[10px] uppercase text-white/50 hover:text-white transition-colors duration-400">
-                <span className="material-symbols-outlined text-[16px] text-primary/70 group-hover:text-primary transition-colors">{btn.icon}</span>
-                {btn.label}
-              </button>
-            ))}
-          </motion.div>
         </div>
       </div>
 
@@ -124,9 +67,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
           >
             {[
               { label: 'Achievement', value: item.winner || 'Tournament Finalist' },
-              { label: 'Event Attended', value: item.location || 'External Tournament' },
-              { label: 'Year', value: item.date?.split(',')[1]?.trim() || item.date || '' },
-              { label: 'Format', value: 'British Parliamentary' }
+              { label: 'Event Attended', value: item.location || 'External Tournament' }
             ].map((data, i) => (
               <motion.div 
                 key={data.label}
@@ -140,7 +81,7 @@ function LegacyModalContent({ item, mockExpertise, mockGallery, scrollRef }) {
                 <span className="font-body-md text-[13px] text-white/90">
                   {data.value}
                 </span>
-                {i < 3 && (
+                {i < 1 && (
                   <div className="hidden md:block w-full h-[1px] bg-white/5 mt-8" />
                 )}
               </motion.div>
