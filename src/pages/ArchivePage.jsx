@@ -19,7 +19,7 @@ export default function ArchivePage() {
   const [registerModalOpen, setRegisterModalOpen] = useState(false)
   const [registerItem, setRegisterItem] = useState(null)
   const [returnToArchive, setReturnToArchive] = useState(false)
-  const [activeFilter, setActiveFilter] = useState('All Events')
+  const [activeFilter, setActiveFilter] = useState('Upcoming')
   const [visibleCount, setVisibleCount] = useState(5)
   const { events: eventsList, archiveTimeline: timelineList, loading } = useData()
 

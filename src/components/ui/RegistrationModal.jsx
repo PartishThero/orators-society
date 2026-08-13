@@ -100,7 +100,11 @@ export default function RegistrationModal({ isOpen, onClose, eventItem }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 24 }}
             transition={{ type: 'spring', stiffness: 340, damping: 32 }}
-            className="relative w-full h-[100dvh] sm:h-[550px] sm:max-w-md bg-[#090909] border-t sm:border border-white/10 rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl p-6 sm:p-8 z-10 overflow-hidden flex flex-col"
+            className={`relative w-full h-[100dvh] ${
+              isSuccess && eventItem.google_form_link 
+                ? 'sm:h-[85vh] sm:max-w-4xl' 
+                : 'sm:h-[550px] sm:max-w-md'
+            } bg-[#090909] border-t sm:border border-white/10 rounded-t-[2rem] sm:rounded-[2rem] shadow-2xl p-6 sm:p-8 z-10 overflow-hidden flex flex-col transition-all duration-500`}
           >
             <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
             <button
@@ -154,12 +158,6 @@ export default function RegistrationModal({ isOpen, onClose, eventItem }) {
                       {eventItem.title}
                     </p>
                   </div>
-                  <button 
-                    onClick={onClose}
-                    className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/50 hover:text-white hover:bg-white/5 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">close</span>
-                  </button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-5 flex-grow">

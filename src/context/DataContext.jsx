@@ -339,40 +339,42 @@ export function DataProvider({ children }) {
           legacyTimeline: true, registrations: true, recruitments: true, globalSettings: true
         });
 
-        const [
-          eventsRes, legacyRes, archiveTimelineRes, legacyTimelineRes,
-          registrationsRes, recruitmentsRes, settingsRes
-        ] = await Promise.all([
-          supabase.from('events').select('*').order('created_at', { ascending: false }).order('id', { ascending: false }),
-          supabase.from('legacy_events').select('*').order('created_at', { ascending: false }),
-          supabase.from('archive_timeline').select('*').order('year', { ascending: false }),
-          supabase.from('legacy_timeline').select('*').order('year', { ascending: false }),
-          supabase.from('event_registrations').select('*').order('created_at', { ascending: false }),
-          supabase.from('society_petitions').select('*').order('created_at', { ascending: false }),
-          supabase.from('global_settings').select('*')
-        ]);
+        try {
+          const [
+            eventsRes, legacyRes, archiveTimelineRes, legacyTimelineRes,
+            registrationsRes, recruitmentsRes, settingsRes
+          ] = await Promise.all([
+            supabase.from('events').select('*').order('created_at', { ascending: false }).order('id', { ascending: false }),
+            supabase.from('legacy_events').select('*').order('created_at', { ascending: false }),
+            supabase.from('archive_timeline').select('*').order('year', { ascending: false }),
+            supabase.from('legacy_timeline').select('*').order('year', { ascending: false }),
+            supabase.from('event_registrations').select('*').order('created_at', { ascending: false }),
+            supabase.from('society_petitions').select('*').order('created_at', { ascending: false }),
+            supabase.from('global_settings').select('*')
+          ]);
 
-        if (eventsRes.data) setEvents(eventsRes.data.map(item => ({...item, colSpan: item.col_span})));
-        if (legacyRes.data) setLegacyEvents(legacyRes.data.map(item => ({...item, colSpan: item.col_span})));
-        if (archiveTimelineRes.data) setArchiveTimeline(archiveTimelineRes.data);
-        if (legacyTimelineRes.data) setLegacyTimeline(legacyTimelineRes.data);
-        if (registrationsRes.data) setRegistrations(registrationsRes.data);
-        if (recruitmentsRes.data) setRecruitments(recruitmentsRes.data);
-        
-        if (settingsRes.data) {
-          setGlobalSettings(prev => {
-            const settingsMap = { ...prev };
-            settingsRes.data.forEach(item => {
-              settingsMap[item.key] = item.value;
+          if (eventsRes.data) setEvents(eventsRes.data.map(item => ({...item, colSpan: item.col_span})));
+          if (legacyRes.data) setLegacyEvents(legacyRes.data.map(item => ({...item, colSpan: item.col_span})));
+          if (archiveTimelineRes.data) setArchiveTimeline(archiveTimelineRes.data);
+          if (legacyTimelineRes.data) setLegacyTimeline(legacyTimelineRes.data);
+          if (registrationsRes.data) setRegistrations(registrationsRes.data);
+          if (recruitmentsRes.data) setRecruitments(recruitmentsRes.data);
+          
+          if (settingsRes.data) {
+            setGlobalSettings(prev => {
+              const settingsMap = { ...prev };
+              settingsRes.data.forEach(item => {
+                settingsMap[item.key] = item.value;
+              });
+              return settingsMap;
             });
-            return settingsMap;
+          }
+        } finally {
+          setLoading({
+            events: false, legacyEvents: false, archiveTimeline: false, 
+            legacyTimeline: false, registrations: false, recruitments: false, globalSettings: false
           });
         }
-
-        setLoading({
-          events: false, legacyEvents: false, archiveTimeline: false, 
-          legacyTimeline: false, registrations: false, recruitments: false, globalSettings: false
-        });
       };
       
       initializeData().catch(err => console.error("Initialization failed:", err));
