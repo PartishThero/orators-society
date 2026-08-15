@@ -198,14 +198,14 @@ export default function HomePage() {
                   role: "Club Coordinator",
                   desc: "Guiding the Orator Society with unwavering support, Dr. Nigar ensures that the club's academic and extracurricular goals align perfectly with the institution's values.",
                   marginTop: "",
-                  img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=200&h=200&q=80"
+                  img: "/Cores/dr%20noor.png"
                 },
                 {
                   name: "Fiza Farzeen",
                   role: "Club Coordinator",
-                  desc: "As a cornerstone of the society's operations, Fiza brings exceptional leadership and organizational skills to mentor our aspiring debaters and speakers.",
+                  desc: "The Orators’ Society is a platform for SST students to build confidence by expressing themselves in a manner that is articulate and respectful, being a part of it sets you up to be a better communicator.",
                   marginTop: "",
-                  img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=200&h=200&q=80"
+                  img: "/Cores/fiza.png"
                 }
               ].map((person, idx) => (
                 <motion.div
