@@ -13,19 +13,19 @@ import { useData } from '../context/DataContext'
 import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
 
 const governingCore = [
-  { name: "Shrest Sharma", role: "Society President", desc: "Strategic direction & budget authorizations. Ensuring the society's long-term vision is met with precision and excellence.", img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Sneha Agarwal", role: "Society Secretary", desc: "Administration, communications & transparency. Overseeing day-to-day operations and member relations.", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Smit Rupani", role: "Core Member", desc: "Executive Organizer. Coordinating high-level logistics and event execution.", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Avishkar Wagh", role: "Core Member", desc: "Executive Organizer. Driving operational success and resource management.", img: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Koushik", role: "Core Member", desc: "Executive Organizer. Specializing in technical setups and on-ground coordination.", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Samadrita", role: "Core Member", desc: "Social & Engagement Organ. Facilitating community building and outreach programs.", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Sneha Raj", role: "Core Member", desc: "Creative & Visual Architecture. Leading the design and aesthetic direction of society materials.", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=400&h=500&q=80" }
+  { name: "Shrest Sharma", role: "Society President", desc: "Powered entirely by late-night poetry sessions, pure eloquence, and the absolute conviction to over-explain any simple point.", img: "/Cores/shresht.jpeg" },
+  { name: "Avishkar Wagh", role: "Society Secretary", desc: "The Secretary ensures that vision translates into action — through clear communication and consistent follow-through.", img: "/Cores/avishkar.jpeg" },
+  { name: "Sneha Agarwal", role: "Club core", desc: "Empowering voices through impactful events while keeping the numbers in check", img: "/Cores/sneha%20aggarwal.jpeg" },
+  { name: "Sneha Raj", role: "Club Core", desc: "Wise men speak because they have something to say; fools because they have to say something. - Plato", img: "/Cores/sneha.jpeg" },
+  { name: "Smit Rupani", role: "Club Core", desc: "I look forward fo interacting with people and finding ways of collaborating whether as teammates or fellow debaters.", img: "/Cores/smit.jpeg" },
+  { name: "Koushik", role: "Creative Core", desc: "A driven and creative person who loves taking initiative, leading from the front, and constantly pushing himself to grow.", img: "/Cores/kaushik.jpeg" },
+  { name: "Samadrita", role: "Social Core", desc: "⁠Connecting people through stories.", img: "/Cores/samadrita.jpeg" },
 ];
 
 const foundationalPillar = [
-  { name: "Sai Sevithaa", role: "Founding Core Member", desc: "A visionary founder who laid the groundwork for the society's culture and debate formats.", img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Kushal S.", role: "Founding Core Member", desc: "Instrumental in establishing the core principles and initial outreach strategies of the society.", img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&h=500&q=80" },
-  { name: "Tanishka Mangure", role: "Founding Core Member", desc: "Pioneered the early event structures and fostered a community of passionate debaters.", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&h=500&q=80" }
+  { name: "Sai Sevithaa", role: "Founding Core Member", desc: "A visionary founder who laid the groundwork for the society's culture and debate formats.", img: "/Cores/sai%20saveta.jpeg" },
+  { name: "Kushal S.", role: "Founding Core Member", desc: "Instrumental in establishing the core principles and initial outreach strategies of the society.", img: "/Cores/kushal.jpeg" },
+  { name: "Tanishka Mangure", role: "Founding Core Member", desc: "Pioneered the early event structures and fostered a community of passionate debaters.", img: "/Cores/tanishka.jpeg" }
 ];
 export default function LegacyPage() {
   const [modalOpen, setModalOpen] = useState(false)
@@ -79,7 +79,7 @@ color1: "#1A2A40", // Navy Blue anchor
               THE GOVERNING EXECUTIVE CORE
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full mb-32">
+            <div className="flex flex-wrap justify-center gap-8 w-full mb-32">
               {governingCore.map((person, idx) => (
                 <motion.div
                   key={`gov-${idx}`}
@@ -87,7 +87,7 @@ color1: "#1A2A40", // Navy Blue anchor
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: idx * 0.1, ease: 'easeOut' }}
-                  className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full aspect-[4/5] md:aspect-auto md:h-[400px]"
+                  className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full md:w-[calc(33.333%-1.35rem)] lg:w-[calc(25%-1.5rem)] aspect-[4/5] md:aspect-auto md:h-[400px]"
                 >
                   <img
                     src={person.img}
