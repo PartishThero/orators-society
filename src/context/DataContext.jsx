@@ -1,14 +1,18 @@
-import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
+import { events as localEvents } from '../data/events';
+import { legacyItems as localLegacyEvents } from '../data/legacy';
+import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
+import { registrations as localRegistrations } from '../data/registrations';
 
 const DataContext = createContext(null);
 
 export function DataProvider({ children }) {
-  const [events, setEvents] = useState([]);
-  const [legacyEvents, setLegacyEvents] = useState([]);
-  const [archiveTimeline, setArchiveTimeline] = useState([]);
-  const [legacyTimeline, setLegacyTimeline] = useState([]);
-  const [registrations, setRegistrations] = useState([]);
+  const [events, setEvents] = useState(isSupabaseConfigured ? [] : localEvents);
+  const [legacyEvents, setLegacyEvents] = useState(isSupabaseConfigured ? [] : localLegacyEvents);
+  const [archiveTimeline, setArchiveTimeline] = useState(isSupabaseConfigured ? [] : localArchiveTimeline);
+  const [legacyTimeline, setLegacyTimeline] = useState(isSupabaseConfigured ? [] : localLegacyTimeline);
+  const [registrations, setRegistrations] = useState(localRegistrations);
   const [recruitments, setRecruitments] = useState([]);
   const [globalSettings, setGlobalSettings] = useState({
     recruitment_form_link: 'https://docs.google.com/forms/d/e/1FAIpQLSf4M0B81wN_rU7y2fA2K3H6H0i3fQz2t4yA4m0/viewform?usp=pp_url&entry.12345=DummyName&entry.67890=DummyEmail'
@@ -377,36 +381,30 @@ export function DataProvider({ children }) {
     }
   }, []);
 
-  const contextValue = useMemo(() => ({
-    events,
-    legacyEvents,
-    archiveTimeline,
-    legacyTimeline,
-    registrations,
-    recruitments,
-    globalSettings,
-    loading,
-    refreshData,
-    addRegistration,
-    addRecruitment,
-    deleteRegistration,
-    deleteRecruitment,
-    fetchGlobalSettings,
-  }), [
-    events, legacyEvents, archiveTimeline, legacyTimeline,
-    registrations, recruitments, globalSettings, loading,
-    refreshData, addRegistration, addRecruitment,
-    deleteRegistration, deleteRecruitment, fetchGlobalSettings
-  ]);
-
   return (
-    <DataContext.Provider value={contextValue}>
+    <DataContext.Provider
+      value={{
+        events,
+        legacyEvents,
+        archiveTimeline,
+        legacyTimeline,
+        registrations,
+        recruitments,
+        globalSettings,
+        loading,
+        refreshData,
+        addRegistration,
+        addRecruitment,
+        deleteRegistration,
+        deleteRecruitment,
+        fetchGlobalSettings,
+      }}
+    >
       {children}
     </DataContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useData() {
   const context = useContext(DataContext);
   if (!context) {

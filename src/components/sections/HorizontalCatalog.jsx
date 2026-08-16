@@ -9,9 +9,6 @@ export default function HorizontalCatalog({
 }) {
   const scrollRef = useRef(null)
 
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
-
   // Implement horizontal scrolling with mouse wheel (optional enhancement)
   useEffect(() => {
     const el = scrollRef.current
@@ -25,60 +22,17 @@ export default function HorizontalCatalog({
       }
     }
 
-    const checkScroll = () => {
-      if (el) {
-        setCanScrollLeft(el.scrollLeft > 0)
-        setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 5)
-      }
-    }
-    
-    checkScroll()
     el.addEventListener('wheel', handleWheel, { passive: false })
-    el.addEventListener('scroll', checkScroll, { passive: true })
-    window.addEventListener('resize', checkScroll)
-    
-    return () => {
-      el.removeEventListener('wheel', handleWheel)
-      el.removeEventListener('scroll', checkScroll)
-      window.removeEventListener('resize', checkScroll)
-    }
-  }, [items])
-
-  const scrollByAmount = (amount) => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: amount, behavior: 'smooth' })
-    }
-  }
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [])
 
   if (!items || items.length === 0) return null
 
   return (
-    <div className="relative w-full overflow-hidden archive-tint py-8 group">
-      
-      {/* Desktop Scroll Controls */}
-      <div className="hidden md:block absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-black/80 to-transparent z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button 
-          onClick={() => scrollByAmount(-400)}
-          className={`absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/50 border border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-300 pointer-events-auto shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md ${canScrollLeft ? 'opacity-100 cursor-pointer' : 'opacity-30 cursor-default'}`}
-          disabled={!canScrollLeft}
-        >
-          <span className="material-symbols-outlined text-[24px]">chevron_left</span>
-        </button>
-      </div>
-
-      <div className="hidden md:block absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-black/80 to-transparent z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <button 
-          onClick={() => scrollByAmount(400)}
-          className={`absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 flex items-center justify-center rounded-full bg-black/50 border border-white/20 text-white hover:bg-primary hover:text-black hover:border-primary transition-all duration-300 pointer-events-auto shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md ${canScrollRight ? 'opacity-100 cursor-pointer' : 'opacity-30 cursor-default'}`}
-          disabled={!canScrollRight}
-        >
-          <span className="material-symbols-outlined text-[24px]">chevron_right</span>
-        </button>
-      </div>
-
+    <div className="relative w-full overflow-hidden archive-tint py-8">
       <div 
         ref={scrollRef}
-        className="flex flex-row overflow-x-auto hide-scrollbar gap-6 md:gap-10 px-[clamp(1.5rem,7vw,10rem)] pb-8 snap-x snap-mandatory relative z-10"
+        className="flex flex-row overflow-x-auto hide-scrollbar gap-6 md:gap-10 px-[clamp(1.5rem,7vw,10rem)] pb-8 snap-x snap-mandatory"
         style={{ scrollBehavior: 'smooth' }}
       >
         {items.map((item, idx) => (
@@ -87,7 +41,7 @@ export default function HorizontalCatalog({
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: Math.min(idx * 0.1, 1), ease: 'easeOut' }}
-            className="relative w-[85vw] sm:w-[450px] lg:w-[500px] h-[75dvh] max-h-[700px] flex-shrink-0 cursor-pointer overflow-hidden rounded-[1rem] shadow-2xl group/card snap-center border border-white/5 bg-black/20"
+            className="relative w-[85vw] sm:w-[450px] lg:w-[500px] h-[700px] flex-shrink-0 cursor-pointer overflow-hidden rounded-[1rem] shadow-2xl group snap-center border border-white/5 bg-black/20"
             onClick={() => onItemClick(item)}
           >
             {/* Base Image */}
@@ -96,14 +50,14 @@ export default function HorizontalCatalog({
               alt={item.title || ''}
               loading="lazy"
               decoding="async"
-              className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover/card:scale-105"
+              className="absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out group-hover:scale-105"
             />
             
             {/* Color Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-tr from-[#f3cd93]/30 to-[#1a2a40]/30 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-[#f3cd93]/30 to-[#1a2a40]/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay pointer-events-none" />
 
             {/* Bottom Gradient for Text */}
-            <div className="absolute inset-x-0 bottom-0 p-8 pt-32 bg-gradient-to-t from-black/95 via-black/80 to-transparent flex flex-col gap-2 translate-y-4 group-hover/card:translate-y-0 transition-transform duration-500">
+            <div className="absolute inset-x-0 bottom-0 p-8 pt-32 bg-gradient-to-t from-black/95 via-black/80 to-transparent flex flex-col gap-2 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
               
               {/* Title */}
               <h3 className="font-display-xl text-[24px] font-extrabold tracking-[0.05em] uppercase text-primary leading-[1.2] drop-shadow-xl line-clamp-2">

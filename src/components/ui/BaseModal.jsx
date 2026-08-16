@@ -94,7 +94,7 @@ export default function BaseModal({
             </div>
 
             {/* Right Column: Content Area */}
-            <div className="w-full md:w-[65%] h-[calc(100%-200px)] md:h-full flex flex-col md:flex-row relative min-w-0 overflow-y-auto">
+            <div className="w-full md:w-[65%] h-[calc(100%-200px)] md:h-full flex flex-col md:flex-row relative min-w-0 overflow-y-auto md:overflow-hidden">
               {cloneElement(children, { scrollRef })}
             </div>
           </motion.div>

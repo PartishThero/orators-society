@@ -11,6 +11,7 @@ const PREFIX = 'legacy-events';
 
 
 export default function LegacyAdminModal({ isOpen, onClose, item, onSave }) {
+  if (typeof document === 'undefined') return null;
 
   const [editItem, setEditItem] = useState(item || {});
   const [cardDragActive, setCardDragActive] = useState(false);
@@ -19,7 +20,6 @@ export default function LegacyAdminModal({ isOpen, onClose, item, onSave }) {
 
   useEffect(() => {
     if (item) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditItem({
         ...item,
       });
