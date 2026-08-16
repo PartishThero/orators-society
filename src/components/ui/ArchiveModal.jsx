@@ -1,45 +1,15 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import BaseModal from './BaseModal'
+import { uploadToStorage } from '../../utils/supabaseClient'
 
-const compressAndGetBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(mimeType, quality);
-        resolve(dataUrl);
-      };
-      img.onerror = (err) => reject(err);
-    };
-    reader.onerror = (err) => reject(err);
-  });
-};
+// Removed: compressAndGetBase64 — images now upload to Supabase Storage
+// event cover → bucket: 'event-images', prefix: 'events'
+// gallery images → bucket: 'event-images', prefix: 'gallery'
+const COVER_BUCKET = 'event-images';
+const COVER_PREFIX = 'events';
+const GALLERY_BUCKET = 'event-images';
+const GALLERY_PREFIX = 'gallery';
 
 export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave, onRegister }) {
   if (typeof document === 'undefined') return null
@@ -91,15 +61,15 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
     e.stopPropagation();
     setCardDragActive(false);
 
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    if (e.dataTransfer.files?.[0]) {
       const file = e.dataTransfer.files[0];
       if (file.type.startsWith('image/')) {
         try {
           setCompressing(true);
-          const base64 = await compressAndGetBase64(file);
-          handleFieldChange('img', base64);
+          const publicUrl = await uploadToStorage(file, COVER_BUCKET, COVER_PREFIX);
+          handleFieldChange('img', publicUrl);
         } catch (err) {
-          console.error("Error loading image file:", err);
+          console.error('Cover image upload failed:', err);
         } finally {
           setCompressing(false);
         }
@@ -108,15 +78,15 @@ export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = fals
   };
 
   const handleCardFileSelect = async (e) => {
-    if (e.target.files && e.target.files[0]) {
+    if (e.target.files?.[0]) {
       const file = e.target.files[0];
       if (file.type.startsWith('image/')) {
         try {
           setCompressing(true);
-          const base64 = await compressAndGetBase64(file);
-          handleFieldChange('img', base64);
+          const publicUrl = await uploadToStorage(file, COVER_BUCKET, COVER_PREFIX);
+          handleFieldChange('img', publicUrl);
         } catch (err) {
-          console.error("Error loading image file:", err);
+          console.error('Cover image upload failed:', err);
         } finally {
           setCompressing(false);
         }
@@ -220,44 +190,34 @@ function ArchiveModalContent({ item, isAdminEdit, onFieldChange, onSave, scrollR
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       setCompressing(true);
-      const files = Array.from(e.dataTransfer.files);
-      const newImages = [];
-      for (const file of files) {
-        if (file.type.startsWith('image/')) {
-          try {
-            const base64 = await compressAndGetBase64(file);
-            newImages.push(base64);
-          } catch (err) {
-            console.error("Error processing file:", err);
-          }
-        }
+      const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+      try {
+        const urls = await Promise.all(
+          files.map(f => uploadToStorage(f, GALLERY_BUCKET, GALLERY_PREFIX))
+        );
+        if (urls.length > 0) onFieldChange('gallery', [...gallery, ...urls]);
+      } catch (err) {
+        console.error('Gallery upload failed:', err);
+      } finally {
+        setCompressing(false);
       }
-      if (newImages.length > 0) {
-        onFieldChange('gallery', [...gallery, ...newImages]);
-      }
-      setCompressing(false);
     }
   };
 
   const handleGalleryFileSelect = async (e) => {
     if (e.target.files && e.target.files.length > 0) {
       setCompressing(true);
-      const files = Array.from(e.target.files);
-      const newImages = [];
-      for (const file of files) {
-        if (file.type.startsWith('image/')) {
-          try {
-            const base64 = await compressAndGetBase64(file);
-            newImages.push(base64);
-          } catch (err) {
-            console.error("Error processing file:", err);
-          }
-        }
+      const files = Array.from(e.target.files).filter(f => f.type.startsWith('image/'));
+      try {
+        const urls = await Promise.all(
+          files.map(f => uploadToStorage(f, GALLERY_BUCKET, GALLERY_PREFIX))
+        );
+        if (urls.length > 0) onFieldChange('gallery', [...gallery, ...urls]);
+      } catch (err) {
+        console.error('Gallery upload failed:', err);
+      } finally {
+        setCompressing(false);
       }
-      if (newImages.length > 0) {
-        onFieldChange('gallery', [...gallery, ...newImages]);
-      }
-      setCompressing(false);
     }
   };
 

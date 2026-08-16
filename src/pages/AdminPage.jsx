@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase, isSupabaseConfigured } from '../utils/supabaseClient';
+import { supabase, isSupabaseConfigured, deleteFromStorage } from '../utils/supabaseClient';
 import PageLayout from '../components/layout/PageLayout';
 import SectionWrapper from '../components/layout/SectionWrapper';
 
@@ -697,6 +697,14 @@ export default function AdminPage() {
       }
 
       setStatusMessage({ type: 'success', text: 'Item deleted successfully.' });
+      // Clean up Storage files (no-ops on base64 or external URLs)
+      if (data[0]) {
+        const bucket = (type === 'Event') ? 'event-images' : 'legacy-images';
+        if (data[0].img) await deleteFromStorage(bucket, data[0].img);
+        if (Array.isArray(data[0].gallery)) {
+          await Promise.all(data[0].gallery.map(url => deleteFromStorage('event-images', url)));
+        }
+      }
       fetchData(false, false);
       refreshData(activeTab);
     } catch (err) {

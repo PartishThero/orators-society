@@ -1,51 +1,22 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import BaseModal from './BaseModal'
+import { uploadToStorage } from '../../utils/supabaseClient'
 
-const compressAndGetBase64 = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.8) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (event) => {
-      const img = new Image();
-      img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
+// Removed: compressAndGetBase64 — images now go to Supabase Storage via uploadToStorage()
+// Bucket: 'legacy-images', Prefix: 'legacy-events'
+const BUCKET = 'legacy-images';
+const PREFIX = 'legacy-events';
 
-        if (width > height) {
-          if (width > maxWidth) {
-            height = Math.round((height * maxWidth) / width);
-            width = maxWidth;
-          }
-        } else {
-          if (height > maxHeight) {
-            width = Math.round((width * maxHeight) / height);
-            height = maxHeight;
-          }
-        }
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-
-        const mimeType = file.type === 'image/png' ? 'image/png' : 'image/jpeg';
-        const dataUrl = canvas.toDataURL(mimeType, quality);
-        resolve(dataUrl);
-      };
-      img.onerror = (err) => reject(err);
-    };
-    reader.onerror = (err) => reject(err);
-  });
-};
 
 export default function LegacyAdminModal({ isOpen, onClose, item, onSave }) {
   if (typeof document === 'undefined') return null;
 
   const [editItem, setEditItem] = useState(item || {});
   const [cardDragActive, setCardDragActive] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState(null);
 
   useEffect(() => {
     if (item) {
@@ -72,36 +43,30 @@ export default function LegacyAdminModal({ isOpen, onClose, item, onSave }) {
     }
   };
 
+  const handleImageUpload = async (file) => {
+    if (!file || !file.type.startsWith('image/')) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const publicUrl = await uploadToStorage(file, BUCKET, PREFIX);
+      handleFieldChange('img', publicUrl);
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      setUploadError('Upload failed: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleCardDrop = async (e) => {
     e.preventDefault();
     e.stopPropagation();
     setCardDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('image/')) {
-        try {
-          const base64 = await compressAndGetBase64(file);
-          handleFieldChange('img', base64);
-        } catch (err) {
-          console.error("Error loading image file:", err);
-        }
-      }
-    }
+    if (e.dataTransfer.files?.[0]) await handleImageUpload(e.dataTransfer.files[0]);
   };
 
   const handleCardFileSelect = async (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      if (file.type.startsWith('image/')) {
-        try {
-          const base64 = await compressAndGetBase64(file);
-          handleFieldChange('img', base64);
-        } catch (err) {
-          console.error("Error loading image file:", err);
-        }
-      }
-    }
+    if (e.target.files?.[0]) await handleImageUpload(e.target.files[0]);
   };
 
   const handleSave = () => {

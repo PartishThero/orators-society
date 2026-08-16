@@ -1,0 +1,5 @@
+{
+  "name": "orators-images",
+  "compatibility_date": "2026-08-16",
+  "main": "cloudflare-worker.js"
+}

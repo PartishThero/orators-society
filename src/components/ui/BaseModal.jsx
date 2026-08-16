@@ -1,6 +1,7 @@
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useEffect, useRef, cloneElement } from 'react'
 import { createPortal } from 'react-dom'
+import { getCdnUrl } from '../../utils/supabaseClient'
 
 export default function BaseModal({ 
   isOpen, 
@@ -71,7 +72,7 @@ export default function BaseModal({
                   initial={{ scale: 1.1 }}
                   animate={{ scale: 1 }}
                   transition={{ duration: 1.5, ease: 'easeOut' }}
-                  src={item.img}
+                  src={getCdnUrl(item.img)}
                   alt={item.title || 'Modal poster'}
                   className="w-full h-full object-cover opacity-80"
                 />

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { getCdnUrl } from '../../utils/supabaseClient'
 
 export default function HorizontalCatalog({
   items,
@@ -45,7 +46,7 @@ export default function HorizontalCatalog({
           >
             {/* Base Image */}
             <img
-              src={item.img}
+              src={getCdnUrl(item.img)}
               alt={item.title || ''}
               loading="lazy"
               decoding="async"

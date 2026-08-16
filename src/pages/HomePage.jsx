@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Link } from 'react-router-dom'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
+import { getCdnUrl } from '../utils/supabaseClient'
 
 
 const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
@@ -69,7 +70,7 @@ export default function HomePage() {
           >
             {/* Poster strip */}
             <div className="relative h-[140px] overflow-hidden">
-              <img src={promoEvent.img} alt={promoEvent.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
+              <img src={getCdnUrl(promoEvent.img)} alt={promoEvent.title} className="absolute inset-0 w-full h-full object-cover opacity-50" />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0E1117]/90 via-[#0E1117]/40 to-transparent" />
               <button
                 onClick={() => {
@@ -218,7 +219,7 @@ export default function HomePage() {
                   className={`group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full aspect-[4/5] md:aspect-auto md:h-[450px] ${person.marginTop}`}
                 >
                   <img
-                    src={person.img}
+                    src={getCdnUrl(person.img)}
                     alt={person.name}
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   />
@@ -313,7 +314,7 @@ export default function HomePage() {
                     transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
                     className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D] w-full max-w-[500px] aspect-square md:w-[500px] md:h-[500px]"
                   >
-                    <img src={event.img} alt={event.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                    <img src={getCdnUrl(event.img)} alt={event.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
                     <div className="absolute inset-0 p-8 flex flex-col justify-end text-left z-10">
                       <div>
