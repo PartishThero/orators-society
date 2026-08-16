@@ -9,9 +9,6 @@ import { getCdnUrl } from '../utils/supabaseClient'
 const ArchiveModal = lazy(() => import('../components/ui/ArchiveModal'))
 const RegistrationModal = lazy(() => import('../components/ui/RegistrationModal'))
 import RecruitmentModal from '../components/ui/RecruitmentModal'
-import { events as localEvents } from '../data/events'
-import { philosophyData } from '../data/philosophy'
-import { sectionVariants } from '../styles/theme'
 import { useData } from '../context/DataContext'
 
 export default function HomePage() {
@@ -144,7 +141,7 @@ export default function HomePage() {
         </SectionWrapper>
 
         {/* ── 2. Philosophy (Architectural Grid) ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-20 md:py-32">
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-32">
 
           <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 relative z-10 gap-12 lg:gap-0">
             <div className="relative pr-0 lg:pr-20 w-full max-w-md mx-auto lg:ml-auto pb-6 lg:pb-0 z-20">
@@ -181,7 +178,7 @@ export default function HomePage() {
         </SectionWrapper>
 
         {/* ── 3. Our Foundations ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-32 border-t border-white/5 bg-black">
 
           <div className="max-w-7xl w-full mx-auto relative z-10 flex flex-col items-center text-center">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
@@ -221,6 +218,8 @@ export default function HomePage() {
                   <img
                     src={getCdnUrl(person.img)}
                     alt={person.name}
+                    loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
@@ -287,7 +286,7 @@ export default function HomePage() {
         </SectionWrapper>
 
         {/* ── 4. From the Archives (Gallery Wall) ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-32 border-t border-white/5 bg-[#030303]">
 
           <div className="max-w-8xl w-full mx-auto relative z-10 flex flex-col justify-center items-center text-center h-full">
             <span className="font-label-caps text-[12px] tracking-[0.3em] uppercase text-primary mb-6 block font-semibold">
@@ -314,7 +313,7 @@ export default function HomePage() {
                     transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
                     className="group relative rounded-[2rem] overflow-hidden cursor-pointer border border-white/5 bg-[#0D0D0D] w-full max-w-[500px] aspect-square md:w-[500px] md:h-[500px]"
                   >
-                    <img src={getCdnUrl(event.img)} alt={event.title} loading="lazy" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
+                    <img src={getCdnUrl(event.img)} alt={event.title} loading="lazy" decoding="async" className="absolute inset-0 w-full h-full object-cover mix-blend-luminosity opacity-40 group-hover:opacity-60 group-hover:scale-105 group-hover:mix-blend-normal transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80" />
                     <div className="absolute inset-0 p-8 flex flex-col justify-end text-left z-10">
                       <div>

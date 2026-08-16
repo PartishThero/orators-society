@@ -84,7 +84,7 @@ export default {
       },
       fontSize: {
         'headline-lg-mobile': ['32px', { lineHeight: '38px', fontWeight: '700' }],
-        'display-xl': ['120px', { lineHeight: '108px', letterSpacing: '-0.05em', fontWeight: '800' }],
+        'display-xl': ['clamp(4.5rem, 8vw, 7.5rem)', { lineHeight: '0.9', letterSpacing: '-0.05em', fontWeight: '800' }],
         'body-lg': ['20px', { lineHeight: '34px', fontWeight: '400' }],
         'label-caps': ['12px', { lineHeight: '16px', letterSpacing: '0.12em', fontWeight: '500' }],
         'headline-lg': ['48px', { lineHeight: '54px', letterSpacing: '-0.02em', fontWeight: '700' }],
@@ -94,5 +94,7 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/container-queries'),
+  ],
 }

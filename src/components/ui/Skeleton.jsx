@@ -1,4 +1,3 @@
-import React from 'react';
 
 export const MasonrySkeleton = () => {
   // Column spans out of 5: 3, 2 | 2, 3 | 5

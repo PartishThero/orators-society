@@ -4,9 +4,6 @@ import { supabase, isSupabaseConfigured, deleteFromStorage } from '../utils/supa
 import PageLayout from '../components/layout/PageLayout';
 import SectionWrapper from '../components/layout/SectionWrapper';
 
-import { events as localEvents } from '../data/events';
-import { legacyItems as localLegacyEvents } from '../data/legacy';
-import { archiveTimelineEvents as localArchiveTimeline, legacyTimelineEvents as localLegacyTimeline } from '../data/timeline';
 import ArchiveModal from '../components/ui/ArchiveModal';
 import LegacyAdminModal from '../components/ui/LegacyAdminModal';
 import { useData } from '../context/DataContext';
@@ -44,7 +41,6 @@ export default function AdminPage() {
     recruitment_form_link: ''
   });
   const [dataLoading, setDataLoading] = useState(false);
-  const [syncLoading, setSyncLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState(null);
   const [sortConfig, setSortConfig] = useState({ key: 'created_at', direction: 'desc' });
 
@@ -91,43 +87,7 @@ export default function AdminPage() {
     }
   };
 
-  // Track session
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setLoading(false);
-      return;
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      verifyAdminAccess(session);
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      verifyAdminAccess(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  // Fetch all data initially
-  useEffect(() => {
-    if (!session) return;
-    fetchAllData();
-  }, [session]);
-
-  // Sync settings when they load
-  useEffect(() => {
-    if (globalSettings) {
-      setAdminSettings({
-        recruitment_form_link: globalSettings.recruitment_form_link || ''
-      });
-    }
-  }, [globalSettings]);
-
-  async function fetchAllData() {
+  const fetchAllData = async () => {
     setDataLoading(true);
     setStatusMessage(null);
     try {
@@ -170,7 +130,51 @@ export default function AdminPage() {
     } finally {
       setDataLoading(false);
     }
-  }
+  };
+
+  // Track session
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      // Intentionally not setting state here to avoid cascading renders.
+      // Loading state defaults to true, but we will handle the !isSupabaseConfigured
+      // in the render branch directly.
+      return;
+    }
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      verifyAdminAccess(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      verifyAdminAccess(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Fetch all data initially
+  useEffect(() => {
+    if (!session) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchAllData();
+  }, [session]);
+
+  // Sync settings when they load
+  useEffect(() => {
+    if (globalSettings && globalSettings.recruitment_form_link !== undefined) {
+      // Only set if different to avoid render loops
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAdminSettings(prev => {
+        if (prev.recruitment_form_link !== globalSettings.recruitment_form_link) {
+          return { recruitment_form_link: globalSettings.recruitment_form_link || '' };
+        }
+        return prev;
+      });
+    }
+  }, [globalSettings]);
 
   async function fetchData(showLoading = true, clearStatus = true) {
     if (showLoading) setDataLoading(true);
@@ -304,104 +308,7 @@ export default function AdminPage() {
     await supabase.auth.signOut();
   }
 
-  // Sync Initial Static Data to Supabase
-  async function syncInitialData() {
-    if (!window.confirm('This will copy all events and timelines from local files to Supabase. Continue?')) return;
-    setSyncLoading(true);
-    setStatusMessage(null);
 
-    try {
-      let eventCount = 0;
-      let legacyCount = 0;
-      let archiveTimelineCount = 0;
-      let legacyTimelineCount = 0;
-
-      // 1. Sync regular events
-      const mappedEvents = localEvents.map(e => ({
-        img: e.img,
-        title: e.title,
-        subtitle: e.subtitle || '',
-        date: e.date,
-        synopsis: e.synopsis || '',
-        winner: e.winner || '',
-        location: e.location || '',
-        height: e.height || 400,
-        col_span: e.colSpan || 1,
-        status: e.status || 'past',
-        google_form_link: e.google_form_link || null
-      }));
-
-      if (mappedEvents.length > 0) {
-        const { error } = await supabase.from('events').insert(mappedEvents);
-        if (error) throw error;
-        eventCount = mappedEvents.length;
-      }
-
-      // 2. Sync legacy events
-      const mappedLegacy = localLegacyEvents.map(e => ({
-        img: e.img,
-        title: e.title,
-        subtitle: e.subtitle || '',
-        date: e.date,
-        synopsis: e.synopsis || '',
-        winner: e.winner || '',
-        location: e.location || '',
-        height: e.height || 400,
-        col_span: e.colSpan || 1,
-        status: e.status || 'past',
-        google_form_link: e.google_form_link || null
-      }));
-
-      if (mappedLegacy.length > 0) {
-        const { error } = await supabase.from('legacy_events').insert(mappedLegacy);
-        if (error) throw error;
-        legacyCount = mappedLegacy.length;
-      }
-
-      // 3. Sync Archive Timeline
-      if (localArchiveTimeline && localArchiveTimeline.length > 0) {
-        const { error } = await supabase.from('archive_timeline').insert(
-          localArchiveTimeline.map(t => ({
-            year: t.year,
-            title: t.title,
-            badge: t.badge || 'outline',
-            entries: t.entries || []
-          }))
-        );
-        if (error) throw error;
-        archiveTimelineCount = localArchiveTimeline.length;
-      }
-
-      // 4. Sync Legacy Timeline
-      if (localLegacyTimeline && localLegacyTimeline.length > 0) {
-        const { error } = await supabase.from('legacy_timeline').insert(
-          localLegacyTimeline.map(t => ({
-            year: t.year,
-            title: t.title,
-            body: t.body || '',
-            active: t.active || false
-          }))
-        );
-        if (error) throw error;
-        legacyTimelineCount = localLegacyTimeline.length;
-      }
-
-      setStatusMessage({
-        type: 'success',
-        text: `Successfully synced: ${eventCount} events, ${legacyCount} legacy events, ${archiveTimelineCount} archive timeline events, and ${legacyTimelineCount} legacy timeline events.`
-      });
-      fetchData();
-      refreshData('events');
-      refreshData('legacy');
-      refreshData('archive_timeline');
-      refreshData('legacy_timeline');
-    } catch (err) {
-      console.error(err);
-      setStatusMessage({ type: 'error', text: err.message || 'Synchronization failed. Verify database tables exist.' });
-    } finally {
-      setSyncLoading(false);
-    }
-  }
 
   // Open Add/Edit Modal
   function openAddModal() {

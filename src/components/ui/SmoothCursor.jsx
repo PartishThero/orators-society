@@ -80,6 +80,7 @@ export function SmoothCursor({
 }) {
   const lastMousePos = useRef({ x: 0, y: 0 })
   const velocity = useRef({ x: 0, y: 0 })
+  // eslint-disable-next-line react-hooks/purity
   const lastUpdateTime = useRef(Date.now())
   const previousAngle = useRef(0)
   const accumulatedRotation = useRef(0)

@@ -12,12 +12,11 @@ const GALLERY_BUCKET = 'event-images';
 const GALLERY_PREFIX = 'gallery';
 
 export default function ArchiveModal({ isOpen, onClose, item, isAdminEdit = false, onSave, onRegister }) {
-  if (typeof document === 'undefined') return null
-
   const [editItem, setEditItem] = useState(item || {});
 
   useEffect(() => {
     if (item) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setEditItem({
         ...item,
         themes: item.themes || [],

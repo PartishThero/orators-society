@@ -97,8 +97,11 @@ body {
 .card-hover-effect {
   transition: transform 0.4s ease-in-out, background-color 0.4s ease-in-out;
 }
-.card-hover-effect:hover {
-  transform: translateX(8px);
+
+@media (hover: hover) {
+  .card-hover-effect:hover {
+    transform: translateX(8px);
+  }
 }
 
 /* Material Symbols font */

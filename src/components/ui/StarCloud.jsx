@@ -20,14 +20,18 @@ export default function StarCloud(props) {
   // Generate initial stars
   const initialStars = useMemo(() => {
     return Array.from({ length: starCount }, (_, i) => ({
+      // eslint-disable-next-line react-hooks/purity
       x: (Math.random() - 0.5) * cloudSize,
+      // eslint-disable-next-line react-hooks/purity
       y: (Math.random() - 0.5) * cloudSize,
+      // eslint-disable-next-line react-hooks/purity
       z: Math.random() * cloudSize,
       id: i
     }))
   }, [starCount, cloudSize])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStars(initialStars)
   }, [initialStars])
 

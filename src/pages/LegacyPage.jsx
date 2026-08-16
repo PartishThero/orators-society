@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense, useCallback } from 'react'
+import { useState, lazy, Suspense, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
@@ -6,8 +6,6 @@ import SectionWrapper from '../components/layout/SectionWrapper'
 import HorizontalCatalog from '../components/sections/HorizontalCatalog'
 import TimelineSection from '../components/sections/TimelineSection'
 const LegacyModal = lazy(() => import('../components/ui/LegacyModal'))
-import { legacyItems } from '../data/legacy'
-import { legacyTimelineEvents } from '../data/timeline'
 import { spotlightData } from '../data/spotlight'
 import { useData } from '../context/DataContext'
 import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
@@ -67,7 +65,7 @@ color1: "#1A2A40", // Navy Blue anchor
         </SectionWrapper>
 
         {/* ── 1.5. Core Members ── */}
-        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-24 md:py-32 border-t border-white/5">
+        <SectionWrapper className="px-[clamp(1.5rem,7vw,10rem)] py-16 md:py-32 border-t border-white/5">
 
           <div className="max-w-7xl mx-auto relative z-10 w-full flex flex-col items-center text-center">
             
@@ -87,18 +85,19 @@ color1: "#1A2A40", // Navy Blue anchor
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: idx * 0.1, ease: 'easeOut' }}
-                  className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full md:w-[calc(33.333%-1.35rem)] lg:w-[calc(25%-1.5rem)] aspect-[4/5] md:aspect-auto md:h-[400px]"
+                  className="@container group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full md:w-[calc(33.333%-1.35rem)] lg:w-[calc(25%-1.5rem)] aspect-[4/5] md:aspect-auto md:min-h-[400px]"
                 >
                   <img
                     src={person.img}
                     alt={person.name}
                     loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
                   
-                  <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-end text-left z-10">
-                    <h3 className="font-display-xl text-[1.4rem] md:text-[1.8rem] text-white uppercase leading-[1.1] tracking-tight mb-1">
+                  <div className="absolute inset-0 p-6 @sm:p-8 flex flex-col justify-end text-left z-10">
+                    <h3 className="font-display-xl text-[1.4rem] @sm:text-[1.8rem] text-white uppercase leading-[1.1] tracking-tight mb-1">
                       {person.name}
                     </h3>
                     <span className="font-label-caps text-[9px] text-primary tracking-[0.2em] uppercase mb-0 block">
@@ -135,18 +134,19 @@ color1: "#1A2A40", // Navy Blue anchor
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.8, delay: idx * 0.15, ease: 'easeOut' }}
-                  className="group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full aspect-[4/5] md:aspect-auto md:h-[450px]"
+                  className="@container group relative rounded-[2rem] overflow-hidden border border-white/5 bg-[#0D0D0D] w-full aspect-[4/5] md:aspect-auto md:min-h-[450px]"
                 >
                   <img
                     src={person.img}
                     alt={person.name}
                     loading="lazy"
+                    decoding="async"
                     className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-500" />
                   
-                  <div className="absolute inset-0 p-8 md:p-10 flex flex-col justify-end text-left z-10">
-                    <h3 className="font-display-xl text-[1.8rem] md:text-[2.2rem] text-white uppercase leading-[1.1] tracking-tight mb-1">
+                  <div className="absolute inset-0 p-6 @sm:p-8 flex flex-col justify-end text-left z-10">
+                    <h3 className="font-display-xl text-[1.6rem] @sm:text-[2.2rem] text-white uppercase leading-[1.1] tracking-tight mb-1">
                       {person.name}
                     </h3>
                     <span className="font-label-caps text-[10px] text-primary tracking-[0.2em] uppercase mb-0 block">

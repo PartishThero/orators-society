@@ -1,12 +1,10 @@
-import { useState, useEffect, lazy, Suspense, useCallback, useMemo } from 'react'
+import { useState, lazy, Suspense, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import PageLayout from '../components/layout/PageLayout'
 import SectionWrapper from '../components/layout/SectionWrapper'
 import HorizontalCatalog from '../components/sections/HorizontalCatalog'
 import TimelineSection from '../components/sections/TimelineSection'
 
-import { events as localEvents } from '../data/events'
-import { archiveTimelineEvents } from '../data/timeline'
 import { useData } from '../context/DataContext'
 import { MasonrySkeleton, TimelineSkeleton } from '../components/ui/Skeleton'
 
