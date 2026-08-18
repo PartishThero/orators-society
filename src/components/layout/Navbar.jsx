@@ -158,14 +158,14 @@ export default function Navbar() {
               ))}
 
               {/* Recruitment Button */}
-              <button
+              {/* <button
                 onClick={() => setRecruitModalOpen(true)}
                 className="relative px-5 py-2 group overflow-hidden rounded-full border border-[#C5A872]/30 hover:border-[#C5A872] transition-colors duration-400 bg-[#C5A872]/5 hover:bg-[#C5A872]/10"
               >
                 <span className="relative z-10 text-[#C5A872] font-bold group-hover:text-white transition-colors duration-400">
                   RECRUIT
                 </span>
-              </button>
+              </button> */}
             </div>
 
             {/* Hamburger Button for Mobile */}

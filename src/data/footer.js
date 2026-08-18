@@ -6,7 +6,7 @@ export const footerData = {
   },
   contact: {
     label: "Direct Access",
-    email: "access@oratorsociety.org"
+    email: "orators@sst.scaler.com"
   },
   copyright: "© 2026 THE ORATOR SOCIETY. THE ART OF DISRUPTION.",
   socials: [
